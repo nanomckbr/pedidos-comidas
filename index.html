@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pedidos Comidas</title>
+    <style>
+      :root {
+        --bg: #000000;
+        --panel: #09090b;
+        --card: rgba(24, 24, 27, 0.92);
+        --border: rgba(255, 255, 255, 0.1);
+        --text: #ffffff;
+        --muted: #a1a1aa;
+        --accent: #f97316;
+        --accent-soft: rgba(249, 115, 22, 0.18);
+        --green: #22c55e;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      .hero {
+        background: linear-gradient(135deg, #000000 0%, #09090b 55%, #431407 100%);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .container {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .hero-inner {
+        padding: 48px 0 36px;
+      }
+
+      .brand-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+
+      .logo-box {
+        width: 88px;
+        height: 88px;
+        border-radius: 24px;
+        background: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 8px;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+      }
+
+      .logo-inner {
+        width: 100%;
+        height: 100%;
+        border-radius: 18px;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-weight: 900;
+        font-size: 11px;
+        line-height: 1.1;
+        padding: 8px;
+      }
+
+      .logo-inner span {
+        color: var(--accent);
+      }
+
+      .pill {
+        display: inline-block;
+        font-size: 14px;
+        color: #d4d4d8;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 999px;
+        padding: 7px 12px;
+        margin-bottom: 8px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(36px, 6vw, 62px);
+        line-height: 1;
+      }
+
+      .hero p {
+        color: #d4d4d8;
+        max-width: 760px;
+        font-size: 18px;
+        line-height: 1.6;
+        margin: 16px 0 0;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.9fr);
+        gap: 28px;
+        padding: 32px 0 48px;
+      }
+
+      .group {
+        margin-bottom: 34px;
+      }
+
+      .group h2 {
+        margin: 0 0 16px;
+        font-size: 28px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
+      }
+
+      .card-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .card h3 {
+        margin: 0;
+        font-size: 23px;
+      }
+
+      .price-tag {
+        background: var(--accent-soft);
+        color: #ffedd5;
+        font-size: 14px;
+        font-weight: 700;
+        padding: 8px 12px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .desc {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.65;
+        margin: 12px 0 18px;
+      }
+
+      button,
+      .btn-link {
+        border: 0;
+        border-radius: 18px;
+        padding: 14px 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.15s ease;
+      }
+
+      button:hover,
+      .btn-link:hover {
+        transform: scale(1.02);
+      }
+
+      .btn-accent {
+        background: var(--accent);
+        color: #000;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 18px;
+        align-self: start;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 20px;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .sidebar h2 {
+        margin: 0;
+        font-size: 30px;
+      }
+
+      .sidebar .sub {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .empty {
+        margin-top: 18px;
+        padding: 16px;
+        border: 1px dashed var(--border);
+        border-radius: 18px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .cart-item {
+        margin-top: 14px;
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .cart-head,
+      .total-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .cart-head p,
+      .cart-head small,
+      .total-row p {
+        margin: 0;
+      }
+
+      .cart-head small {
+        color: var(--muted);
+      }
+
+      .qty {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .qty button {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        border: 1px solid var(--border);
+        padding: 0;
+        font-size: 20px;
+      }
+
+      .total-wrap {
+        border-top: 1px solid var(--border);
+        margin-top: 18px;
+        padding-top: 18px;
+      }
+
+      .total-row {
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      .field {
+        margin-top: 16px;
+      }
+
+      .field label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: #d4d4d8;
+        font-weight: 700;
+      }
+
+      .field input,
+      .field select,
+      .field textarea {
+        width: 100%;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        color: #fff;
+        padding: 14px 15px;
+        outline: none;
+        font-size: 15px;
+      }
+
+      .field textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+
+      .btn-link {
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        margin-top: 18px;
+      }
+
+      .btn-whatsapp {
+        background: var(--green);
+        color: #000;
+      }
+
+      .btn-disabled {
+        background: #3f3f46;
+        color: #a1a1aa;
+        pointer-events: none;
+      }
+
+      @media (max-width: 920px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: static;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="container hero-inner">
+        <div class="brand-row">
+          <div class="logo-box">
+            <div class="logo-inner">
+              PEDIDOS<br /><span>COMIDAS</span>
+            </div>
+          </div>
+          <div>
+            <div class="pill">Rotisería & Delivery</div>
+            <div style="color:#a1a1aa; font-size:14px;">
+              Hamburguesas con pedido rápido y total automático.
+            </div>
+          </div>
+        </div>
+        <h1>Pedidos Comidas</h1>
+        <p>
+          Elegí tus hamburguesas, agregalas al carrito y enviá tu pedido por WhatsApp con el total calculado automáticamente.
+        </p>
+      </div>
+    </header>
+
+    <main class="container layout">
+      <section></section>
+
+      <aside class="sidebar">
+        <h2>Tu pedido</h2>
+        <p class="sub">El total se calcula solo y luego se manda por WhatsApp.</p>
+
+        <div id="cart-list">
+          <div class="empty">Todavía no agregaste hamburguesas.</div>
+        </div>
+
+        <div class="total-wrap">
+          <div class="total-row">
+            <p>Total</p>
+            <p id="total">$0</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="name">Nombre</label>
+          <input id="name" type="text" placeholder="Tu nombre" />
+        </div>
+
+        <div class="field">
+          <label for="type">Tipo de pedido</label>
+          <select id="type">
+            <option value="delivery">Delivery</option>
+            <option value="retiro en local">Retiro en local</option>
+          </select>
+        </div>
+
+        <div class="field" id="address-field">
+          <label for="address">Dirección</label>
+          <input id="address" type="text" placeholder="Calle, número y referencia" />
+        </div>
+
+        <div class="field">
+          <label for="payment">Forma de pago</label>
+          <select id="payment">
+            <option value="efectivo">Efectivo</option>
+            <option value="transferencia">Transferencia</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="notes">Observaciones</label>
+          <textarea id="notes" placeholder="Sin tomate, llamar al llegar, etc."></textarea>
+        </div>
+
+        <a id="send-order" class="btn-link btn-disabled" href="#">Enviar pedido por WhatsApp</a>
+      </aside>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const phoneNumber = '5493765102837';
+      const supabaseUrl = 'https://ylvmzavgebttklblidcd.supabase.co';
+      const supabaseKey = 'sb_publishable_rFS54R3Uw06tOJ0qxoFhBA_uoEHW457';
+      const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+      const cart = [];
+      let categories = [];
+      let products = [];
+
+      const menuSection = document.querySelector('main section');
+      const cartList = document.getElementById('cart-list');
+      const totalEl = document.getElementById('total');
+      const sendOrder = document.getElementById('send-order');
+      const orderType = document.getElementById('type');
+      const addressField = document.getElementById('address-field');
+
+      function formatPrice(value) {
+        return new Intl.NumberFormat('es-AR', {
+          style: 'currency',
+          currency: 'ARS',
+          maximumFractionDigits: 0
+        }).format(value);
+      }
+
+      function renderMenu() {
+        menuSection.innerHTML = '';
+
+        categories.forEach(category => {
+          const section = document.createElement('div');
+          section.className = 'group';
+
+          const title = document.createElement('h2');
+          title.textContent = category.name;
+          section.appendChild(title);
+
+          const grid = document.createElement('div');
+          grid.className = 'grid';
+
+          const categoryProducts = products
+            .filter(product => product.category_id === category.id && product.is_active)
+            .sort((a, b) => a.sort_order - b.sort_order);
+
+          categoryProducts.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'card';
+            article.innerHTML = `
+              <div>
+                <div class="card-top">
+                  <h3>${item.name}</h3>
+                  <span class="price-tag">${formatPrice(item.price)}</span>
+                </div>
+                <p class="desc">${item.description || ''}</p>
+              </div>
+              <button class="btn-accent" data-id="${item.id}">Agregar al pedido</button>
+            `;
+
+            article
+              .querySelector('button')
+              .addEventListener('click', () => addToCart(item.id));
+
+            grid.appendChild(article);
+          });
+
+          section.appendChild(grid);
+          menuSection.appendChild(section);
+        });
+      }
+
+      function findItem(id) {
+        return products.find(item => item.id === id);
+      }
+
+      function addToCart(id) {
+        const product = findItem(id);
+        if (!product) return;
+
+        const existing = cart.find(item => item.id === id);
+        if (existing) {
+          existing.quantity += 1;
+        } else {
+          cart.push({ ...product, quantity: 1 });
+        }
+
+        renderCart();
+      }
+
+      function changeQty(id, delta) {
+        const item = cart.find(product => product.id === id);
+        if (!item) return;
+
+        item.quantity += delta;
+
+        if (item.quantity <= 0) {
+          const index = cart.findIndex(product => product.id === id);
+          cart.splice(index, 1);
+        }
+
+        renderCart();
+      }
+
+      function getTotal() {
+        return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      }
+
+      function renderCart() {
+        if (!cart.length) {
+          cartList.innerHTML = '<div class="empty">Todavía no agregaste hamburguesas.</div>';
+          totalEl.textContent = formatPrice(0);
+          sendOrder.className = 'btn-link btn-disabled';
+          sendOrder.href = '#';
+          sendOrder.onclick = null;
+          sendOrder.textContent = 'Enviar pedido por WhatsApp';
+          return;
+        }
+
+        cartList.innerHTML = cart
+          .map(item => `
+            <div class="cart-item">
+              <div class="cart-head">
+                <div>
+                  <p><strong>${item.name}</strong></p>
+                  <small>${formatPrice(item.price)} c/u</small>
+                </div>
+                <p><strong>${formatPrice(item.price * item.quantity)}</strong></p>
+              </div>
+              <div class="qty">
+                <button data-id="${item.id}" data-delta="-1">−</button>
+                <strong>${item.quantity}</strong>
+                <button data-id="${item.id}" data-delta="1">+</button>
+              </div>
+            </div>
+          `)
+          .join('');
+
+        cartList.querySelectorAll('.qty button').forEach(button => {
+          button.addEventListener('click', () =>
+            changeQty(Number(button.dataset.id), Number(button.dataset.delta))
+          );
+        });
+
+        const total = getTotal();
+        totalEl.textContent = formatPrice(total);
+
+        sendOrder.href = '#';
+        sendOrder.onclick = (e) => {
+          e.preventDefault();
+          saveOrderAndSendWhatsapp();
+        };
+        sendOrder.className = 'btn-link btn-whatsapp';
+        sendOrder.textContent = 'Enviar pedido por WhatsApp';
+      }
+
+      async function saveOrderAndSendWhatsapp() {
+        if (!cart.length) return;
+
+        const name = document.getElementById('name').value.trim();
+        const type = document.getElementById('type').value;
+        const address = document.getElementById('address').value.trim();
+        const payment = document.getElementById('payment').value;
+        const notes = document.getElementById('notes').value.trim();
+        const total = getTotal();
+
+        if (!name) {
+          alert('Por favor, ingresa tu nombre.');
+          return;
+        }
+
+        if (type === 'delivery' && !address) {
+          alert('Por favor, ingresa la dirección para delivery.');
+          return;
+        }
+
+        sendOrder.textContent = 'Guardando pedido...';
+        sendOrder.className = 'btn-link btn-disabled';
+
+        const { data: orderData, error: orderError } = await supabaseClient
+          .from('orders')
+          .insert([
+            {
+              store_id: 1,
+              customer_name: name,
+              order_type: type,
+              address: type === 'delivery' ? address : null,
+              payment_method: payment,
+              notes: notes || null,
+              total: total,
+              status: 'nuevo'
+            }
+          ])
+          .select()
+          .single();
+
+        if (orderError) {
+          console.error(orderError);
+          alert('No se pudo guardar el pedido.');
+          sendOrder.textContent = 'Enviar pedido por WhatsApp';
+          sendOrder.className = 'btn-link btn-whatsapp';
+          return;
+        }
+
+        const itemsPayload = cart.map(item => ({
+          order_id: orderData.id,
+          product_id: item.id,
+          product_name: item.name,
+          unit_price: item.price,
+          quantity: item.quantity,
+          subtotal: item.price * item.quantity
+        }));
+
+        const { error: itemsError } = await supabaseClient
+          .from('order_items')
+          .insert(itemsPayload);
+
+        if (itemsError) {
+          console.error(itemsError);
+          alert('El pedido principal se guardó, pero fallaron los productos.');
+          sendOrder.textContent = 'Enviar pedido por WhatsApp';
+          sendOrder.className = 'btn-link btn-whatsapp';
+          return;
+        }
+
+        const itemsText = cart
+          .map(item => `- ${item.quantity} x ${item.name} = ${formatPrice(item.price * item.quantity)}`)
+          .join('\n');
+
+        let message = `🍔 Nuevo pedido desde el menú web\n\n`;
+        message += `Pedido N°: ${orderData.id}\n`;
+        message += `Nombre: ${name}\n`;
+        message += `Tipo: ${type}\n`;
+
+        if (type === 'delivery') {
+          message += `Dirección: ${address}\n`;
+        }
+
+        message += `Pedido:\n${itemsText}\n\n`;
+        message += `Total: ${formatPrice(total)}\n`;
+        message += `Forma de pago: ${payment}\n`;
+        message += `Observaciones: ${notes || '-'}\n`;
+
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+
+        sendOrder.textContent = 'Enviar pedido por WhatsApp';
+        sendOrder.className = 'btn-link btn-whatsapp';
+      }
+
+      async function loadMenu() {
+        menuSection.innerHTML = '<div class="empty">Cargando menú...</div>';
+
+        const { data: categoriesData, error: categoriesError } = await supabaseClient
+          .from('categories')
+          .select('*')
+          .order('sort_order', { ascending: true });
+
+        const { data: productsData, error: productsError } = await supabaseClient
+          .from('products')
+          .select('*')
+          .eq('is_active', true)
+          .order('sort_order', { ascending: true });
+
+        if (categoriesError || productsError) {
+          menuSection.innerHTML = '<div class="empty">No se pudo cargar el menú desde Supabase.</div>';
+          console.error(categoriesError || productsError);
+          return;
+        }
+
+        categories = categoriesData || [];
+        products = productsData || [];
+        renderMenu();
+      }
+
+      orderType.addEventListener('change', () => {
+        addressField.style.display = orderType.value === 'delivery' ? 'block' : 'none';
+        renderCart();
+      });
+
+      ['name', 'address', 'payment', 'notes'].forEach(id => {
+        document.getElementById(id).addEventListener('input', renderCart);
+        document.getElementById(id).addEventListener('change', renderCart);
+      });
+
+      loadMenu();
+      renderCart();
+    </script>
+  </body>
+</html>
