@@ -1,165 +1,628 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Login Admin — Pedidos Comidas</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pedidos Comidas</title>
+    <style>
+      :root {
+        --bg: #000000;
+        --panel: #09090b;
+        --card: rgba(24, 24, 27, 0.92);
+        --border: rgba(255, 255, 255, 0.1);
+        --text: #ffffff;
+        --muted: #a1a1aa;
+        --accent: #f97316;
+        --accent-soft: rgba(249, 115, 22, 0.18);
+        --green: #22c55e;
+      }
 
-<style>
+      * {
+        box-sizing: border-box;
+      }
 
-:root{
---bg:#000;
---panel:#09090b;
---border:rgba(255,255,255,.1);
---text:#fff;
---muted:#a1a1aa;
---accent:#f97316;
-}
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
 
-*{box-sizing:border-box;}
+      .hero {
+        background: linear-gradient(135deg, #000000 0%, #09090b 55%, #431407 100%);
+        border-bottom: 1px solid var(--border);
+      }
 
-body{
-margin:0;
-min-height:100vh;
-display:grid;
-place-items:center;
-background:linear-gradient(135deg,#000 0%,#09090b 55%,#431407 100%);
-color:var(--text);
-font-family:Arial,Helvetica,sans-serif;
-}
+      .container {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+      }
 
-.card{
-width:min(420px,calc(100% - 32px));
-background:rgba(24,24,27,.96);
-border:1px solid var(--border);
-border-radius:18px;
-padding:14px;
-}
+      .hero-inner {
+        padding: 48px 0 36px;
+      }
 
-h1{
-margin:0 0 8px;
-font-size:34px;
-}
+      .brand-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
 
-p{
-margin:0 0 20px;
-color:var(--muted);
-}
+      .logo-box {
+        width: 88px;
+        height: 88px;
+        border-radius: 24px;
+        background: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 8px;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+      }
 
-label{
-display:block;
-margin:14px 0 8px;
-font-weight:700;
-}
+      .logo-inner {
+        width: 100%;
+        height: 100%;
+        border-radius: 18px;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-weight: 900;
+        font-size: 11px;
+        line-height: 1.1;
+        padding: 8px;
+      }
 
-input{
-width:100%;
-border-radius:16px;
-border:1px solid var(--border);
-background:rgba(255,255,255,.04);
-color:#fff;
-padding:14px 15px;
-font-size:15px;
-outline:none;
-}
+      .logo-inner span {
+        color: var(--accent);
+      }
 
-button{
-width:100%;
-margin-top:18px;
-border:0;
-border-radius:16px;
-padding:14px 16px;
-font-weight:700;
-cursor:pointer;
-background:var(--accent);
-color:#000;
-}
+      .pill {
+        display: inline-block;
+        font-size: 14px;
+        color: #d4d4d8;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 999px;
+        padding: 7px 12px;
+        margin-bottom: 8px;
+      }
 
-.error{
-margin-top:14px;
-color:#fca5a5;
-min-height:20px;
-}
+      h1 {
+        margin: 0;
+        font-size: clamp(36px, 6vw, 62px);
+        line-height: 1;
+      }
 
-</style>
-</head>
+      .hero p {
+        color: #d4d4d8;
+        max-width: 760px;
+        font-size: 18px;
+        line-height: 1.6;
+        margin: 16px 0 0;
+      }
 
-<body>
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.9fr);
+        gap: 28px;
+        padding: 32px 0 48px;
+      }
 
-<div class="card">
+      .section-title {
+        font-size: 30px;
+        margin: 0 0 16px;
+      }
 
-<h1>Login admin</h1>
-<p>Acceso privado a pedidos y gestión.</p>
+      .group {
+        margin-bottom: 34px;
+      }
 
-<form id="login-form">
+      .group h2 {
+        margin: 0 0 16px;
+        font-size: 28px;
+      }
 
-<label>Email</label>
-<input id="email" type="email" required />
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
 
-<label>Contraseña</label>
-<input id="password" type="password" required />
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
+      }
 
-<button type="submit" id="login-btn">Entrar</button>
+      .card-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+      }
 
-<div class="error" id="error-box"></div>
+      .card h3 {
+        margin: 0;
+        font-size: 23px;
+      }
 
-</form>
+      .price-tag {
+        background: var(--accent-soft);
+        color: #ffedd5;
+        font-size: 14px;
+        font-weight: 700;
+        padding: 8px 12px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
 
-</div>
+      .desc {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.65;
+        margin: 12px 0 18px;
+      }
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+      button,
+      .btn-link {
+        border: 0;
+        border-radius: 18px;
+        padding: 14px 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.15s ease;
+      }
 
-<script>
+      button:hover,
+      .btn-link:hover {
+        transform: scale(1.02);
+      }
 
-const supabaseUrl='https://ylvmzavgebttklblidcd.supabase.co';
-const supabaseKey='sb_publishable_rFS54R3Uw06tOJ0qxoFhBA_uoEHW457';
+      .btn-accent {
+        background: var(--accent);
+        color: #000;
+      }
 
-const supabaseClient=supabase.createClient(supabaseUrl,supabaseKey);
+      .sidebar {
+        position: sticky;
+        top: 18px;
+        align-self: start;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 20px;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+      }
 
-const form=document.getElementById('login-form');
-const btn=document.getElementById('login-btn');
-const errorBox=document.getElementById('error-box');
+      .sidebar h2 {
+        margin: 0;
+        font-size: 30px;
+      }
 
+      .sidebar .sub {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
 
-/* si ya hay sesión ir al admin */
+      .empty {
+        margin-top: 18px;
+        padding: 16px;
+        border: 1px dashed var(--border);
+        border-radius: 18px;
+        color: var(--muted);
+        font-size: 14px;
+      }
 
-supabaseClient.auth.getSession().then(({data})=>{
-if(data.session){
-window.location.href='/admin';
-}
-});
+      .cart-item {
+        margin-top: 14px;
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.03);
+      }
 
+      .cart-head,
+      .total-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
 
-form.addEventListener('submit',async(e)=>{
+      .cart-head p,
+      .cart-head small,
+      .total-row p {
+        margin: 0;
+      }
 
-e.preventDefault();
+      .cart-head small {
+        color: var(--muted);
+      }
 
-errorBox.textContent='';
-btn.textContent='Entrando...';
-btn.disabled=true;
+      .qty {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 12px;
+      }
 
-const email=document.getElementById('email').value.trim();
-const password=document.getElementById('password').value;
+      .qty button {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        border: 1px solid var(--border);
+        padding: 0;
+        font-size: 20px;
+      }
 
-const {error}=await supabaseClient.auth.signInWithPassword({
-email,
-password
-});
+      .total-wrap {
+        border-top: 1px solid var(--border);
+        margin-top: 18px;
+        padding-top: 18px;
+      }
 
-if(error){
+      .total-row {
+        font-size: 22px;
+        font-weight: 700;
+      }
 
-errorBox.textContent='Credenciales incorrectas o usuario inexistente.';
-btn.textContent='Entrar';
-btn.disabled=false;
-return;
+      .field {
+        margin-top: 16px;
+      }
 
-}
+      .field label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: #d4d4d8;
+        font-weight: 700;
+      }
 
-window.location.href='/admin';
+      .field input,
+      .field select,
+      .field textarea {
+        width: 100%;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        color: #fff;
+        padding: 14px 15px;
+        outline: none;
+        font-size: 15px;
+      }
 
-});
+      .field textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
 
-</script>
+      .btn-link {
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        margin-top: 18px;
+      }
 
-</body>
+      .btn-whatsapp {
+        background: var(--green);
+        color: #000;
+      }
+
+      .btn-disabled {
+        background: #3f3f46;
+        color: #a1a1aa;
+        pointer-events: none;
+      }
+
+      @media (max-width: 920px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: static;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="container hero-inner">
+        <div class="brand-row">
+          <div class="logo-box">
+            <div class="logo-inner">
+              PEDIDOS<br /><span>COMIDAS</span>
+            </div>
+          </div>
+          <div>
+            <div class="pill">Rotisería & Delivery</div>
+            <div style="color:#a1a1aa; font-size:14px;">Hamburguesas con pedido rápido y total automático.</div>
+          </div>
+        </div>
+        <h1>Pedidos Comidas</h1>
+        <p>
+          Elegí tus hamburguesas, agregalas al carrito y enviá tu pedido por WhatsApp con el total calculado automáticamente.
+        </p>
+      </div>
+    </header>
+
+    <main class="container layout">
+      <section>
+        <div class="group">
+          <h2>Hamburguesas Clásicas</h2>
+          <div class="grid" id="clasicas"></div>
+        </div>
+
+        <div class="group">
+          <h2>Hamburguesas Gourmet (incluyen papas fritas)</h2>
+          <div class="grid" id="gourmet"></div>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <h2>Tu pedido</h2>
+        <p class="sub">El total se calcula solo y luego se manda por WhatsApp.</p>
+
+        <div id="cart-list">
+          <div class="empty">Todavía no agregaste hamburguesas.</div>
+        </div>
+
+        <div class="total-wrap">
+          <div class="total-row">
+            <p>Total</p>
+            <p id="total">$0</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="name">Nombre</label>
+          <input id="name" type="text" placeholder="Tu nombre" />
+        </div>
+
+        <div class="field">
+          <label for="type">Tipo de pedido</label>
+          <select id="type">
+            <option value="delivery">Delivery</option>
+            <option value="retiro en local">Retiro en local</option>
+          </select>
+        </div>
+
+        <div class="field" id="address-field">
+          <label for="address">Dirección</label>
+          <input id="address" type="text" placeholder="Calle, número y referencia" />
+        </div>
+
+        <div class="field">
+          <label for="payment">Forma de pago</label>
+          <select id="payment">
+            <option value="efectivo">Efectivo</option>
+            <option value="transferencia">Transferencia</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="notes">Observaciones</label>
+          <textarea id="notes" placeholder="Sin tomate, llamar al llegar, etc."></textarea>
+        </div>
+
+        <a id="send-order" class="btn-link btn-disabled" href="#">Enviar pedido por WhatsApp</a>
+      </aside>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const phoneNumber = '5493765102837';
+      const supabaseUrl = 'https://ylvmzavgebttklblidcd.supabase.co';
+      const supabaseKey = 'sb_publishable_rFS54R3Uw06tOJ0qxoFhBA_uoEHW457';
+      const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+      const cart = [];
+      let categories = [];
+      let products = [];
+
+      const menuSection = document.querySelector('main section');
+      const cartList = document.getElementById('cart-list');
+      const totalEl = document.getElementById('total');
+      const sendOrder = document.getElementById('send-order');
+      const orderType = document.getElementById('type');
+      const addressField = document.getElementById('address-field');
+
+      function formatPrice(value) {
+        return new Intl.NumberFormat('es-AR', {
+          style: 'currency',
+          currency: 'ARS',
+          maximumFractionDigits: 0
+        }).format(value);
+      }
+
+      function slugify(text) {
+        return text
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+      }
+
+      function renderMenu() {
+        menuSection.innerHTML = '';
+
+        categories.forEach(category => {
+          const section = document.createElement('div');
+          section.className = 'group';
+
+          const title = document.createElement('h2');
+          title.textContent = category.name;
+          section.appendChild(title);
+
+          const grid = document.createElement('div');
+          grid.className = 'grid';
+
+          const categoryProducts = products
+            .filter(product => product.category_id === category.id && product.is_active)
+            .sort((a, b) => a.sort_order - b.sort_order);
+
+          categoryProducts.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'card';
+            article.innerHTML = `
+              <div>
+                <div class="card-top">
+                  <h3>${item.name}</h3>
+                  <span class="price-tag">${formatPrice(item.price)}</span>
+                </div>
+                <p class="desc">${item.description || ''}</p>
+              </div>
+              <button class="btn-accent" data-id="${item.id}">Agregar al pedido</button>
+            `;
+
+            article.querySelector('button').addEventListener('click', () => addToCart(item.id));
+            grid.appendChild(article);
+          });
+
+          section.appendChild(grid);
+          menuSection.appendChild(section);
+        });
+      }
+
+      function findItem(id) {
+        return products.find(item => item.id === id);
+      }
+
+      function addToCart(id) {
+        const product = findItem(id);
+        if (!product) return;
+
+        const existing = cart.find(item => item.id === id);
+        if (existing) {
+          existing.quantity += 1;
+        } else {
+          cart.push({ ...product, quantity: 1 });
+        }
+
+        renderCart();
+      }
+
+      function changeQty(id, delta) {
+        const item = cart.find(product => product.id === id);
+        if (!item) return;
+
+        item.quantity += delta;
+
+        if (item.quantity <= 0) {
+          const index = cart.findIndex(product => product.id === id);
+          cart.splice(index, 1);
+        }
+
+        renderCart();
+      }
+
+      function getTotal() {
+        return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      }
+
+      function renderCart() {
+        if (!cart.length) {
+          cartList.innerHTML = '<div class="empty">Todavía no agregaste hamburguesas.</div>';
+          totalEl.textContent = formatPrice(0);
+          sendOrder.className = 'btn-link btn-disabled';
+          sendOrder.href = '#';
+          return;
+        }
+
+        cartList.innerHTML = cart.map(item => `
+          <div class="cart-item">
+            <div class="cart-head">
+              <div>
+                <p><strong>${item.name}</strong></p>
+                <small>${formatPrice(item.price)} c/u</small>
+              </div>
+              <p><strong>${formatPrice(item.price * item.quantity)}</strong></p>
+            </div>
+            <div class="qty">
+              <button data-id="${item.id}" data-delta="-1">−</button>
+              <strong>${item.quantity}</strong>
+              <button data-id="${item.id}" data-delta="1">+</button>
+            </div>
+          </div>
+        `).join('');
+
+        cartList.querySelectorAll('.qty button').forEach(button => {
+          button.addEventListener('click', () => changeQty(Number(button.dataset.id), Number(button.dataset.delta)));
+        });
+
+        const total = getTotal();
+        totalEl.textContent = formatPrice(total);
+
+        const name = document.getElementById('name').value.trim();
+        const type = document.getElementById('type').value;
+        const address = document.getElementById('address').value.trim();
+        const payment = document.getElementById('payment').value;
+        const notes = document.getElementById('notes').value.trim();
+
+        const itemsText = cart.map(item => `- ${item.quantity} x ${item.name} = ${formatPrice(item.price * item.quantity)}`).join('\n');
+
+        let message = `🍔 Nuevo pedido desde el menú web\n\n`;
+        message += `Nombre: ${name}\n`;
+        message += `Tipo: ${type}\n`;
+        if (type === 'delivery') message += `Dirección: ${address}\n`;
+        message += `Pedido:\n${itemsText}\n\n`;
+        message += `Total: ${formatPrice(total)}\n`;
+        message += `Forma de pago: ${payment}\n`;
+        message += `Observaciones: ${notes || '-'}\n`;
+
+        sendOrder.href = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        sendOrder.className = 'btn-link btn-whatsapp';
+      }
+
+      async function loadMenu() {
+        menuSection.innerHTML = '<div class="empty">Cargando menú...</div>';
+
+        const { data: categoriesData, error: categoriesError } = await supabaseClient
+          .from('categories')
+          .select('*')
+          .order('sort_order', { ascending: true });
+
+        const { data: productsData, error: productsError } = await supabaseClient
+          .from('products')
+          .select('*')
+          .eq('is_active', true)
+          .order('sort_order', { ascending: true });
+
+        if (categoriesError || productsError) {
+          menuSection.innerHTML = '<div class="empty">No se pudo cargar el menú desde Supabase.</div>';
+          console.error(categoriesError || productsError);
+          return;
+        }
+
+        categories = categoriesData || [];
+        products = productsData || [];
+        renderMenu();
+      }
+
+      orderType.addEventListener('change', () => {
+        addressField.style.display = orderType.value === 'delivery' ? 'block' : 'none';
+        renderCart();
+      });
+
+      ['name', 'address', 'payment', 'notes'].forEach(id => {
+        document.getElementById(id).addEventListener('input', renderCart);
+        document.getElementById(id).addEventListener('change', renderCart);
+      });
+
+      loadMenu();
+      renderCart();
+    </script>
+  </body>
 </html>
