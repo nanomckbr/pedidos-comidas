@@ -616,9 +616,9 @@
       refreshBtn.addEventListener('click', loadOrders);
 
       logoutBtn.addEventListener('click', async () => {
-  await supabaseClient.auth.signOut();
-  window.location.href = '/login';
-});
+        await supabaseClient.auth.signOut();
+        window.location.href = '/login';
+      });
 
       toggleAutorefreshBtn.addEventListener('click', () => {
         autoRefreshEnabled = !autoRefreshEnabled;
