@@ -336,9 +336,6 @@
       let autoRefreshInterval = null;
       let knownOrderIds = new Set();
 
-      const DAY_CUT_KEY = 'pedidoscomidas_day_cut';
-      const DAY_RESET_KEY = 'pedidoscomidas_day_reset';
-
       function formatPrice(value) {
         return new Intl.NumberFormat('es-AR', {
           style: 'currency',
@@ -359,37 +356,63 @@
         return `status-${status}`;
       }
 
-      function getDayCut() {
-        const saved = localStorage.getItem(DAY_CUT_KEY);
-        if (saved) return new Date(saved);
+      async function ensureStoreSettings() {
+        const { data, error } = await supabaseClient
+          .from('store_settings')
+          .select('*')
+          .eq('store_id', 1)
+          .limit(1);
 
-        const now = new Date();
-        now.setHours(0, 0, 0, 0);
-        localStorage.setItem(DAY_CUT_KEY, now.toISOString());
-        return now;
+        if (error) {
+          console.error('Error leyendo store_settings:', error);
+          return null;
+        }
+
+        if (data && data.length > 0) return data[0];
+
+        const now = new Date().toISOString();
+        const { data: inserted, error: insertError } = await supabaseClient
+          .from('store_settings')
+          .insert([{ store_id: 1, day_cutoff: now }])
+          .select()
+          .single();
+
+        if (insertError) {
+          console.error('Error creando store_settings:', insertError);
+          return null;
+        }
+
+        return inserted;
       }
 
-      function getDayReset() {
-        const saved = localStorage.getItem(DAY_RESET_KEY);
-        if (saved) return new Date(saved);
-
-        const now = new Date();
-        now.setHours(0, 0, 0, 0);
-        localStorage.setItem(DAY_RESET_KEY, now.toISOString());
-        return now;
+      async function getDayCut() {
+        const settings = await ensureStoreSettings();
+        if (!settings || !settings.day_cutoff) return new Date();
+        return new Date(settings.day_cutoff);
       }
 
-      function setDayCutNow() {
-        const now = new Date();
-        localStorage.setItem(DAY_CUT_KEY, now.toISOString());
-        localStorage.setItem(DAY_RESET_KEY, now.toISOString());
-        updateDayCutInfo();
+      async function setDayCutNow() {
+        const now = new Date().toISOString();
+
+        const { error } = await supabaseClient
+          .from('store_settings')
+          .update({ day_cutoff: now, updated_at: now })
+          .eq('store_id', 1);
+
+        if (error) {
+          console.error('Error actualizando day_cutoff:', error);
+          alert('No se pudo reiniciar el día.');
+          return false;
+        }
+
+        await updateDayCutInfo();
+        knownOrderIds = new Set();
+        return true;
       }
 
-      function updateDayCutInfo() {
-        const cut = getDayCut();
-        const reset = getDayReset();
-        dayCutInfoEl.textContent = `Corte del día: ${cut.toLocaleString('es-AR')} · Reset visible desde: ${reset.toLocaleString('es-AR')}`;
+      async function updateDayCutInfo() {
+        const cut = await getDayCut();
+        dayCutInfoEl.textContent = `Corte del día: ${cut.toLocaleString('es-AR')}`;
       }
 
       function playNewOrderSound() {
@@ -397,9 +420,9 @@
           const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
           const notes = [
-            { freq: 880, start: 0.00, duration: 0.18, gain: 0.16 },
-            { freq: 988, start: 0.20, duration: 0.18, gain: 0.16 },
-            { freq: 1174, start: 0.40, duration: 0.26, gain: 0.18 }
+            { freq: 740, start: 0.00, duration: 0.22, gain: 0.14 },
+            { freq: 880, start: 0.24, duration: 0.24, gain: 0.15 },
+            { freq: 1047, start: 0.52, duration: 0.34, gain: 0.18 }
           ];
 
           notes.forEach(note => {
@@ -410,7 +433,7 @@
             oscillator.frequency.setValueAtTime(note.freq, audioContext.currentTime + note.start);
 
             gainNode.gain.setValueAtTime(0.001, audioContext.currentTime + note.start);
-            gainNode.gain.exponentialRampToValueAtTime(note.gain, audioContext.currentTime + note.start + 0.03);
+            gainNode.gain.exponentialRampToValueAtTime(note.gain, audioContext.currentTime + note.start + 0.04);
             gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + note.start + note.duration);
 
             oscillator.connect(gainNode);
@@ -426,37 +449,25 @@
 
       function detectNewOrders(orders) {
         const currentIds = new Set(orders.map(order => order.id));
-
         if (knownOrderIds.size > 0) {
           const hasNew = [...currentIds].some(id => !knownOrderIds.has(id));
           if (hasNew) playNewOrderSound();
         }
-
         knownOrderIds = currentIds;
       }
 
       function sortOrders(orders) {
-        const priority = {
-          nuevo: 1,
-          preparando: 2,
-          enviado: 3,
-          entregado: 4,
-          cancelado: 5
-        };
-
+        const priority = { nuevo: 1, preparando: 2, enviado: 3, entregado: 4, cancelado: 5 };
         return [...orders].sort((a, b) => {
           const pA = priority[a.status] || 99;
           const pB = priority[b.status] || 99;
-
           if (pA !== pB) return pA - pB;
-
           return new Date(b.created_at) - new Date(a.created_at);
         });
       }
 
-      function buildStats(orders) {
-        const cut = getDayCut();
-
+      async function buildStats(orders) {
+        const cut = await getDayCut();
         const ventasDelDia = orders
           .filter(order => order.status === 'entregado' && new Date(order.created_at) >= cut)
           .reduce((sum, order) => sum + (order.total || 0), 0);
@@ -484,8 +495,6 @@
 
       function renderOrders(orders, items) {
         const sortedOrders = sortOrders(orders);
-        buildStats(sortedOrders);
-
         if (!sortedOrders.length) {
           ordersContainer.innerHTML = '<div class="empty">Todavía no hay pedidos guardados.</div>';
           return;
@@ -493,7 +502,6 @@
 
         ordersContainer.innerHTML = sortedOrders.map(order => {
           const orderItems = items.filter(item => item.order_id === order.id);
-
           const itemsHtml = orderItems.length
             ? `
               <div class="items">
@@ -581,17 +589,18 @@
           return;
         }
 
-        const resetPoint = getDayReset();
+        const cut = await getDayCut();
         const allOrders = ordersData || [];
-        const visibleOrders = allOrders.filter(order => new Date(order.created_at) >= resetPoint);
+        const visibleOrders = allOrders.filter(order => new Date(order.created_at) >= cut);
         const visibleOrderIds = new Set(visibleOrders.map(order => order.id));
         const visibleItems = (itemsData || []).filter(item => visibleOrderIds.has(item.order_id));
 
         detectNewOrders(visibleOrders);
+        await buildStats(visibleOrders);
         renderOrders(visibleOrders, visibleItems);
 
         updatedAtEl.textContent = `Última actualización: ${new Date().toLocaleTimeString('es-AR')}`;
-        updateDayCutInfo();
+        await updateDayCutInfo();
       }
 
       function startAutoRefresh() {
@@ -613,7 +622,6 @@
 
       toggleAutorefreshBtn.addEventListener('click', () => {
         autoRefreshEnabled = !autoRefreshEnabled;
-
         if (autoRefreshEnabled) {
           startAutoRefresh();
           toggleAutorefreshBtn.textContent = 'Auto refresh: ON';
@@ -623,19 +631,19 @@
         }
       });
 
-      resetDayBtn.addEventListener('click', () => {
+      resetDayBtn.addEventListener('click', async () => {
         const ok = confirm('¿Seguro que quieres reiniciar el día? Se ocultarán de la vista todos los pedidos recibidos hasta este momento.');
         if (!ok) return;
-
-        setDayCutNow();
-        loadOrders();
+        const updated = await setDayCutNow();
+        if (!updated) return;
+        await loadOrders();
       });
 
       (async () => {
         const allowed = await requireAuth();
         if (!allowed) return;
-
-        loadOrders();
+        await ensureStoreSettings();
+        await loadOrders();
         startAutoRefresh();
       })();
     </script>
