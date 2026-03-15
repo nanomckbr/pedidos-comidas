@@ -91,7 +91,7 @@
       // Si ya hay sesión, manda al admin
       supabaseClient.auth.getSession().then(({ data }) => {
         if (data.session) {
-          window.location.href = '/admin.html';
+          window.location.href = '/admin';
         }
       });
 
@@ -116,7 +116,7 @@
           return;
         }
 
-        window.location.href = '/admin';
+        window.location.href = '/admin.html';
       });
     </script>
   </body>
