@@ -408,10 +408,32 @@
         return created;
       }
 
-      function fileToBase64(file) {
+      function resizeImageToDataUrl(file, maxSize = 420, quality = 0.82) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
+          reader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              let { width, height } = img;
+
+              if (width > height && width > maxSize) {
+                height = Math.round((height * maxSize) / width);
+                width = maxSize;
+              } else if (height >= width && height > maxSize) {
+                width = Math.round((width * maxSize) / height);
+                height = maxSize;
+              }
+
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+              resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.onerror = reject;
+            img.src = reader.result;
+          };
           reader.onerror = reject;
           reader.readAsDataURL(file);
         });
@@ -439,15 +461,15 @@
         }
 
         saveLogoFeedback.className = 'save-note';
-        saveLogoFeedback.textContent = 'Guardando logo...';
+        saveLogoFeedback.textContent = 'Procesando y guardando logo...';
 
         try {
-          const base64Image = await fileToBase64(file);
+          const compressedImage = await resizeImageToDataUrl(file);
 
           const { error } = await supabaseClient
             .from('store_settings')
             .update({
-              logo_image: base64Image
+              logo_image: compressedImage
             })
             .eq('store_id', 1);
 
@@ -458,14 +480,14 @@
             return;
           }
 
-          logoPreview.src = base64Image;
+          logoPreview.src = compressedImage;
           logoPreviewWrap.style.display = 'block';
           saveLogoFeedback.className = 'save-note ok';
           saveLogoFeedback.textContent = 'Logo guardado correctamente.';
         } catch (err) {
           console.error(err);
           saveLogoFeedback.className = 'save-note error';
-          saveLogoFeedback.textContent = 'No se pudo leer la imagen.';
+          saveLogoFeedback.textContent = 'No se pudo procesar la imagen.';
         }
       }
 
@@ -491,21 +513,7 @@
         logoPreviewWrap.style.display = 'none';
         saveLogoFeedback.className = 'save-note ok';
         saveLogoFeedback.textContent = 'Logo quitado correctamente.';
-      })
-          .eq('store_id', 1);
-
-        if (error) {
-          console.error(error);
-          saveLogoFeedback.className = 'save-note error';
-          saveLogoFeedback.textContent = 'No se pudo guardar el logo.';
-          return;
-        }
-
-        saveLogoFeedback.className = 'save-note ok';
-        saveLogoFeedback.textContent = 'Logo guardado correctamente.';
       }
-
-
 
       function formatDate(value) {
         const date = new Date(value);
@@ -768,15 +776,16 @@
         await removeBrandingImage();
       });
 
-      logoImageInput.addEventListener('change', () => {
+      logoImageInput.addEventListener('change', async () => {
         const file = logoImageInput.files?.[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          logoPreview.src = reader.result;
+        try {
+          const previewData = await resizeImageToDataUrl(file, 220, 0.8);
+          logoPreview.src = previewData;
           logoPreviewWrap.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
+        } catch (err) {
+          console.error(err);
+        }
       });
 
       logoutBtn.addEventListener('click', async () => {
