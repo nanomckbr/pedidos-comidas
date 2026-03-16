@@ -247,6 +247,10 @@
         font-size: 14px;
       }
 
+      .field input[type="file"] {
+        padding: 8px;
+      }
+
       .save-note {
         margin-top: 12px;
         font-size: 13px;
@@ -304,23 +308,24 @@
       <section class="settings-card">
         <small style="display:block;color:var(--muted);margin-bottom:8px;">Branding</small>
         <strong style="font-size:24px;">Editar logo de la página</strong>
-        <div class="updated-at" style="margin-top:8px;">Cambia las dos líneas del logo que ve el cliente arriba del menú.</div>
+        <div class="updated-at" style="margin-top:8px;">Sube una imagen para reemplazar el logo que ve el cliente arriba del menú.</div>
 
         <div class="settings-grid">
-          <div class="field">
-            <label for="logo-line-1-input">Línea 1 del logo</label>
-            <input id="logo-line-1-input" type="text" placeholder="Ej: PEDIDOS" />
-          </div>
-
-          <div class="field">
-            <label for="logo-line-2-input">Línea 2 del logo</label>
-            <input id="logo-line-2-input" type="text" placeholder="Ej: COMIDAS" />
+          <div class="field" style="grid-column: 1 / -1;">
+            <label for="logo-image-input">Seleccionar imagen</label>
+            <input id="logo-image-input" type="file" accept="image/*" />
           </div>
         </div>
 
         <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
           <button class="btn-accent" id="save-logo-btn">Guardar logo</button>
+          <button class="btn-dark" id="remove-logo-btn" type="button">Quitar logo</button>
           <div id="save-logo-feedback" class="save-note"></div>
+        </div>
+
+        <div id="logo-preview-wrap" style="margin-top:14px;display:none;">
+          <div class="updated-at" style="margin-bottom:8px;">Vista previa</div>
+          <img id="logo-preview" alt="Vista previa del logo" style="max-width:140px;max-height:140px;border-radius:18px;border:1px solid var(--border);background:#111;padding:8px;object-fit:contain;" />
         </div>
       </section>
 
@@ -356,10 +361,12 @@
       const statNuevo = document.getElementById('stat-nuevo');
       const statPreparando = document.getElementById('stat-preparando');
       const statVentas = document.getElementById('stat-ventas');
-      const logoLine1Input = document.getElementById('logo-line-1-input');
-      const logoLine2Input = document.getElementById('logo-line-2-input');
+      const logoImageInput = document.getElementById('logo-image-input');
       const saveLogoBtn = document.getElementById('save-logo-btn');
+      const removeLogoBtn = document.getElementById('remove-logo-btn');
       const saveLogoFeedback = document.getElementById('save-logo-feedback');
+      const logoPreviewWrap = document.getElementById('logo-preview-wrap');
+      const logoPreview = document.getElementById('logo-preview');
 
       let autoRefreshEnabled = true;
       let autoRefreshInterval = null;
@@ -401,23 +408,90 @@
         return created;
       }
 
+      function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
       async function loadBrandingSettings() {
         const settings = await ensureStoreSettingsRow();
         if (!settings) return;
-        logoLine1Input.value = settings.logo_line_1 || 'PEDIDOS';
-        logoLine2Input.value = settings.logo_line_2 || 'COMIDAS';
+
+        if (settings.logo_image) {
+          logoPreview.src = settings.logo_image;
+          logoPreviewWrap.style.display = 'block';
+        } else {
+          logoPreviewWrap.style.display = 'none';
+        }
       }
 
       async function saveBrandingSettings() {
+        const file = logoImageInput.files?.[0];
+
+        if (!file) {
+          saveLogoFeedback.className = 'save-note error';
+          saveLogoFeedback.textContent = 'Selecciona una imagen primero.';
+          return;
+        }
+
         saveLogoFeedback.className = 'save-note';
         saveLogoFeedback.textContent = 'Guardando logo...';
+
+        try {
+          const base64Image = await fileToBase64(file);
+
+          const { error } = await supabaseClient
+            .from('store_settings')
+            .update({
+              logo_image: base64Image
+            })
+            .eq('store_id', 1);
+
+          if (error) {
+            console.error(error);
+            saveLogoFeedback.className = 'save-note error';
+            saveLogoFeedback.textContent = 'No se pudo guardar el logo.';
+            return;
+          }
+
+          logoPreview.src = base64Image;
+          logoPreviewWrap.style.display = 'block';
+          saveLogoFeedback.className = 'save-note ok';
+          saveLogoFeedback.textContent = 'Logo guardado correctamente.';
+        } catch (err) {
+          console.error(err);
+          saveLogoFeedback.className = 'save-note error';
+          saveLogoFeedback.textContent = 'No se pudo leer la imagen.';
+        }
+      }
+
+      async function removeBrandingImage() {
+        saveLogoFeedback.className = 'save-note';
+        saveLogoFeedback.textContent = 'Quitando logo...';
 
         const { error } = await supabaseClient
           .from('store_settings')
           .update({
-            logo_line_1: logoLine1Input.value.trim() || 'PEDIDOS',
-            logo_line_2: logoLine2Input.value.trim() || 'COMIDAS'
+            logo_image: null
           })
+          .eq('store_id', 1);
+
+        if (error) {
+          console.error(error);
+          saveLogoFeedback.className = 'save-note error';
+          saveLogoFeedback.textContent = 'No se pudo quitar el logo.';
+          return;
+        }
+
+        logoImageInput.value = '';
+        logoPreviewWrap.style.display = 'none';
+        saveLogoFeedback.className = 'save-note ok';
+        saveLogoFeedback.textContent = 'Logo quitado correctamente.';
+      })
           .eq('store_id', 1);
 
         if (error) {
@@ -688,6 +762,21 @@
 
       saveLogoBtn.addEventListener('click', async () => {
         await saveBrandingSettings();
+      });
+
+      removeLogoBtn.addEventListener('click', async () => {
+        await removeBrandingImage();
+      });
+
+      logoImageInput.addEventListener('change', () => {
+        const file = logoImageInput.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          logoPreview.src = reader.result;
+          logoPreviewWrap.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
       });
 
       logoutBtn.addEventListener('click', async () => {
