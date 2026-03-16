@@ -120,6 +120,8 @@
 
       .category-chip,
       .subcategory-chip {
+        white-space: normal;
+        line-height: 1.2;
         border: 1px solid var(--border);
         background: rgba(255, 255, 255, 0.04);
         color: #fff;
@@ -130,22 +132,24 @@
       }
 
       .subcategory-chip {
+        white-space: normal;
+        line-height: 1.2;
         padding: 8px 12px;
         font-size: 13px;
       }
 
       .subcategory-nav.subcategory-highlighted {
         padding: 12px;
-        border: 1px solid rgba(234, 179, 8, 0.2);
+        border: 1px solid rgba(239,68,68,0.25);
         border-radius: 18px;
-        background: rgba(234, 179, 8, 0.06);
+        background: rgba(239,68,68,0.05);
       }
 
       .subcategory-label {
         display: block;
         margin-top: 16px;
         margin-bottom: 10px;
-        color: #facc15;
+        color: #ef4444;
         font-size: 13px;
         font-weight: 700;
         letter-spacing: 0.04em;
@@ -153,14 +157,21 @@
       }
 
       .subcategory-chip.subcategory-yellow {
-        background: rgba(234, 179, 8, 0.12);
-        border-color: rgba(234, 179, 8, 0.35);
-        color: #fde68a;
+        background: rgba(239,68,68,0.08);
+        border-color: rgba(239,68,68,0.35);
+        color: #fecaca;
+        font-weight: 700;
       }
 
       .subcategory-chip.subcategory-yellow.active {
-        background: #eab308;
-        border-color: #eab308;
+        background: #ef4444;
+        border-color: #ef4444;
+        color: #111;
+      }
+
+      .subcategory-chip.subcategory-yellow.active {
+        background: #ef4444;
+        border-color: #ef4444;
         color: #111827;
       }
 
