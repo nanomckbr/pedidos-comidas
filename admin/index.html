@@ -839,19 +839,21 @@
         }
       });
 
-      resetDayBtn.addEventListener('click', () => {
+      resetDayBtn.addEventListener('click', async () => {
         const ok = confirm('¿Seguro que quieres reiniciar el día? Se ocultarán de la vista todos los pedidos recibidos hasta este momento.');
         if (!ok) return;
 
         setDayCutNow();
-        loadOrders();
+        await loadOrders();
+        await loadProductsAdmin();
       });
 
       (async () => {
         const allowed = await requireAuth();
         if (!allowed) return;
 
-        loadOrders();
+        await loadOrders();
+        await loadProductsAdmin();
         startAutoRefresh();
       })();
     </script>
