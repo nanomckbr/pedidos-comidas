@@ -780,7 +780,7 @@
           );
         });
 
-        const total = cartSnapshot.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const total = getTotal();
         totalEl.textContent = formatPrice(total);
 
         sendOrder.href = '#';
