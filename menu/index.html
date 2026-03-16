@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pedidos Comidas — Panel menú</title>
+    <style>
+      :root {
+        --bg: #000000;
+        --panel: #09090b;
+        --card: rgba(24, 24, 27, 0.95);
+        --border: rgba(255, 255, 255, 0.1);
+        --text: #ffffff;
+        --muted: #a1a1aa;
+        --accent: #f97316;
+        --red: #ef4444;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+      .hero {
+        background: linear-gradient(135deg, #000000 0%, #09090b 55%, #431407 100%);
+        border-bottom: 1px solid var(--border);
+      }
+      .container {
+        width: min(1280px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+      .hero-inner {
+        padding: 32px 0 24px;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+      }
+      .brand h1 {
+        margin: 0;
+        font-size: clamp(28px, 5vw, 48px);
+      }
+      .brand p {
+        margin: 10px 0 0;
+        color: #d4d4d8;
+      }
+      .top-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      button, .link-btn {
+        border: 0;
+        border-radius: 16px;
+        padding: 12px 16px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .btn-accent {
+        background: var(--accent);
+        color: #000;
+      }
+      .btn-dark {
+        background: #18181b;
+        color: #fff;
+        border: 1px solid var(--border);
+      }
+      .container-main { padding: 24px 0 40px; }
+      .stat-card, .new-product-box, .product-admin-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 18px;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
+      }
+      .orders-grid { display: grid; gap: 16px; }
+      .updated-at, .muted {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .new-product-box { margin-bottom: 18px; }
+      .new-product-grid, .product-admin-grid {
+        margin-top: 16px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+      }
+      .new-product-field label, .product-admin-field label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .new-product-field input[type="text"],
+      .new-product-field input[type="number"],
+      .new-product-field textarea,
+      .new-product-field select,
+      .product-admin-field input[type="text"],
+      .product-admin-field input[type="number"] {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: #18181b;
+        color: #fff;
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+      .new-product-field textarea {
+        min-height: 84px;
+        resize: vertical;
+      }
+      .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+        color: #fff;
+        font-size: 14px;
+      }
+      .new-product-actions, .product-admin-actions {
+        margin-top: 16px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .new-product-feedback, .save-feedback {
+        color: #86efac;
+        font-size: 13px;
+      }
+      .product-admin-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+      .product-admin-title {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 800;
+      }
+      .product-admin-category {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .loading, .empty {
+        color: var(--muted);
+        padding: 18px 0;
+      }
+      .empty {
+        padding: 24px;
+        border: 1px dashed var(--border);
+        border-radius: 20px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="container hero-inner">
+        <div class="brand">
+          <h1>Panel menú — Pedidos Comidas</h1>
+          <p>Gestiona productos, precios, promos y visibilidad</p>
+        </div>
+
+        <div class="top-actions">
+          <a href="/admin" class="btn-dark link-btn">Volver a pedidos</a>
+          <button class="btn-dark" id="refresh-btn">Actualizar</button>
+          <button class="btn-dark" id="logout-btn">Salir</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container container-main">
+      <div class="stat-card" style="margin-bottom: 18px;">
+        <small style="display:block;color:var(--muted);margin-bottom:8px;">Gestión de menú</small>
+        <strong style="font-size:24px;">Productos</strong>
+        <div class="updated-at" style="margin-top:8px;">
+          Crea, edita y oculta productos desde aquí.
+        </div>
+      </div>
+
+      <div class="new-product-box">
+        <small style="display:block;color:var(--muted);margin-bottom:8px;">Nuevo producto</small>
+        <strong style="font-size:24px;">Agregar producto al menú</strong>
+        <div class="updated-at" style="margin-top:8px;">
+          Pedidos Comidas.
+        </div>
+
+        <div class="new-product-grid">
+          <div class="new-product-field">
+            <label for="new-product-name">Nombre</label>
+            <input type="text" id="new-product-name" placeholder="Ej: Pizza Muzzarella" />
+          </div>
+
+          <div class="new-product-field">
+            <label for="new-product-price">Precio</label>
+            <input type="number" id="new-product-price" min="0" placeholder="Ej: 8500" />
+          </div>
+
+          <div class="new-product-field">
+            <label for="new-product-category">Categoría</label>
+            <select id="new-product-category"></select>
+          </div>
+
+          <div class="new-product-field">
+            <label for="new-product-sort-order">Orden</label>
+            <input type="number" id="new-product-sort-order" min="0" placeholder="Ej: 1" />
+          </div>
+
+          <div class="new-product-field" style="grid-column: 1 / -1;">
+            <label for="new-product-description">Descripción</label>
+            <textarea id="new-product-description" placeholder="Ingredientes, detalles, etc."></textarea>
+          </div>
+
+          <div class="new-product-field">
+            <label for="new-product-promo-label">Texto promo</label>
+            <input type="text" id="new-product-promo-label" placeholder="Ej: 2x1 / Combo / Promo" />
+          </div>
+        </div>
+
+        <div class="checkbox-row">
+          <input type="checkbox" id="new-product-active" checked />
+          <label for="new-product-active">Producto activo</label>
+        </div>
+
+        <div class="checkbox-row">
+          <input type="checkbox" id="new-product-promo" />
+          <label for="new-product-promo">Marcar como promo</label>
+        </div>
+
+        <div class="new-product-actions">
+          <button class="btn-accent" id="create-product-btn">Crear producto</button>
+          <div class="new-product-feedback" id="new-product-feedback"></div>
+        </div>
+      </div>
+
+      <div id="products-admin-container" class="orders-grid">
+        <div class="loading">Cargando productos...</div>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      const supabaseUrl = 'https://ylvmzavgebttklblidcd.supabase.co';
+      const supabaseKey = 'sb_publishable_rFS54R3Uw06tOJ0qxoFhBA_uoEHW457';
+      const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+      async function requireAuth() {
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error || !data.session) {
+          window.location.href = '/login';
+          return false;
+        }
+        return true;
+      }
+
+      const productsAdminContainer = document.getElementById('products-admin-container');
+      const newProductName = document.getElementById('new-product-name');
+      const newProductPrice = document.getElementById('new-product-price');
+      const newProductCategory = document.getElementById('new-product-category');
+      const newProductSortOrder = document.getElementById('new-product-sort-order');
+      const newProductDescription = document.getElementById('new-product-description');
+      const newProductPromo = document.getElementById('new-product-promo');
+      const newProductPromoLabel = document.getElementById('new-product-promo-label');
+      const newProductActive = document.getElementById('new-product-active');
+      const createProductBtn = document.getElementById('create-product-btn');
+      const newProductFeedback = document.getElementById('new-product-feedback');
+      const refreshBtn = document.getElementById('refresh-btn');
+      const logoutBtn = document.getElementById('logout-btn');
+
+      async function loadProductsAdmin() {
+        productsAdminContainer.innerHTML = '<div class="loading">Cargando productos...</div>';
+
+        const { data: categoriesData, error: categoriesError } = await supabaseClient
+          .from('categories')
+          .select('*')
+          .order('sort_order', { ascending: true });
+
+        const { data: productsData, error: productsError } = await supabaseClient
+          .from('products')
+          .select('*')
+          .order('sort_order', { ascending: true });
+
+        if (categoriesError || productsError) {
+          console.error(categoriesError || productsError);
+          productsAdminContainer.innerHTML = '<div class="empty">No se pudieron cargar los productos.</div>';
+          return;
+        }
+
+        const categoriesMap = {};
+        (categoriesData || []).forEach(cat => {
+          categoriesMap[cat.id] = cat.name;
+        });
+
+        if (!productsData || !productsData.length) {
+          productsAdminContainer.innerHTML = '<div class="empty">No hay productos cargados.</div>';
+          return;
+        }
+
+        productsAdminContainer.innerHTML = productsData.map(product => `
+          <article class="product-admin-card">
+            <div class="product-admin-top">
+              <div>
+                <h3 class="product-admin-title">${product.name}</h3>
+                <div class="product-admin-category">
+                  ${categoriesMap[product.category_id] || 'Sin categoría'}
+                </div>
+              </div>
+            </div>
+
+            <div class="product-admin-grid">
+              <div class="product-admin-field">
+                <label>Precio</label>
+                <input type="number" min="0" value="${product.price || 0}" id="price-${product.id}" />
+              </div>
+
+              <div class="product-admin-field">
+                <label>Texto promo</label>
+                <input type="text" value="${product.promo_label || ''}" placeholder="Ej: 2x1 / Combo / Promo" id="promo-label-${product.id}" />
+              </div>
+            </div>
+
+            <div class="checkbox-row">
+              <input type="checkbox" id="active-${product.id}" ${product.is_active ? 'checked' : ''} />
+              <label for="active-${product.id}">Producto activo</label>
+            </div>
+
+            <div class="checkbox-row">
+              <input type="checkbox" id="promo-${product.id}" ${product.is_promo ? 'checked' : ''} />
+              <label for="promo-${product.id}">Marcar como promo</label>
+            </div>
+
+            <div class="product-admin-actions">
+              <button class="btn-accent save-product-btn" data-product-id="${product.id}">
+                Guardar cambios
+              </button>
+            </div>
+
+            <div class="save-feedback" id="feedback-${product.id}"></div>
+          </article>
+        `).join('');
+
+        document.querySelectorAll('.save-product-btn').forEach(button => {
+          button.addEventListener('click', async () => {
+            const productId = Number(button.dataset.productId);
+            await saveProductChanges(productId);
+          });
+        });
+      }
+
+      async function saveProductChanges(productId) {
+        const price = Number(document.getElementById(`price-${productId}`).value || 0);
+        const isActive = document.getElementById(`active-${productId}`).checked;
+        const isPromo = document.getElementById(`promo-${productId}`).checked;
+        const promoLabel = document.getElementById(`promo-label-${productId}`).value.trim();
+        const feedback = document.getElementById(`feedback-${productId}`);
+
+        feedback.style.color = '#d4d4d8';
+        feedback.textContent = 'Guardando...';
+
+        const { error } = await supabaseClient
+          .from('products')
+          .update({
+            price: price,
+            is_active: isActive,
+            is_promo: isPromo,
+            promo_label: promoLabel || null
+          })
+          .eq('id', productId);
+
+        if (error) {
+          console.error(error);
+          feedback.style.color = '#fca5a5';
+          feedback.textContent = 'No se pudo guardar.';
+          return;
+        }
+
+        feedback.style.color = '#86efac';
+        feedback.textContent = 'Guardado correctamente.';
+      }
+
+      async function loadCategoriesForNewProduct() {
+        const { data, error } = await supabaseClient
+          .from('categories')
+          .select('*')
+          .order('sort_order', { ascending: true });
+
+        if (error) {
+          console.error(error);
+          newProductCategory.innerHTML = '<option value="">Error cargando categorías</option>';
+          return;
+        }
+
+        if (!data || !data.length) {
+          newProductCategory.innerHTML = '<option value="">Sin categorías</option>';
+          return;
+        }
+
+        newProductCategory.innerHTML = data.map(category => `
+          <option value="${category.id}">${category.name}</option>
+        `).join('');
+      }
+
+      async function createNewProduct() {
+        const name = newProductName.value.trim();
+        const price = Number(newProductPrice.value || 0);
+        const categoryId = Number(newProductCategory.value || 0);
+        const sortOrder = Number(newProductSortOrder.value || 0);
+        const description = newProductDescription.value.trim();
+        const isPromo = newProductPromo.checked;
+        const promoLabel = newProductPromoLabel.value.trim();
+        const isActive = newProductActive.checked;
+
+        if (!name) {
+          newProductFeedback.style.color = '#fca5a5';
+          newProductFeedback.textContent = 'Escribe un nombre para el producto.';
+          return;
+        }
+
+        if (!categoryId) {
+          newProductFeedback.style.color = '#fca5a5';
+          newProductFeedback.textContent = 'Selecciona una categoría.';
+          return;
+        }
+
+        if (!price || price < 0) {
+          newProductFeedback.style.color = '#fca5a5';
+          newProductFeedback.textContent = 'Ingresa un precio válido.';
+          return;
+        }
+
+        newProductFeedback.style.color = '#d4d4d8';
+        newProductFeedback.textContent = 'Creando producto...';
+
+        const { error } = await supabaseClient
+          .from('products')
+          .insert([{
+            store_id: 1,
+            category_id: categoryId,
+            name: name,
+            description: description || null,
+            price: price,
+            is_promo: isPromo,
+            promo_label: promoLabel || null,
+            is_active: isActive,
+            sort_order: sortOrder
+          }]);
+
+        if (error) {
+          console.error(error);
+          newProductFeedback.style.color = '#fca5a5';
+          newProductFeedback.textContent = 'No se pudo crear el producto.';
+          return;
+        }
+
+        newProductName.value = '';
+        newProductPrice.value = '';
+        newProductSortOrder.value = '';
+        newProductDescription.value = '';
+        newProductPromo.checked = false;
+        newProductPromoLabel.value = '';
+        newProductActive.checked = true;
+
+        newProductFeedback.style.color = '#86efac';
+        newProductFeedback.textContent = 'Producto creado correctamente.';
+
+        await loadProductsAdmin();
+      }
+
+      createProductBtn.addEventListener('click', async () => {
+        await createNewProduct();
+      });
+
+      refreshBtn.addEventListener('click', async () => {
+        await loadCategoriesForNewProduct();
+        await loadProductsAdmin();
+      });
+
+      logoutBtn.addEventListener('click', async () => {
+        await supabaseClient.auth.signOut();
+        window.location.href = '/login';
+      });
+
+      (async () => {
+        const allowed = await requireAuth();
+        if (!allowed) return;
+
+        await loadCategoriesForNewProduct();
+        await loadProductsAdmin();
+      })();
+    </script>
+  </body>
+</html>
