@@ -402,13 +402,13 @@
           <div>
             <div class="pill">Rotisería & Delivery</div>
             <div style="color:#a1a1aa; font-size:14px;">
-              Hamburguesas con pedido rápido y total automático.
+              Pedidos rápidos y totalmente automáticos.
             </div>
           </div>
         </div>
         <h1>Pedidos Comidas</h1>
         <p>
-          Elegí tus hamburguesas, agregalas al carrito y enviá tu pedido por WhatsApp con el total calculado automáticamente.
+          Elegí tus pedido, agregalas al carrito y enviá tu pedido por WhatsApp con el total calculado automáticamente.
         </p>
       </div>
     </header>
@@ -614,7 +614,7 @@
 
       function renderCart() {
         if (!cart.length) {
-          cartList.innerHTML = '<div class="empty">Todavía no agregaste hamburguesas.</div>';
+          cartList.innerHTML = '<div class="empty">Carrito vacío.</div>';
           totalEl.textContent = formatPrice(0);
           sendOrder.className = 'btn-link btn-disabled';
           sendOrder.href = '#';
