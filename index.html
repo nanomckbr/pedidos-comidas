@@ -396,27 +396,7 @@
       }
 
 
-      @media (max-width: 920px) {
-        .layout {
-          grid-template-columns: 1fr;
-        }
 
-        .sidebar {
-          position: static;
-        }
-      }
-    
-
-      .promo-badge {
-        display: inline-block;
-        margin-top: 6px;
-        background: rgba(249, 115, 22, 0.18);
-        color: #fed7aa;
-        font-size: 12px;
-        font-weight: 700;
-        padding: 4px 8px;
-        border-radius: 999px;
-      }
       .toast {
         position: fixed;
         left: 50%;
@@ -440,6 +420,27 @@
         transform: translateX(-50%) translateY(0);
       }
 
+      @media (max-width: 920px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: static;
+        }
+      }
+    
+
+      .promo-badge {
+        display: inline-block;
+        margin-top: 6px;
+        background: rgba(249, 115, 22, 0.18);
+        color: #fed7aa;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 4px 8px;
+        border-radius: 999px;
+      }
 
     </style>
   </head>
@@ -600,16 +601,6 @@
             logoFallbackEl.style.display = 'flex';
           };
           logoImageEl.src = logoImage;
-        } else {
-          logoImageEl.style.display = 'none';
-          logoFallbackEl.style.display = 'flex';
-        }
-      }
-
-        if (data?.logo_image) {
-          logoImageEl.src = data.logo_image;
-          logoImageEl.style.display = 'block';
-          logoFallbackEl.style.display = 'none';
         } else {
           logoImageEl.style.display = 'none';
           logoFallbackEl.style.display = 'flex';
@@ -823,7 +814,7 @@
         const address = document.getElementById('address').value.trim();
         const payment = document.getElementById('payment').value;
         const notes = document.getElementById('notes').value.trim();
-        const total = getTotal();
+        const total = cartSnapshot.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
         if (!name) {
           alert('Por favor, ingresa tu nombre.');
@@ -886,21 +877,34 @@
 
         const itemsText = cartSnapshot
           .map(item => `- ${item.quantity} x ${item.name} = ${formatPrice(item.price * item.quantity)}`)
-          .join('\n');
+          .join('
+');
 
-        let message = `🍔 Nuevo pedido desde el menú web\n\n`;
-        message += `Pedido N°: ${orderData.id}\n`;
-        message += `Nombre: ${name}\n`;
-        message += `Tipo: ${type}\n`;
+        let message = `🍔 Nuevo pedido desde el menú web
+
+`;
+        message += `Pedido N°: ${orderData.id}
+`;
+        message += `Nombre: ${name}
+`;
+        message += `Tipo: ${type}
+`;
 
         if (type === 'delivery') {
-          message += `Dirección: ${address}\n`;
+          message += `Dirección: ${address}
+`;
         }
 
-        message += `Pedido:\n${itemsText}\n\n`;
-        message += `Total: ${formatPrice(total)}\n`;
-        message += `Forma de pago: ${payment}\n`;
-        message += `Observaciones: ${notes || '-'}\n`;
+        message += `Pedido:
+${itemsText}
+
+`;
+        message += `Total: ${formatPrice(total)}
+`;
+        message += `Forma de pago: ${payment}
+`;
+        message += `Observaciones: ${notes || '-'}
+`;
 
         const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');
