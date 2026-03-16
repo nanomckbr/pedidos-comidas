@@ -123,25 +123,25 @@
       }
 
       .group h2 {
-        margin: 0 0 12px;
-        font-size: 22px;
+        margin: 0 0 16px;
+        font-size: 28px;
       }
 
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
       }
 
       .card {
         background: var(--card);
         border: 1px solid var(--border);
-        border-radius: 18px;
-        padding: 14px;
+        border-radius: 24px;
+        padding: 18px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
       }
 
       .card-top {
@@ -153,36 +153,34 @@
 
       .card h3 {
         margin: 0;
-        font-size: 18px;
-        line-height: 1.2;
+        font-size: 23px;
       }
 
       .price-tag {
         background: var(--accent-soft);
         color: #ffedd5;
-        font-size: 12px;
+        font-size: 14px;
         font-weight: 700;
-        padding: 6px 10px;
+        padding: 8px 12px;
         border-radius: 999px;
         white-space: nowrap;
       }
 
       .desc {
         color: var(--muted);
-        font-size: 12px;
-        line-height: 1.45;
-        margin: 8px 0 12px;
+        font-size: 14px;
+        line-height: 1.65;
+        margin: 12px 0 18px;
       }
 
       button,
       .btn-link {
         border: 0;
-        border-radius: 14px;
-        padding: 10px 12px;
+        border-radius: 18px;
+        padding: 14px 16px;
         font-weight: 700;
         cursor: pointer;
         transition: transform 0.15s ease;
-        font-size: 13px;
       }
 
       button:hover,
@@ -376,35 +374,8 @@
       }
 
 
-            .subcategory-nav {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 18px;
-      }
-
-      .subcategory-chip {
-        border: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.04);
-        color: #fff;
-        border-radius: 999px;
-        padding: 8px 12px;
-        font-size: 13px;
-        font-weight: 700;
-      }
-
-      .subcategory-chip.active {
-        background: rgba(249, 115, 22, 0.18);
-        color: #ffedd5;
-      }
-
       .subgroup {
-        display: none;
-        margin-bottom: 20px;
-      }
-
-      .subgroup.active {
-        display: block;
+        margin-bottom: 24px;
       }
 
       .subgroup:last-child {
@@ -412,14 +383,14 @@
       }
 
       .subgroup h3 {
-        margin: 0 0 12px;
-        font-size: 18px;
+        margin: 0 0 14px;
+        font-size: 20px;
         color: #f3f4f6;
       }
 
       .subgroup h4 {
         margin: 0 0 12px;
-        font-size: 15px;
+        font-size: 16px;
         color: var(--muted);
         letter-spacing: 0.02em;
       }
@@ -446,7 +417,6 @@
         padding: 4px 8px;
         border-radius: 999px;
       }
-
       .toast {
         position: fixed;
         left: 50%;
@@ -469,6 +439,7 @@
         opacity: 1;
         transform: translateX(-50%) translateY(0);
       }
+
 
     </style>
   </head>
@@ -570,7 +541,6 @@
       let categories = [];
       let products = [];
       let activeCategoryId = null;
-      let activeSubcategoryByCategory = {};
 
       const categoryNav = document.getElementById('category-nav');
       const menuPanels = document.getElementById('menu-panels');
@@ -625,11 +595,17 @@
         }
       }
 
-        if (data?.logo_line_1) logoLine1El.textContent = data.logo_line_1;
-        if (data?.logo_line_2) logoLine2El.textContent = data.logo_line_2;
+      function resetOrderForm() {
+        cart.length = 0;
+        document.getElementById('name').value = '';
+        document.getElementById('type').value = 'delivery';
+        document.getElementById('address').value = '';
+        document.getElementById('payment').value = 'efectivo';
+        document.getElementById('notes').value = '';
+        addressField.style.display = 'block';
+        renderCart();
+        showToast(`${product.name} agregado al carrito`);
       }
-
-
 
       function renderMenu() {
         categoryNav.innerHTML = '';
@@ -686,36 +662,9 @@
             groups[key].push(item);
           });
 
-          const subgroupKeys = Object.keys(groups);
-          const visibleSubgroupKey = activeSubcategoryByCategory[category.id] && groups[activeSubcategoryByCategory[category.id]]
-            ? activeSubcategoryByCategory[category.id]
-            : subgroupKeys[0];
-
-          activeSubcategoryByCategory[category.id] = visibleSubgroupKey;
-
-          if (subgroupKeys.length > 1 || subgroupKeys[0] !== '__sin_subcategoria__') {
-            const subgroupNav = document.createElement('div');
-            subgroupNav.className = 'subcategory-nav';
-
-            subgroupKeys.forEach(subgroupName => {
-              const label = subgroupName === '__sin_subcategoria__' ? 'General' : subgroupName;
-              const subChip = document.createElement('button');
-              subChip.className = `subcategory-chip${subgroupName === visibleSubgroupKey ? ' active' : ''}`;
-              subChip.textContent = label;
-              subChip.addEventListener('click', () => {
-                activeSubcategoryByCategory[category.id] = subgroupName;
-                renderMenu();
-              });
-              subgroupNav.appendChild(subChip);
-            });
-
-            section.appendChild(subgroupNav);
-          }
-
-          subgroupKeys.forEach(subgroupName => {
-            const items = groups[subgroupName];
+          Object.entries(groups).forEach(([subgroupName, items]) => {
             const subgroup = document.createElement('div');
-            subgroup.className = `subgroup${subgroupName === visibleSubgroupKey ? ' active' : ''}`;
+            subgroup.className = 'subgroup';
 
             if (subgroupName !== '__sin_subcategoria__') {
               const subgroupTitle = document.createElement('h3');
@@ -775,7 +724,6 @@
         }
 
         renderCart();
-        showToast(`${product.name} agregado al carrito`);
       }
 
       function changeQty(id, delta) {
@@ -938,31 +886,6 @@
         sendOrder.className = 'btn-link btn-whatsapp';
       }
 
-
-      function resetOrderForm() {
-        cart.length = 0;
-        document.getElementById('name').value = '';
-        document.getElementById('type').value = 'delivery';
-        document.getElementById('address').value = '';
-        document.getElementById('payment').value = 'efectivo';
-        document.getElementById('notes').value = '';
-        addressField.style.display = 'block';
-        renderCart();
-      }
-
-      function handleSendOrderClick(e) {
-        if (!cart.length) {
-          e.preventDefault();
-          return;
-        }
-
-        const targetUrl = sendOrder.href;
-        setTimeout(() => {
-          resetOrderForm();
-          window.location.reload();
-        }, 250);
-      }
-
       async function loadMenu() {
         menuPanels.innerHTML = '<div class="empty">Cargando menú...</div>';
 
@@ -998,7 +921,16 @@
         document.getElementById(id).addEventListener('change', renderCart);
       });
 
-      sendOrder.addEventListener('click', handleSendOrderClick);
+      sendOrder.addEventListener('click', (e) => {
+        if (!cart.length || sendOrder.classList.contains('btn-disabled')) {
+          e.preventDefault();
+          return;
+        }
+
+        setTimeout(() => {
+          resetOrderForm();
+        }, 250);
+      });
 
       loadBranding();
       loadMenu();
