@@ -578,12 +578,33 @@
           .from('store_settings')
           .select('logo_image')
           .eq('store_id', 1)
-          .maybeSingle();
+          .order('id', { ascending: false })
+          .limit(1);
 
         if (error) {
           console.error('No se pudo cargar el logo:', error);
+          logoImageEl.style.display = 'none';
+          logoFallbackEl.style.display = 'flex';
           return;
         }
+
+        const logoImage = data && data.length ? data[0].logo_image : null;
+
+        if (logoImage) {
+          logoImageEl.onload = () => {
+            logoImageEl.style.display = 'block';
+            logoFallbackEl.style.display = 'none';
+          };
+          logoImageEl.onerror = () => {
+            logoImageEl.style.display = 'none';
+            logoFallbackEl.style.display = 'flex';
+          };
+          logoImageEl.src = logoImage;
+        } else {
+          logoImageEl.style.display = 'none';
+          logoFallbackEl.style.display = 'flex';
+        }
+      }
 
         if (data?.logo_image) {
           logoImageEl.src = data.logo_image;
@@ -795,6 +816,8 @@
       async function saveOrderAndSendWhatsapp() {
         if (!cart.length) return;
 
+        const cartSnapshot = cart.map(item => ({ ...item }));
+
         const name = document.getElementById('name').value.trim();
         const type = document.getElementById('type').value;
         const address = document.getElementById('address').value.trim();
@@ -840,7 +863,7 @@
           return;
         }
 
-        const itemsPayload = cart.map(item => ({
+        const itemsPayload = cartSnapshot.map(item => ({
           order_id: orderData.id,
           product_id: item.id,
           product_name: item.name,
@@ -861,7 +884,7 @@
           return;
         }
 
-        const itemsText = cart
+        const itemsText = cartSnapshot
           .map(item => `- ${item.quantity} x ${item.name} = ${formatPrice(item.price * item.quantity)}`)
           .join('\n');
 
@@ -882,6 +905,7 @@
         const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');
 
+        resetOrderForm();
         sendOrder.textContent = 'Enviar pedido por WhatsApp';
         sendOrder.className = 'btn-link btn-whatsapp';
       }
@@ -919,17 +943,6 @@
       ['name', 'address', 'payment', 'notes'].forEach(id => {
         document.getElementById(id).addEventListener('input', renderCart);
         document.getElementById(id).addEventListener('change', renderCart);
-      });
-
-      sendOrder.addEventListener('click', (e) => {
-        if (!cart.length || sendOrder.classList.contains('btn-disabled')) {
-          e.preventDefault();
-          return;
-        }
-
-        setTimeout(() => {
-          resetOrderForm();
-        }, 250);
       });
 
       loadBranding();
