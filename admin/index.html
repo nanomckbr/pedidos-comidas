@@ -213,6 +213,48 @@
         font-size: 13px;
         margin-top: 6px;
       }
+
+      .settings-card {
+        margin-top: 18px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 18px;
+      }
+
+      .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .field label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .field input {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: #18181b;
+        color: #fff;
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+
+      .save-note {
+        margin-top: 12px;
+        font-size: 13px;
+      }
+
+      .save-note.ok { color: #86efac; }
+      .save-note.error { color: #fca5a5; }
+
       @media (max-width: 700px) {
         .order-id { font-size: 24px; }
       }
@@ -259,6 +301,29 @@
       <div class="updated-at" id="updated-at">Sin actualizar todavía.</div>
       <div class="day-cut" id="day-cut-info">Corte del día: no definido.</div>
 
+      <section class="settings-card">
+        <small style="display:block;color:var(--muted);margin-bottom:8px;">Branding</small>
+        <strong style="font-size:24px;">Editar logo de la página</strong>
+        <div class="updated-at" style="margin-top:8px;">Cambia las dos líneas del logo que ve el cliente arriba del menú.</div>
+
+        <div class="settings-grid">
+          <div class="field">
+            <label for="logo-line-1-input">Línea 1 del logo</label>
+            <input id="logo-line-1-input" type="text" placeholder="Ej: PEDIDOS" />
+          </div>
+
+          <div class="field">
+            <label for="logo-line-2-input">Línea 2 del logo</label>
+            <input id="logo-line-2-input" type="text" placeholder="Ej: COMIDAS" />
+          </div>
+        </div>
+
+        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button class="btn-accent" id="save-logo-btn">Guardar logo</button>
+          <div id="save-logo-feedback" class="save-note"></div>
+        </div>
+      </section>
+
       <div id="orders-container" class="orders-grid">
         <div class="loading">Cargando pedidos...</div>
       </div>
@@ -291,6 +356,10 @@
       const statNuevo = document.getElementById('stat-nuevo');
       const statPreparando = document.getElementById('stat-preparando');
       const statVentas = document.getElementById('stat-ventas');
+      const logoLine1Input = document.getElementById('logo-line-1-input');
+      const logoLine2Input = document.getElementById('logo-line-2-input');
+      const saveLogoBtn = document.getElementById('save-logo-btn');
+      const saveLogoFeedback = document.getElementById('save-logo-feedback');
 
       let autoRefreshEnabled = true;
       let autoRefreshInterval = null;
@@ -303,6 +372,66 @@
           maximumFractionDigits: 0
         }).format(value);
       }
+
+      async function ensureStoreSettingsRow() {
+        const { data, error } = await supabaseClient
+          .from('store_settings')
+          .select('*')
+          .eq('store_id', 1)
+          .maybeSingle();
+
+        if (error) {
+          console.error('No se pudo leer store_settings:', error);
+          return null;
+        }
+
+        if (data) return data;
+
+        const { data: created, error: createError } = await supabaseClient
+          .from('store_settings')
+          .insert([{ store_id: 1 }])
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('No se pudo crear store_settings:', createError);
+          return null;
+        }
+
+        return created;
+      }
+
+      async function loadBrandingSettings() {
+        const settings = await ensureStoreSettingsRow();
+        if (!settings) return;
+        logoLine1Input.value = settings.logo_line_1 || 'PEDIDOS';
+        logoLine2Input.value = settings.logo_line_2 || 'COMIDAS';
+      }
+
+      async function saveBrandingSettings() {
+        saveLogoFeedback.className = 'save-note';
+        saveLogoFeedback.textContent = 'Guardando logo...';
+
+        const { error } = await supabaseClient
+          .from('store_settings')
+          .update({
+            logo_line_1: logoLine1Input.value.trim() || 'PEDIDOS',
+            logo_line_2: logoLine2Input.value.trim() || 'COMIDAS'
+          })
+          .eq('store_id', 1);
+
+        if (error) {
+          console.error(error);
+          saveLogoFeedback.className = 'save-note error';
+          saveLogoFeedback.textContent = 'No se pudo guardar el logo.';
+          return;
+        }
+
+        saveLogoFeedback.className = 'save-note ok';
+        saveLogoFeedback.textContent = 'Logo guardado correctamente.';
+      }
+
+
 
       function formatDate(value) {
         const date = new Date(value);
@@ -557,6 +686,10 @@
         await loadOrders();
       });
 
+      saveLogoBtn.addEventListener('click', async () => {
+        await saveBrandingSettings();
+      });
+
       logoutBtn.addEventListener('click', async () => {
         await supabaseClient.auth.signOut();
         window.location.href = '/login';
@@ -583,6 +716,7 @@
       (async () => {
         const allowed = await requireAuth();
         if (!allowed) return;
+        await loadBrandingSettings();
         await loadOrders();
         startAutoRefresh();
       })();
