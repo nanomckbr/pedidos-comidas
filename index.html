@@ -320,6 +320,52 @@
         pointer-events: none;
       }
 
+      .categories-header {
+        margin-bottom: 24px;
+      }
+
+      .categories-header h2 {
+        margin: 0 0 10px;
+        font-size: 30px;
+      }
+
+      .categories-header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .category-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .category-chip {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        color: #fff;
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .category-chip.active {
+        background: var(--accent);
+        color: #000;
+      }
+
+      .category-panel {
+        display: none;
+      }
+
+      .category-panel.active {
+        display: block;
+      }
+
+
       @media (max-width: 920px) {
         .layout {
           grid-template-columns: 1fr;
@@ -368,7 +414,15 @@
     </header>
 
     <main class="container layout">
-      <section></section>
+      <section>
+        <div class="categories-header">
+          <h2>Categorías</h2>
+          <p>Elige una categoría para ver su menú. Puedes cambiar entre categorías sin perder lo agregado al carrito.</p>
+          <div id="category-nav" class="category-nav"></div>
+        </div>
+
+        <div id="menu-panels"></div>
+      </section>
 
       <aside class="sidebar">
         <h2>Tu pedido</h2>
@@ -430,8 +484,10 @@
       const cart = [];
       let categories = [];
       let products = [];
+      let activeCategoryId = null;
 
-      const menuSection = document.querySelector('main section');
+      const categoryNav = document.getElementById('category-nav');
+      const menuPanels = document.getElementById('menu-panels');
       const cartList = document.getElementById('cart-list');
       const totalEl = document.getElementById('total');
       const sendOrder = document.getElementById('send-order');
@@ -447,9 +503,31 @@
       }
 
       function renderMenu() {
-        menuSection.innerHTML = '';
+        categoryNav.innerHTML = '';
+        menuPanels.innerHTML = '';
+
+        if (!categories.length) {
+          menuPanels.innerHTML = '<div class="empty">No hay categorías disponibles.</div>';
+          return;
+        }
+
+        if (!activeCategoryId || !categories.some(category => category.id === activeCategoryId)) {
+          activeCategoryId = categories[0].id;
+        }
 
         categories.forEach(category => {
+          const chip = document.createElement('button');
+          chip.className = `category-chip${category.id === activeCategoryId ? ' active' : ''}`;
+          chip.textContent = category.name;
+          chip.addEventListener('click', () => {
+            activeCategoryId = category.id;
+            renderMenu();
+          });
+          categoryNav.appendChild(chip);
+
+          const panel = document.createElement('div');
+          panel.className = `category-panel${category.id === activeCategoryId ? ' active' : ''}`;
+
           const section = document.createElement('div');
           section.className = 'group';
 
@@ -464,32 +542,37 @@
             .filter(product => product.category_id === category.id && product.is_active)
             .sort((a, b) => a.sort_order - b.sort_order);
 
-          categoryProducts.forEach(item => {
-            const article = document.createElement('article');
-            article.className = 'card';
-            article.innerHTML = `
-              <div>
-                <div class="card-top">
-                  <div>
-                    <h3>${item.name}</h3>
-                    ${item.is_promo && item.promo_label ? `<div class="promo-badge">${item.promo_label}</div>` : ''}
+          if (!categoryProducts.length) {
+            grid.innerHTML = '<div class="empty">Todavía no hay productos en esta categoría.</div>';
+          } else {
+            categoryProducts.forEach(item => {
+              const article = document.createElement('article');
+              article.className = 'card';
+              article.innerHTML = `
+                <div>
+                  <div class="card-top">
+                    <div>
+                      <h3>${item.name}</h3>
+                      ${item.is_promo && item.promo_label ? `<div class="promo-badge">${item.promo_label}</div>` : ''}
+                    </div>
+                    <span class="price-tag">${formatPrice(item.price)}</span>
                   </div>
-                  <span class="price-tag">${formatPrice(item.price)}</span>
+                  <p class="desc">${item.description || ''}</p>
                 </div>
-                <p class="desc">${item.description || ''}</p>
-              </div>
-              <button class="btn-accent" data-id="${item.id}">Agregar al pedido</button>
-            `;
+                <button class="btn-accent" data-id="${item.id}">Agregar al pedido</button>
+              `;
 
-            article
-              .querySelector('button')
-              .addEventListener('click', () => addToCart(item.id));
+              article
+                .querySelector('button')
+                .addEventListener('click', () => addToCart(item.id));
 
-            grid.appendChild(article);
-          });
+              grid.appendChild(article);
+            });
+          }
 
           section.appendChild(grid);
-          menuSection.appendChild(section);
+          panel.appendChild(section);
+          menuPanels.appendChild(panel);
         });
       }
 
@@ -672,7 +755,7 @@
       }
 
       async function loadMenu() {
-        menuSection.innerHTML = '<div class="empty">Cargando menú...</div>';
+        menuPanels.innerHTML = '<div class="empty">Cargando menú...</div>';
 
         const { data: categoriesData, error: categoriesError } = await supabaseClient
           .from('categories')
@@ -686,7 +769,7 @@
           .order('sort_order', { ascending: true });
 
         if (categoriesError || productsError) {
-          menuSection.innerHTML = '<div class="empty">No se pudo cargar el menú desde Supabase.</div>';
+          menuPanels.innerHTML = '<div class="empty">No se pudo cargar el menú desde Supabase.</div>';
           console.error(categoriesError || productsError);
           return;
         }
