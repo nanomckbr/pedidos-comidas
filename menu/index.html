@@ -14,22 +14,28 @@
         --muted: #a1a1aa;
         --accent: #f97316;
         --red: #ef4444;
+        --accent-soft: rgba(249, 115, 22, 0.18);
       }
+
       * { box-sizing: border-box; }
+
       body {
         margin: 0;
         font-family: Arial, Helvetica, sans-serif;
         background: var(--bg);
         color: var(--text);
       }
+
       .hero {
         background: linear-gradient(135deg, #000000 0%, #09090b 55%, #431407 100%);
         border-bottom: 1px solid var(--border);
       }
+
       .container {
         width: min(1280px, calc(100% - 32px));
         margin: 0 auto;
       }
+
       .hero-inner {
         padding: 32px 0 24px;
         display: flex;
@@ -38,19 +44,23 @@
         align-items: flex-end;
         flex-wrap: wrap;
       }
+
       .brand h1 {
         margin: 0;
         font-size: clamp(28px, 5vw, 48px);
       }
+
       .brand p {
         margin: 10px 0 0;
         color: #d4d4d8;
       }
+
       .top-actions {
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
       }
+
       button, .link-btn {
         border: 0;
         border-radius: 16px;
@@ -61,49 +71,192 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        font-size: 14px;
+        transition: transform 0.15s ease;
       }
+
+      button:hover, .link-btn:hover {
+        transform: translateY(-1px);
+      }
+
       .btn-accent {
         background: var(--accent);
         color: #000;
       }
+
       .btn-dark {
         background: #18181b;
         color: #fff;
         border: 1px solid var(--border);
       }
+
       .container-main { padding: 24px 0 40px; }
-      .stat-card, .new-product-box, .product-admin-card {
+
+      .panel-box, .new-product-box {
         background: var(--card);
         border: 1px solid var(--border);
         border-radius: 24px;
         padding: 18px;
         box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
       }
-      .orders-grid { display: grid; gap: 16px; }
+
+      .panel-box { margin-bottom: 18px; }
+      .new-product-box { margin-top: 24px; }
+
       .updated-at, .muted {
         color: var(--muted);
         font-size: 13px;
       }
-      .new-product-box { margin-bottom: 18px; }
-      .new-product-grid, .product-admin-grid {
-        margin-top: 16px;
+
+      .category-nav,
+      .subcategory-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .category-nav { margin-top: 18px; }
+      .subcategory-nav { margin-top: 14px; }
+
+      .category-chip,
+      .subcategory-chip {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        color: #fff;
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .subcategory-chip {
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+
+      .category-chip.active {
+        background: var(--accent);
+        color: #000;
+      }
+
+      .subcategory-chip.active {
+        background: var(--accent-soft);
+        color: #ffedd5;
+      }
+
+      .bulk-actions {
+        margin-top: 18px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .bulk-save-feedback,
+      .new-product-feedback {
+        font-size: 13px;
+      }
+
+      .bulk-save-feedback.ok,
+      .new-product-feedback.ok { color: #86efac; }
+
+      .bulk-save-feedback.error,
+      .new-product-feedback.error { color: #fca5a5; }
+
+      .loading, .empty {
+        color: var(--muted);
+      }
+
+      .empty {
+        padding: 24px;
+        border: 1px dashed var(--border);
+        border-radius: 20px;
+        text-align: center;
+        margin-top: 18px;
+      }
+
+      .group {
+        margin-top: 22px;
+      }
+
+      .group h2 {
+        margin: 0 0 12px;
+        font-size: 22px;
+      }
+
+      .group h3 {
+        margin: 0 0 12px;
+        font-size: 18px;
+        color: #f3f4f6;
+      }
+
+      .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
         gap: 12px;
       }
-      .new-product-field label, .product-admin-field label {
+
+      .card {
+        background: rgba(24, 24, 27, 0.92);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+      }
+
+      .card-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: flex-start;
+      }
+
+      .card h4 {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.2;
+      }
+
+      .price-tag {
+        background: var(--accent-soft);
+        color: #ffedd5;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 6px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .desc {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+        margin: 8px 0 12px;
+      }
+
+      .edit-grid,
+      .new-product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .field label {
         display: block;
         margin-bottom: 8px;
         color: var(--muted);
         font-size: 13px;
         font-weight: 700;
       }
-      .new-product-field input[type="text"],
-      .new-product-field input[type="number"],
-      .new-product-field textarea,
-      .new-product-field select,
-      .product-admin-field input[type="text"],
-      .product-admin-field input[type="number"] {
+
+      .field input[type="text"],
+      .field input[type="number"],
+      .field textarea,
+      .field select {
         width: 100%;
         border-radius: 14px;
         border: 1px solid var(--border);
@@ -112,55 +265,33 @@
         padding: 10px 12px;
         font-size: 14px;
       }
-      .new-product-field textarea {
-        min-height: 84px;
+
+      .field textarea {
+        min-height: 82px;
         resize: vertical;
       }
+
       .checkbox-row {
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-top: 12px;
+        margin-top: 10px;
         color: #fff;
-        font-size: 14px;
-      }
-      .new-product-actions, .product-admin-actions {
-        margin-top: 16px;
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        align-items: center;
-      }
-      .new-product-feedback, .save-feedback {
-        color: #86efac;
         font-size: 13px;
       }
-      .product-admin-top {
-        display: flex;
-        justify-content: space-between;
-        gap: 14px;
-        align-items: flex-start;
-        flex-wrap: wrap;
+
+      .subgroup {
+        display: none;
       }
-      .product-admin-title {
-        margin: 0;
-        font-size: 24px;
-        font-weight: 800;
+
+      .subgroup.active {
+        display: block;
       }
-      .product-admin-category {
-        margin-top: 6px;
-        color: var(--muted);
-        font-size: 14px;
-      }
-      .loading, .empty {
-        color: var(--muted);
-        padding: 18px 0;
-      }
-      .empty {
-        padding: 24px;
-        border: 1px dashed var(--border);
-        border-radius: 20px;
-        text-align: center;
+
+      @media (max-width: 920px) {
+        .grid {
+          grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        }
       }
     </style>
   </head>
@@ -181,48 +312,65 @@
     </header>
 
     <main class="container container-main">
-      <div class="stat-card" style="margin-bottom: 18px;">
+      <div class="panel-box">
         <small style="display:block;color:var(--muted);margin-bottom:8px;">Gestión de menú</small>
-        <strong style="font-size:24px;">Productos</strong>
+        <strong style="font-size:24px;">Editar productos</strong>
         <div class="updated-at" style="margin-top:8px;">
-          Crea, edita y oculta productos desde aquí.
+          Elige una categoría para editar. Después puedes guardar todos los cambios con un solo botón.
         </div>
+
+        <div id="category-nav" class="category-nav"></div>
+        <div id="subcategory-nav" class="subcategory-nav"></div>
+
+        <div class="bulk-actions">
+          <button class="btn-accent" id="save-all-btn">Guardar todos los cambios</button>
+          <div class="bulk-save-feedback" id="bulk-save-feedback"></div>
+        </div>
+      </div>
+
+      <div id="products-admin-container">
+        <div class="empty">Elige una categoría para comenzar a editar.</div>
       </div>
 
       <div class="new-product-box">
         <small style="display:block;color:var(--muted);margin-bottom:8px;">Nuevo producto</small>
         <strong style="font-size:24px;">Agregar producto al menú</strong>
         <div class="updated-at" style="margin-top:8px;">
-          Pedidos Comidas.
+          Puedes crear productos nuevos y ubicarlos directamente en su categoría y subcategoría.
         </div>
 
         <div class="new-product-grid">
-          <div class="new-product-field">
+          <div class="field">
             <label for="new-product-name">Nombre</label>
             <input type="text" id="new-product-name" placeholder="Ej: Pizza Muzzarella" />
           </div>
 
-          <div class="new-product-field">
+          <div class="field">
             <label for="new-product-price">Precio</label>
             <input type="number" id="new-product-price" min="0" placeholder="Ej: 8500" />
           </div>
 
-          <div class="new-product-field">
+          <div class="field">
             <label for="new-product-category">Categoría</label>
             <select id="new-product-category"></select>
           </div>
 
-          <div class="new-product-field">
+          <div class="field">
+            <label for="new-product-subcategory">Subcategoría</label>
+            <input type="text" id="new-product-subcategory" placeholder="Ej: Mitad / Entera / Fritas · Docena" />
+          </div>
+
+          <div class="field">
             <label for="new-product-sort-order">Orden</label>
             <input type="number" id="new-product-sort-order" min="0" placeholder="Ej: 1" />
           </div>
 
-          <div class="new-product-field" style="grid-column: 1 / -1;">
+          <div class="field" style="grid-column: 1 / -1;">
             <label for="new-product-description">Descripción</label>
             <textarea id="new-product-description" placeholder="Ingredientes, detalles, etc."></textarea>
           </div>
 
-          <div class="new-product-field">
+          <div class="field">
             <label for="new-product-promo-label">Texto promo</label>
             <input type="text" id="new-product-promo-label" placeholder="Ej: 2x1 / Combo / Promo" />
           </div>
@@ -238,14 +386,10 @@
           <label for="new-product-promo">Marcar como promo</label>
         </div>
 
-        <div class="new-product-actions">
+        <div class="bulk-actions">
           <button class="btn-accent" id="create-product-btn">Crear producto</button>
           <div class="new-product-feedback" id="new-product-feedback"></div>
         </div>
-      </div>
-
-      <div id="products-admin-container" class="orders-grid">
-        <div class="loading">Cargando productos...</div>
       </div>
     </main>
 
@@ -265,9 +409,14 @@
       }
 
       const productsAdminContainer = document.getElementById('products-admin-container');
+      const categoryNav = document.getElementById('category-nav');
+      const subcategoryNav = document.getElementById('subcategory-nav');
+      const saveAllBtn = document.getElementById('save-all-btn');
+      const bulkSaveFeedback = document.getElementById('bulk-save-feedback');
       const newProductName = document.getElementById('new-product-name');
       const newProductPrice = document.getElementById('new-product-price');
       const newProductCategory = document.getElementById('new-product-category');
+      const newProductSubcategory = document.getElementById('new-product-subcategory');
       const newProductSortOrder = document.getElementById('new-product-sort-order');
       const newProductDescription = document.getElementById('new-product-description');
       const newProductPromo = document.getElementById('new-product-promo');
@@ -277,6 +426,57 @@
       const newProductFeedback = document.getElementById('new-product-feedback');
       const refreshBtn = document.getElementById('refresh-btn');
       const logoutBtn = document.getElementById('logout-btn');
+
+      let categoriesCache = [];
+      let productsCache = [];
+      let selectedCategoryId = null;
+      let selectedSubcategoryByCategory = {};
+      let dirtyProducts = new Set();
+
+      function formatPrice(value) {
+        return new Intl.NumberFormat('es-AR', {
+          style: 'currency',
+          currency: 'ARS',
+          maximumFractionDigits: 0
+        }).format(value || 0);
+      }
+
+      function markDirty(productId) {
+        dirtyProducts.add(productId);
+        bulkSaveFeedback.className = 'bulk-save-feedback';
+        bulkSaveFeedback.textContent = `${dirtyProducts.size} cambio(s) pendiente(s).`;
+      }
+
+      function updateProductDraft(productId, field, value) {
+        const product = productsCache.find(item => item.id === productId);
+        if (!product) return;
+        product[field] = value;
+        markDirty(productId);
+      }
+
+      async function loadCategoriesForNewProduct() {
+        const { data, error } = await supabaseClient
+          .from('categories')
+          .select('*')
+          .order('sort_order', { ascending: true });
+
+        if (error) {
+          console.error(error);
+          newProductCategory.innerHTML = '<option value="">Error cargando categorías</option>';
+          return;
+        }
+
+        categoriesCache = data || [];
+
+        if (!categoriesCache.length) {
+          newProductCategory.innerHTML = '<option value="">Sin categorías</option>';
+          return;
+        }
+
+        newProductCategory.innerHTML = categoriesCache.map(category => `
+          <option value="${category.id}">${category.name}</option>
+        `).join('');
+      }
 
       async function loadProductsAdmin() {
         productsAdminContainer.innerHTML = '<div class="loading">Cargando productos...</div>';
@@ -297,124 +497,210 @@
           return;
         }
 
-        const categoriesMap = {};
-        (categoriesData || []).forEach(cat => {
-          categoriesMap[cat.id] = cat.name;
-        });
+        categoriesCache = categoriesData || [];
+        productsCache = productsData || [];
+        dirtyProducts = new Set();
+        bulkSaveFeedback.className = 'bulk-save-feedback';
+        bulkSaveFeedback.textContent = '';
 
-        if (!productsData || !productsData.length) {
-          productsAdminContainer.innerHTML = '<div class="empty">No hay productos cargados.</div>';
+        renderCategoryEditor();
+      }
+
+      function renderCategoryEditor() {
+        categoryNav.innerHTML = '';
+        subcategoryNav.innerHTML = '';
+
+        if (!categoriesCache.length) {
+          productsAdminContainer.innerHTML = '<div class="empty">No hay categorías cargadas.</div>';
           return;
         }
 
-        productsAdminContainer.innerHTML = productsData.map(product => `
-          <article class="product-admin-card">
-            <div class="product-admin-top">
-              <div>
-                <h3 class="product-admin-title">${product.name}</h3>
-                <div class="product-admin-category">
-                  ${categoriesMap[product.category_id] || 'Sin categoría'}
-                </div>
+        categoriesCache.forEach(category => {
+          const chip = document.createElement('button');
+          chip.className = `category-chip${category.id === selectedCategoryId ? ' active' : ''}`;
+          chip.textContent = category.name;
+          chip.addEventListener('click', () => {
+            selectedCategoryId = category.id;
+            renderCategoryEditor();
+          });
+          categoryNav.appendChild(chip);
+        });
+
+        if (!selectedCategoryId) {
+          productsAdminContainer.innerHTML = '<div class="empty">Elige una categoría para comenzar a editar.</div>';
+          return;
+        }
+
+        const category = categoriesCache.find(cat => cat.id === selectedCategoryId);
+        const categoryProducts = productsCache
+          .filter(product => product.category_id === selectedCategoryId)
+          .sort((a, b) => {
+            const subA = (a.subcategory || '').localeCompare(b.subcategory || '');
+            if (subA !== 0) return subA;
+            return (a.sort_order || 0) - (b.sort_order || 0);
+          });
+
+        if (!categoryProducts.length) {
+          productsAdminContainer.innerHTML = `<div class="empty">No hay productos cargados en ${category ? category.name : 'esta categoría'}.</div>`;
+          return;
+        }
+
+        const groups = {};
+        categoryProducts.forEach(item => {
+          const key = item.subcategory && item.subcategory.trim() ? item.subcategory.trim() : '__general__';
+          if (!groups[key]) groups[key] = [];
+          groups[key].push(item);
+        });
+
+        const subgroupKeys = Object.keys(groups);
+        const multipleSubgroups = subgroupKeys.length > 1 || subgroupKeys[0] !== '__general__';
+
+        if (!selectedSubcategoryByCategory[selectedCategoryId]) {
+          selectedSubcategoryByCategory[selectedCategoryId] = multipleSubgroups ? null : subgroupKeys[0];
+        }
+
+        const visibleSubgroup = selectedSubcategoryByCategory[selectedCategoryId];
+
+        if (multipleSubgroups) {
+          subgroupKeys.forEach(subgroupName => {
+            const chip = document.createElement('button');
+            chip.className = `subcategory-chip${subgroupName === visibleSubgroup ? ' active' : ''}`;
+            chip.textContent = subgroupName === '__general__' ? 'General' : subgroupName;
+            chip.addEventListener('click', () => {
+              selectedSubcategoryByCategory[selectedCategoryId] = subgroupName;
+              renderCategoryEditor();
+            });
+            subcategoryNav.appendChild(chip);
+          });
+        }
+
+        if (multipleSubgroups && !visibleSubgroup) {
+          productsAdminContainer.innerHTML = '<div class="empty">Elige una subcategoría para editar sus productos.</div>';
+          return;
+        }
+
+        const renderKeys = multipleSubgroups ? [visibleSubgroup] : subgroupKeys;
+
+        productsAdminContainer.innerHTML = renderKeys.map(subgroupName => {
+          const items = groups[subgroupName] || [];
+          const subgroupTitle = subgroupName && subgroupName !== '__general__'
+            ? `<h3>${subgroupName}</h3>`
+            : '';
+
+          return `
+            <section class="group">
+              <h2>${category.name}</h2>
+              ${subgroupTitle}
+              <div class="grid">
+                ${items.map(product => `
+                  <article class="card">
+                    <div>
+                      <div class="card-top">
+                        <div>
+                          <h4>${product.name}</h4>
+                        </div>
+                        <span class="price-tag">${formatPrice(product.price)}</span>
+                      </div>
+                      <p class="desc">${product.description || ''}</p>
+                    </div>
+
+                    <div class="edit-grid">
+                      <div class="field">
+                        <label>Precio</label>
+                        <input type="number" min="0" value="${product.price || 0}" data-product-id="${product.id}" data-field="price" class="product-input" />
+                      </div>
+
+                      <div class="field">
+                        <label>Orden</label>
+                        <input type="number" min="0" value="${product.sort_order || 0}" data-product-id="${product.id}" data-field="sort_order" class="product-input" />
+                      </div>
+
+                      <div class="field" style="grid-column: 1 / -1;">
+                        <label>Texto promo</label>
+                        <input type="text" value="${product.promo_label || ''}" placeholder="Ej: 2x1 / Combo / Promo" data-product-id="${product.id}" data-field="promo_label" class="product-input" />
+                      </div>
+                    </div>
+
+                    <div class="checkbox-row">
+                      <input type="checkbox" id="active-${product.id}" ${product.is_active ? 'checked' : ''} data-product-id="${product.id}" data-field="is_active" class="product-checkbox" />
+                      <label for="active-${product.id}">Producto activo</label>
+                    </div>
+
+                    <div class="checkbox-row">
+                      <input type="checkbox" id="promo-${product.id}" ${product.is_promo ? 'checked' : ''} data-product-id="${product.id}" data-field="is_promo" class="product-checkbox" />
+                      <label for="promo-${product.id}">Marcar como promo</label>
+                    </div>
+                  </article>
+                `).join('')}
               </div>
-            </div>
+            </section>
+          `;
+        }).join('');
 
-            <div class="product-admin-grid">
-              <div class="product-admin-field">
-                <label>Precio</label>
-                <input type="number" min="0" value="${product.price || 0}" id="price-${product.id}" />
-              </div>
+        document.querySelectorAll('.product-input').forEach(input => {
+          input.addEventListener('input', (event) => {
+            const productId = Number(event.target.dataset.productId);
+            const field = event.target.dataset.field;
+            const value = field === 'price' || field === 'sort_order'
+              ? Number(event.target.value || 0)
+              : event.target.value;
+            updateProductDraft(productId, field, value);
+          });
+        });
 
-              <div class="product-admin-field">
-                <label>Texto promo</label>
-                <input type="text" value="${product.promo_label || ''}" placeholder="Ej: 2x1 / Combo / Promo" id="promo-label-${product.id}" />
-              </div>
-            </div>
-
-            <div class="checkbox-row">
-              <input type="checkbox" id="active-${product.id}" ${product.is_active ? 'checked' : ''} />
-              <label for="active-${product.id}">Producto activo</label>
-            </div>
-
-            <div class="checkbox-row">
-              <input type="checkbox" id="promo-${product.id}" ${product.is_promo ? 'checked' : ''} />
-              <label for="promo-${product.id}">Marcar como promo</label>
-            </div>
-
-            <div class="product-admin-actions">
-              <button class="btn-accent save-product-btn" data-product-id="${product.id}">
-                Guardar cambios
-              </button>
-            </div>
-
-            <div class="save-feedback" id="feedback-${product.id}"></div>
-          </article>
-        `).join('');
-
-        document.querySelectorAll('.save-product-btn').forEach(button => {
-          button.addEventListener('click', async () => {
-            const productId = Number(button.dataset.productId);
-            await saveProductChanges(productId);
+        document.querySelectorAll('.product-checkbox').forEach(input => {
+          input.addEventListener('change', (event) => {
+            const productId = Number(event.target.dataset.productId);
+            const field = event.target.dataset.field;
+            updateProductDraft(productId, field, event.target.checked);
           });
         });
       }
 
-      async function saveProductChanges(productId) {
-        const price = Number(document.getElementById(`price-${productId}`).value || 0);
-        const isActive = document.getElementById(`active-${productId}`).checked;
-        const isPromo = document.getElementById(`promo-${productId}`).checked;
-        const promoLabel = document.getElementById(`promo-label-${productId}`).value.trim();
-        const feedback = document.getElementById(`feedback-${productId}`);
-
-        feedback.style.color = '#d4d4d8';
-        feedback.textContent = 'Guardando...';
-
-        const { error } = await supabaseClient
-          .from('products')
-          .update({
-            price: price,
-            is_active: isActive,
-            is_promo: isPromo,
-            promo_label: promoLabel || null
-          })
-          .eq('id', productId);
-
-        if (error) {
-          console.error(error);
-          feedback.style.color = '#fca5a5';
-          feedback.textContent = 'No se pudo guardar.';
+      async function saveAllProductChanges() {
+        if (!dirtyProducts.size) {
+          bulkSaveFeedback.className = 'bulk-save-feedback';
+          bulkSaveFeedback.textContent = 'No hay cambios pendientes.';
           return;
         }
 
-        feedback.style.color = '#86efac';
-        feedback.textContent = 'Guardado correctamente.';
-      }
+        bulkSaveFeedback.className = 'bulk-save-feedback';
+        bulkSaveFeedback.textContent = 'Guardando cambios...';
 
-      async function loadCategoriesForNewProduct() {
-        const { data, error } = await supabaseClient
-          .from('categories')
-          .select('*')
-          .order('sort_order', { ascending: true });
+        for (const productId of dirtyProducts) {
+          const product = productsCache.find(item => item.id === productId);
+          if (!product) continue;
 
-        if (error) {
-          console.error(error);
-          newProductCategory.innerHTML = '<option value="">Error cargando categorías</option>';
-          return;
+          const { error } = await supabaseClient
+            .from('products')
+            .update({
+              price: Number(product.price || 0),
+              sort_order: Number(product.sort_order || 0),
+              is_active: !!product.is_active,
+              is_promo: !!product.is_promo,
+              promo_label: product.promo_label ? product.promo_label.trim() : null
+            })
+            .eq('id', productId);
+
+          if (error) {
+            console.error(error);
+            bulkSaveFeedback.className = 'bulk-save-feedback error';
+            bulkSaveFeedback.textContent = 'No se pudieron guardar todos los cambios.';
+            return;
+          }
         }
 
-        if (!data || !data.length) {
-          newProductCategory.innerHTML = '<option value="">Sin categorías</option>';
-          return;
-        }
-
-        newProductCategory.innerHTML = data.map(category => `
-          <option value="${category.id}">${category.name}</option>
-        `).join('');
+        dirtyProducts = new Set();
+        bulkSaveFeedback.className = 'bulk-save-feedback ok';
+        bulkSaveFeedback.textContent = 'Todos los cambios se guardaron correctamente.';
+        await loadProductsAdmin();
       }
 
       async function createNewProduct() {
         const name = newProductName.value.trim();
         const price = Number(newProductPrice.value || 0);
         const categoryId = Number(newProductCategory.value || 0);
+        const subcategory = newProductSubcategory.value.trim();
         const sortOrder = Number(newProductSortOrder.value || 0);
         const description = newProductDescription.value.trim();
         const isPromo = newProductPromo.checked;
@@ -422,24 +708,24 @@
         const isActive = newProductActive.checked;
 
         if (!name) {
-          newProductFeedback.style.color = '#fca5a5';
+          newProductFeedback.className = 'new-product-feedback error';
           newProductFeedback.textContent = 'Escribe un nombre para el producto.';
           return;
         }
 
         if (!categoryId) {
-          newProductFeedback.style.color = '#fca5a5';
+          newProductFeedback.className = 'new-product-feedback error';
           newProductFeedback.textContent = 'Selecciona una categoría.';
           return;
         }
 
         if (!price || price < 0) {
-          newProductFeedback.style.color = '#fca5a5';
+          newProductFeedback.className = 'new-product-feedback error';
           newProductFeedback.textContent = 'Ingresa un precio válido.';
           return;
         }
 
-        newProductFeedback.style.color = '#d4d4d8';
+        newProductFeedback.className = 'new-product-feedback';
         newProductFeedback.textContent = 'Creando producto...';
 
         const { error } = await supabaseClient
@@ -447,6 +733,7 @@
           .insert([{
             store_id: 1,
             category_id: categoryId,
+            subcategory: subcategory || null,
             name: name,
             description: description || null,
             price: price,
@@ -458,20 +745,21 @@
 
         if (error) {
           console.error(error);
-          newProductFeedback.style.color = '#fca5a5';
+          newProductFeedback.className = 'new-product-feedback error';
           newProductFeedback.textContent = 'No se pudo crear el producto.';
           return;
         }
 
         newProductName.value = '';
         newProductPrice.value = '';
+        newProductSubcategory.value = '';
         newProductSortOrder.value = '';
         newProductDescription.value = '';
         newProductPromo.checked = false;
         newProductPromoLabel.value = '';
         newProductActive.checked = true;
 
-        newProductFeedback.style.color = '#86efac';
+        newProductFeedback.className = 'new-product-feedback ok';
         newProductFeedback.textContent = 'Producto creado correctamente.';
 
         await loadProductsAdmin();
@@ -479,6 +767,10 @@
 
       createProductBtn.addEventListener('click', async () => {
         await createNewProduct();
+      });
+
+      saveAllBtn.addEventListener('click', async () => {
+        await saveAllProductChanges();
       });
 
       refreshBtn.addEventListener('click', async () => {
@@ -494,7 +786,6 @@
       (async () => {
         const allowed = await requireAuth();
         if (!allowed) return;
-
         await loadCategoriesForNewProduct();
         await loadProductsAdmin();
       })();
