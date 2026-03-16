@@ -110,11 +110,6 @@
         padding: 32px 0 48px;
       }
 
-      .section-title {
-        font-size: 30px;
-        margin: 0 0 16px;
-      }
-
       .group {
         margin-bottom: 34px;
       }
@@ -334,6 +329,19 @@
           position: static;
         }
       }
+    
+
+      .promo-badge {
+        display: inline-block;
+        margin-top: 6px;
+        background: rgba(249, 115, 22, 0.18);
+        color: #fed7aa;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 4px 8px;
+        border-radius: 999px;
+      }
+
     </style>
   </head>
   <body>
@@ -347,7 +355,9 @@
           </div>
           <div>
             <div class="pill">Rotisería & Delivery</div>
-            <div style="color:#a1a1aa; font-size:14px;">Hamburguesas con pedido rápido y total automático.</div>
+            <div style="color:#a1a1aa; font-size:14px;">
+              Hamburguesas con pedido rápido y total automático.
+            </div>
           </div>
         </div>
         <h1>Pedidos Comidas</h1>
@@ -358,17 +368,7 @@
     </header>
 
     <main class="container layout">
-      <section>
-        <div class="group">
-          <h2>Hamburguesas Clásicas</h2>
-          <div class="grid" id="clasicas"></div>
-        </div>
-
-        <div class="group">
-          <h2>Hamburguesas Gourmet (incluyen papas fritas)</h2>
-          <div class="grid" id="gourmet"></div>
-        </div>
-      </section>
+      <section></section>
 
       <aside class="sidebar">
         <h2>Tu pedido</h2>
@@ -446,15 +446,6 @@
         }).format(value);
       }
 
-      function slugify(text) {
-        return text
-          .toLowerCase()
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)/g, '');
-      }
-
       function renderMenu() {
         menuSection.innerHTML = '';
 
@@ -479,7 +470,10 @@
             article.innerHTML = `
               <div>
                 <div class="card-top">
-                  <h3>${item.name}</h3>
+                  <div>
+                    <h3>${item.name}</h3>
+                    ${item.is_promo && item.promo_label ? `<div class="promo-badge">${item.promo_label}</div>` : ''}
+                  </div>
                   <span class="price-tag">${formatPrice(item.price)}</span>
                 </div>
                 <p class="desc">${item.description || ''}</p>
@@ -487,7 +481,10 @@
               <button class="btn-accent" data-id="${item.id}">Agregar al pedido</button>
             `;
 
-            article.querySelector('button').addEventListener('click', () => addToCart(item.id));
+            article
+              .querySelector('button')
+              .addEventListener('click', () => addToCart(item.id));
+
             grid.appendChild(article);
           });
 
@@ -538,51 +535,139 @@
           totalEl.textContent = formatPrice(0);
           sendOrder.className = 'btn-link btn-disabled';
           sendOrder.href = '#';
+          sendOrder.onclick = null;
+          sendOrder.textContent = 'Enviar pedido por WhatsApp';
           return;
         }
 
-        cartList.innerHTML = cart.map(item => `
-          <div class="cart-item">
-            <div class="cart-head">
-              <div>
-                <p><strong>${item.name}</strong></p>
-                <small>${formatPrice(item.price)} c/u</small>
+        cartList.innerHTML = cart
+          .map(item => `
+            <div class="cart-item">
+              <div class="cart-head">
+                <div>
+                  <p><strong>${item.name}</strong></p>
+                  <small>${formatPrice(item.price)} c/u</small>
+                </div>
+                <p><strong>${formatPrice(item.price * item.quantity)}</strong></p>
               </div>
-              <p><strong>${formatPrice(item.price * item.quantity)}</strong></p>
+              <div class="qty">
+                <button data-id="${item.id}" data-delta="-1">−</button>
+                <strong>${item.quantity}</strong>
+                <button data-id="${item.id}" data-delta="1">+</button>
+              </div>
             </div>
-            <div class="qty">
-              <button data-id="${item.id}" data-delta="-1">−</button>
-              <strong>${item.quantity}</strong>
-              <button data-id="${item.id}" data-delta="1">+</button>
-            </div>
-          </div>
-        `).join('');
+          `)
+          .join('');
 
         cartList.querySelectorAll('.qty button').forEach(button => {
-          button.addEventListener('click', () => changeQty(Number(button.dataset.id), Number(button.dataset.delta)));
+          button.addEventListener('click', () =>
+            changeQty(Number(button.dataset.id), Number(button.dataset.delta))
+          );
         });
 
         const total = getTotal();
         totalEl.textContent = formatPrice(total);
+
+        sendOrder.href = '#';
+        sendOrder.onclick = (e) => {
+          e.preventDefault();
+          saveOrderAndSendWhatsapp();
+        };
+        sendOrder.className = 'btn-link btn-whatsapp';
+        sendOrder.textContent = 'Enviar pedido por WhatsApp';
+      }
+
+      async function saveOrderAndSendWhatsapp() {
+        if (!cart.length) return;
 
         const name = document.getElementById('name').value.trim();
         const type = document.getElementById('type').value;
         const address = document.getElementById('address').value.trim();
         const payment = document.getElementById('payment').value;
         const notes = document.getElementById('notes').value.trim();
+        const total = getTotal();
 
-        const itemsText = cart.map(item => `- ${item.quantity} x ${item.name} = ${formatPrice(item.price * item.quantity)}`).join('\n');
+        if (!name) {
+          alert('Por favor, ingresa tu nombre.');
+          return;
+        }
+
+        if (type === 'delivery' && !address) {
+          alert('Por favor, ingresa la dirección para delivery.');
+          return;
+        }
+
+        sendOrder.textContent = 'Guardando pedido...';
+        sendOrder.className = 'btn-link btn-disabled';
+
+        const { data: orderData, error: orderError } = await supabaseClient
+          .from('orders')
+          .insert([
+            {
+              store_id: 1,
+              customer_name: name,
+              order_type: type,
+              address: type === 'delivery' ? address : null,
+              payment_method: payment,
+              notes: notes || null,
+              total: total,
+              status: 'nuevo'
+            }
+          ])
+          .select()
+          .single();
+
+        if (orderError) {
+          console.error(orderError);
+          alert('No se pudo guardar el pedido.');
+          sendOrder.textContent = 'Enviar pedido por WhatsApp';
+          sendOrder.className = 'btn-link btn-whatsapp';
+          return;
+        }
+
+        const itemsPayload = cart.map(item => ({
+          order_id: orderData.id,
+          product_id: item.id,
+          product_name: item.name,
+          unit_price: item.price,
+          quantity: item.quantity,
+          subtotal: item.price * item.quantity
+        }));
+
+        const { error: itemsError } = await supabaseClient
+          .from('order_items')
+          .insert(itemsPayload);
+
+        if (itemsError) {
+          console.error(itemsError);
+          alert('El pedido principal se guardó, pero fallaron los productos.');
+          sendOrder.textContent = 'Enviar pedido por WhatsApp';
+          sendOrder.className = 'btn-link btn-whatsapp';
+          return;
+        }
+
+        const itemsText = cart
+          .map(item => `- ${item.quantity} x ${item.name} = ${formatPrice(item.price * item.quantity)}`)
+          .join('\n');
 
         let message = `🍔 Nuevo pedido desde el menú web\n\n`;
+        message += `Pedido N°: ${orderData.id}\n`;
         message += `Nombre: ${name}\n`;
         message += `Tipo: ${type}\n`;
-        if (type === 'delivery') message += `Dirección: ${address}\n`;
+
+        if (type === 'delivery') {
+          message += `Dirección: ${address}\n`;
+        }
+
         message += `Pedido:\n${itemsText}\n\n`;
         message += `Total: ${formatPrice(total)}\n`;
         message += `Forma de pago: ${payment}\n`;
         message += `Observaciones: ${notes || '-'}\n`;
 
-        sendOrder.href = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+
+        sendOrder.textContent = 'Enviar pedido por WhatsApp';
         sendOrder.className = 'btn-link btn-whatsapp';
       }
 
