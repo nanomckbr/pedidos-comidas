@@ -366,6 +366,28 @@
       }
 
 
+      .subgroup {
+        margin-bottom: 24px;
+      }
+
+      .subgroup:last-child {
+        margin-bottom: 0;
+      }
+
+      .subgroup h3 {
+        margin: 0 0 14px;
+        font-size: 20px;
+        color: #f3f4f6;
+      }
+
+      .subgroup h4 {
+        margin: 0 0 12px;
+        font-size: 16px;
+        color: var(--muted);
+        letter-spacing: 0.02em;
+      }
+
+
       @media (max-width: 920px) {
         .layout {
           grid-template-columns: 1fr;
@@ -408,7 +430,7 @@
         </div>
         <h1>Pedidos Comidas</h1>
         <p>
-          Elegí tus pedido, agregalas al carrito y enviá tu pedido por WhatsApp con el total calculado automáticamente.
+          Elegí tus productos, agrégalos al carrito y enviá tu pedido por WhatsApp con el total calculado automáticamente.
         </p>
       </div>
     </header>
@@ -535,17 +557,42 @@
           title.textContent = category.name;
           section.appendChild(title);
 
-          const grid = document.createElement('div');
-          grid.className = 'grid';
-
           const categoryProducts = products
             .filter(product => product.category_id === category.id && product.is_active)
-            .sort((a, b) => a.sort_order - b.sort_order);
+            .sort((a, b) => {
+              const subA = (a.subcategory || '').localeCompare(b.subcategory || '');
+              if (subA !== 0) return subA;
+              return (a.sort_order || 0) - (b.sort_order || 0);
+            });
 
           if (!categoryProducts.length) {
-            grid.innerHTML = '<div class="empty">Todavía no hay productos en esta categoría.</div>';
-          } else {
-            categoryProducts.forEach(item => {
+            section.innerHTML += '<div class="empty">Todavía no hay productos en esta categoría.</div>';
+            panel.appendChild(section);
+            menuPanels.appendChild(panel);
+            return;
+          }
+
+          const groups = {};
+          categoryProducts.forEach(item => {
+            const key = item.subcategory && item.subcategory.trim() ? item.subcategory.trim() : '__sin_subcategoria__';
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(item);
+          });
+
+          Object.entries(groups).forEach(([subgroupName, items]) => {
+            const subgroup = document.createElement('div');
+            subgroup.className = 'subgroup';
+
+            if (subgroupName !== '__sin_subcategoria__') {
+              const subgroupTitle = document.createElement('h3');
+              subgroupTitle.textContent = subgroupName;
+              subgroup.appendChild(subgroupTitle);
+            }
+
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+
+            items.forEach(item => {
               const article = document.createElement('article');
               article.className = 'card';
               article.innerHTML = `
@@ -568,9 +615,11 @@
 
               grid.appendChild(article);
             });
-          }
 
-          section.appendChild(grid);
+            subgroup.appendChild(grid);
+            section.appendChild(subgroup);
+          });
+
           panel.appendChild(section);
           menuPanels.appendChild(panel);
         });
