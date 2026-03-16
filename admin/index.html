@@ -340,6 +340,62 @@
         font-size: 13px;
       }
 
+    
+      .new-product-box {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 18px;
+        margin-bottom: 18px;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
+      }
+
+      .new-product-grid {
+        margin-top: 16px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+      }
+
+      .new-product-field label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .new-product-field input[type="text"],
+      .new-product-field input[type="number"],
+      .new-product-field textarea,
+      .new-product-field select {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: #18181b;
+        color: #fff;
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+
+      .new-product-field textarea {
+        min-height: 84px;
+        resize: vertical;
+      }
+
+      .new-product-actions {
+        margin-top: 16px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .new-product-feedback {
+        color: #86efac;
+        font-size: 13px;
+      }
+
     </style>
   </head>
   <body>
@@ -396,6 +452,62 @@
           </div>
         </div>
 
+        
+        <div class="new-product-box">
+          <small style="display:block;color:var(--muted);margin-bottom:8px;">Nuevo producto</small>
+          <strong style="font-size:24px;">Agregar producto al menú</strong>
+          <div class="updated-at" style="margin-top:8px;">
+            Crea productos nuevos sin tocar el código.
+          </div>
+
+          <div class="new-product-grid">
+            <div class="new-product-field">
+              <label for="new-product-name">Nombre</label>
+              <input type="text" id="new-product-name" placeholder="Ej: Pizza Muzzarella" />
+            </div>
+
+            <div class="new-product-field">
+              <label for="new-product-price">Precio</label>
+              <input type="number" id="new-product-price" min="0" placeholder="Ej: 8500" />
+            </div>
+
+            <div class="new-product-field">
+              <label for="new-product-category">Categoría</label>
+              <select id="new-product-category"></select>
+            </div>
+
+            <div class="new-product-field">
+              <label for="new-product-sort-order">Orden</label>
+              <input type="number" id="new-product-sort-order" min="0" placeholder="Ej: 1" />
+            </div>
+
+            <div class="new-product-field" style="grid-column: 1 / -1;">
+              <label for="new-product-description">Descripción</label>
+              <textarea id="new-product-description" placeholder="Ingredientes, detalles, etc."></textarea>
+            </div>
+
+            <div class="new-product-field">
+              <label for="new-product-promo-label">Texto promo</label>
+              <input type="text" id="new-product-promo-label" placeholder="Ej: 2x1 / Combo / Promo" />
+            </div>
+          </div>
+
+          <div class="checkbox-row">
+            <input type="checkbox" id="new-product-active" checked />
+            <label for="new-product-active">Producto activo</label>
+          </div>
+
+          <div class="checkbox-row">
+            <input type="checkbox" id="new-product-promo" />
+            <label for="new-product-promo">Marcar como promo</label>
+          </div>
+
+          <div class="new-product-actions">
+            <button class="btn-accent" id="create-product-btn">Crear producto</button>
+            <div class="new-product-feedback" id="new-product-feedback"></div>
+          </div>
+        </div>
+
         <div id="products-admin-container" class="orders-grid">
           <div class="loading">Cargando productos...</div>
         </div>
@@ -420,6 +532,16 @@
 
       const ordersContainer = document.getElementById('orders-container');
       const productsAdminContainer = document.getElementById('products-admin-container');
+      const newProductName = document.getElementById('new-product-name');
+      const newProductPrice = document.getElementById('new-product-price');
+      const newProductCategory = document.getElementById('new-product-category');
+      const newProductSortOrder = document.getElementById('new-product-sort-order');
+      const newProductDescription = document.getElementById('new-product-description');
+      const newProductPromo = document.getElementById('new-product-promo');
+      const newProductPromoLabel = document.getElementById('new-product-promo-label');
+      const newProductActive = document.getElementById('new-product-active');
+      const createProductBtn = document.getElementById('create-product-btn');
+      const newProductFeedback = document.getElementById('new-product-feedback');
       const refreshBtn = document.getElementById('refresh-btn');
       const logoutBtn = document.getElementById('logout-btn');
       const toggleAutorefreshBtn = document.getElementById('toggle-autorefresh');
@@ -807,6 +929,96 @@
         feedback.textContent = 'Guardado correctamente.';
       }
 
+
+      async function loadCategoriesForNewProduct() {
+        const { data, error } = await supabaseClient
+          .from('categories')
+          .select('*')
+          .order('sort_order', { ascending: true });
+
+        if (error) {
+          console.error(error);
+          newProductCategory.innerHTML = '<option value="">Error cargando categorías</option>';
+          return;
+        }
+
+        if (!data || !data.length) {
+          newProductCategory.innerHTML = '<option value="">Sin categorías</option>';
+          return;
+        }
+
+        newProductCategory.innerHTML = data.map(category => `
+          <option value="${category.id}">${category.name}</option>
+        `).join('');
+      }
+
+      async function createNewProduct() {
+        const name = newProductName.value.trim();
+        const price = Number(newProductPrice.value || 0);
+        const categoryId = Number(newProductCategory.value || 0);
+        const sortOrder = Number(newProductSortOrder.value || 0);
+        const description = newProductDescription.value.trim();
+        const isPromo = newProductPromo.checked;
+        const promoLabel = newProductPromoLabel.value.trim();
+        const isActive = newProductActive.checked;
+
+        if (!name) {
+          newProductFeedback.style.color = '#fca5a5';
+          newProductFeedback.textContent = 'Escribe un nombre para el producto.';
+          return;
+        }
+
+        if (!categoryId) {
+          newProductFeedback.style.color = '#fca5a5';
+          newProductFeedback.textContent = 'Selecciona una categoría.';
+          return;
+        }
+
+        if (!price || price < 0) {
+          newProductFeedback.style.color = '#fca5a5';
+          newProductFeedback.textContent = 'Ingresa un precio válido.';
+          return;
+        }
+
+        newProductFeedback.style.color = '#d4d4d8';
+        newProductFeedback.textContent = 'Creando producto...';
+
+        const { error } = await supabaseClient
+          .from('products')
+          .insert([{
+            store_id: 1,
+            category_id: categoryId,
+            name: name,
+            description: description || null,
+            price: price,
+            is_promo: isPromo,
+            promo_label: promoLabel || null,
+            is_active: isActive,
+            sort_order: sortOrder
+          }]);
+
+        if (error) {
+          console.error(error);
+          newProductFeedback.style.color = '#fca5a5';
+          newProductFeedback.textContent = 'No se pudo crear el producto.';
+          return;
+        }
+
+        newProductName.value = '';
+        newProductPrice.value = '';
+        newProductSortOrder.value = '';
+        newProductDescription.value = '';
+        newProductPromo.checked = false;
+        newProductPromoLabel.value = '';
+        newProductActive.checked = true;
+
+        newProductFeedback.style.color = '#86efac';
+        newProductFeedback.textContent = 'Producto creado correctamente.';
+
+        await loadProductsAdmin();
+      }
+
+
       function startAutoRefresh() {
         if (autoRefreshInterval) clearInterval(autoRefreshInterval);
         autoRefreshInterval = setInterval(loadOrders, 10000);
@@ -817,8 +1029,13 @@
         autoRefreshInterval = null;
       }
 
+      createProductBtn.addEventListener('click', async () => {
+        await createNewProduct();
+      });
+
       refreshBtn.addEventListener('click', async () => {
         await loadOrders();
+        await loadCategoriesForNewProduct();
         await loadProductsAdmin();
       });
 
@@ -845,6 +1062,7 @@
 
         setDayCutNow();
         await loadOrders();
+        await loadCategoriesForNewProduct();
         await loadProductsAdmin();
       });
 
@@ -853,6 +1071,7 @@
         if (!allowed) return;
 
         await loadOrders();
+        await loadCategoriesForNewProduct();
         await loadProductsAdmin();
         startAutoRefresh();
       })();
