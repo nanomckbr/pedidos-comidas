@@ -214,6 +214,22 @@
         align-items: flex-start;
       }
 
+      
+      .delete-btn {
+        background: transparent;
+        border: 1px solid rgba(239,68,68,0.5);
+        color: #ef4444;
+        border-radius: 10px;
+        padding: 6px 8px;
+        font-weight: 700;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .delete-btn:hover {
+        background: rgba(239,68,68,0.15);
+      }
+
       .card h4 {
         margin: 0;
         font-size: 18px;
@@ -599,7 +615,10 @@
                         <div>
                           <h4>${product.name}</h4>
                         </div>
-                        <span class="price-tag">${formatPrice(product.price)}</span>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                          <span class="price-tag">${formatPrice(product.price)}</span>
+                          <button class="delete-btn" data-delete-id="${product.id}">✕</button>
+                        </div>
                       </div>
                       <p class="desc">${product.description || ''}</p>
                     </div>
@@ -645,6 +664,27 @@
               ? Number(event.target.value || 0)
               : event.target.value;
             updateProductDraft(productId, field, value);
+          });
+        });
+
+        
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const id = Number(e.target.dataset.deleteId);
+            if (!confirm('¿Eliminar este producto del menú?')) return;
+
+            const { error } = await supabaseClient
+              .from('products')
+              .delete()
+              .eq('id', id);
+
+            if (error) {
+              alert('No se pudo eliminar el producto');
+              console.error(error);
+              return;
+            }
+
+            await loadProductsAdmin();
           });
         });
 
