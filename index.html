@@ -439,6 +439,29 @@
         border-radius: 999px;
       }
 
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 22px;
+        transform: translateX(-50%) translateY(20px);
+        background: rgba(34, 197, 94, 0.95);
+        color: #04130a;
+        padding: 10px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.22s ease, transform 0.22s ease;
+        z-index: 50;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
     </style>
   </head>
   <body>
@@ -447,7 +470,7 @@
         <div class="brand-row">
           <div class="logo-box">
             <div class="logo-inner">
-              PEDIDOS<br /><span>COMIDAS</span>
+              <span id="logo-line-1" style="color:#ffffff;">PEDIDOS</span><br /><span id="logo-line-2">COMIDAS</span>
             </div>
           </div>
           <div>
@@ -525,6 +548,8 @@
       </aside>
     </main>
 
+    <div id="toast" class="toast">Producto agregado al carrito</div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
       const phoneNumber = '5493765102837';
@@ -545,6 +570,11 @@
       const sendOrder = document.getElementById('send-order');
       const orderType = document.getElementById('type');
       const addressField = document.getElementById('address-field');
+      const toastEl = document.getElementById('toast');
+      const logoLine1El = document.getElementById('logo-line-1');
+      const logoLine2El = document.getElementById('logo-line-2');
+
+      let toastTimeout = null;
 
       function formatPrice(value) {
         return new Intl.NumberFormat('es-AR', {
@@ -553,6 +583,34 @@
           maximumFractionDigits: 0
         }).format(value);
       }
+
+      function showToast(message) {
+        if (!toastEl) return;
+        toastEl.textContent = message;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          toastEl.classList.remove('show');
+        }, 1400);
+      }
+
+      async function loadBranding() {
+        const { data, error } = await supabaseClient
+          .from('store_settings')
+          .select('logo_line_1, logo_line_2')
+          .eq('store_id', 1)
+          .maybeSingle();
+
+        if (error) {
+          console.error('No se pudo cargar el logo:', error);
+          return;
+        }
+
+        if (data?.logo_line_1) logoLine1El.textContent = data.logo_line_1;
+        if (data?.logo_line_2) logoLine2El.textContent = data.logo_line_2;
+      }
+
+
 
       function renderMenu() {
         categoryNav.innerHTML = '';
@@ -698,6 +756,7 @@
         }
 
         renderCart();
+        showToast(`${product.name} agregado al carrito`);
       }
 
       function changeQty(id, delta) {
@@ -895,6 +954,7 @@
         document.getElementById(id).addEventListener('change', renderCart);
       });
 
+      loadBranding();
       loadMenu();
       renderCart();
     </script>
