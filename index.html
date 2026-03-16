@@ -396,7 +396,27 @@
       }
 
 
+      @media (max-width: 920px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
 
+        .sidebar {
+          position: static;
+        }
+      }
+    
+
+      .promo-badge {
+        display: inline-block;
+        margin-top: 6px;
+        background: rgba(249, 115, 22, 0.18);
+        color: #fed7aa;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 4px 8px;
+        border-radius: 999px;
+      }
       .toast {
         position: fixed;
         left: 50%;
@@ -420,27 +440,6 @@
         transform: translateX(-50%) translateY(0);
       }
 
-      @media (max-width: 920px) {
-        .layout {
-          grid-template-columns: 1fr;
-        }
-
-        .sidebar {
-          position: static;
-        }
-      }
-    
-
-      .promo-badge {
-        display: inline-block;
-        margin-top: 6px;
-        background: rgba(249, 115, 22, 0.18);
-        color: #fed7aa;
-        font-size: 12px;
-        font-weight: 700;
-        padding: 4px 8px;
-        border-radius: 999px;
-      }
 
     </style>
   </head>
@@ -579,28 +578,17 @@
           .from('store_settings')
           .select('logo_image')
           .eq('store_id', 1)
-          .order('id', { ascending: false })
-          .limit(1);
+          .maybeSingle();
 
         if (error) {
           console.error('No se pudo cargar el logo:', error);
-          logoImageEl.style.display = 'none';
-          logoFallbackEl.style.display = 'flex';
           return;
         }
 
-        const logoImage = data && data.length ? data[0].logo_image : null;
-
-        if (logoImage) {
-          logoImageEl.onload = () => {
-            logoImageEl.style.display = 'block';
-            logoFallbackEl.style.display = 'none';
-          };
-          logoImageEl.onerror = () => {
-            logoImageEl.style.display = 'none';
-            logoFallbackEl.style.display = 'flex';
-          };
-          logoImageEl.src = logoImage;
+        if (data?.logo_image) {
+          logoImageEl.src = data.logo_image;
+          logoImageEl.style.display = 'block';
+          logoFallbackEl.style.display = 'none';
         } else {
           logoImageEl.style.display = 'none';
           logoFallbackEl.style.display = 'flex';
@@ -807,14 +795,12 @@
       async function saveOrderAndSendWhatsapp() {
         if (!cart.length) return;
 
-        const cartSnapshot = cart.map(item => ({ ...item }));
-
         const name = document.getElementById('name').value.trim();
         const type = document.getElementById('type').value;
         const address = document.getElementById('address').value.trim();
         const payment = document.getElementById('payment').value;
         const notes = document.getElementById('notes').value.trim();
-        const total = cartSnapshot.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const total = getTotal();
 
         if (!name) {
           alert('Por favor, ingresa tu nombre.');
@@ -854,7 +840,7 @@
           return;
         }
 
-        const itemsPayload = cartSnapshot.map(item => ({
+        const itemsPayload = cart.map(item => ({
           order_id: orderData.id,
           product_id: item.id,
           product_name: item.name,
@@ -875,41 +861,27 @@
           return;
         }
 
-        const itemsText = cartSnapshot
+        const itemsText = cart
           .map(item => `- ${item.quantity} x ${item.name} = ${formatPrice(item.price * item.quantity)}`)
-          .join('
-');
+          .join('\n');
 
-        let message = `🍔 Nuevo pedido desde el menú web
-
-`;
-        message += `Pedido N°: ${orderData.id}
-`;
-        message += `Nombre: ${name}
-`;
-        message += `Tipo: ${type}
-`;
+        let message = `🍔 Nuevo pedido desde el menú web\n\n`;
+        message += `Pedido N°: ${orderData.id}\n`;
+        message += `Nombre: ${name}\n`;
+        message += `Tipo: ${type}\n`;
 
         if (type === 'delivery') {
-          message += `Dirección: ${address}
-`;
+          message += `Dirección: ${address}\n`;
         }
 
-        message += `Pedido:
-${itemsText}
-
-`;
-        message += `Total: ${formatPrice(total)}
-`;
-        message += `Forma de pago: ${payment}
-`;
-        message += `Observaciones: ${notes || '-'}
-`;
+        message += `Pedido:\n${itemsText}\n\n`;
+        message += `Total: ${formatPrice(total)}\n`;
+        message += `Forma de pago: ${payment}\n`;
+        message += `Observaciones: ${notes || '-'}\n`;
 
         const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');
 
-        resetOrderForm();
         sendOrder.textContent = 'Enviar pedido por WhatsApp';
         sendOrder.className = 'btn-link btn-whatsapp';
       }
@@ -947,6 +919,17 @@ ${itemsText}
       ['name', 'address', 'payment', 'notes'].forEach(id => {
         document.getElementById(id).addEventListener('input', renderCart);
         document.getElementById(id).addEventListener('change', renderCart);
+      });
+
+      sendOrder.addEventListener('click', (e) => {
+        if (!cart.length || sendOrder.classList.contains('btn-disabled')) {
+          e.preventDefault();
+          return;
+        }
+
+        setTimeout(() => {
+          resetOrderForm();
+        }, 250);
       });
 
       loadBranding();
