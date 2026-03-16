@@ -423,9 +423,11 @@
             <select id="new-product-category"></select>
           </div>
 
-          <div class="field">
+          <div class="field" id="new-product-subcategory-wrap" style="display:none;">
             <label for="new-product-subcategory">Subcategoría</label>
-            <input type="text" id="new-product-subcategory" placeholder="Ej: Mitad / Entera / Fritas · Docena" />
+            <select id="new-product-subcategory">
+              <option value="">Selecciona una subcategoría</option>
+            </select>
           </div>
 
           <div class="field">
@@ -544,6 +546,40 @@
         newProductCategory.innerHTML = categoriesCache.map(category => `
           <option value="${category.id}">${category.name}</option>
         `).join('');
+        updateNewProductSubcategoryField();
+      }
+
+
+      function getSubcategoryOptionsByCategoryName(categoryName) {
+        const map = {
+          'Pizzas': ['Entera', 'Mitad'],
+          'Empanadas': [
+            'Fritas · Docena',
+            'Fritas · Media docena',
+            'Al horno · Docena',
+            'Al horno · Media docena'
+          ]
+        };
+        return map[categoryName] || [];
+      }
+
+      function updateNewProductSubcategoryField() {
+        const subcategoryWrap = document.getElementById('new-product-subcategory-wrap');
+        const selectedOption = newProductCategory.options[newProductCategory.selectedIndex];
+        const categoryName = selectedOption ? selectedOption.text : '';
+        const options = getSubcategoryOptionsByCategoryName(categoryName);
+
+        if (!options.length) {
+          subcategoryWrap.style.display = 'none';
+          newProductSubcategory.innerHTML = '<option value="">Selecciona una subcategoría</option>';
+          return;
+        }
+
+        subcategoryWrap.style.display = 'block';
+        newProductSubcategory.innerHTML = `
+          <option value="">Selecciona una subcategoría</option>
+          ${options.map(option => `<option value="${option}">${option}</option>`).join('')}
+        `;
       }
 
       async function loadProductsAdmin() {
@@ -866,6 +902,7 @@
         newProductName.value = '';
         newProductPrice.value = '';
         newProductSubcategory.value = '';
+        updateNewProductSubcategoryField();
         newProductSortOrder.value = '';
         newProductDescription.value = '';
         newProductPromo.checked = false;
@@ -877,6 +914,10 @@
 
         await loadProductsAdmin();
       }
+
+      newProductCategory.addEventListener('change', () => {
+        updateNewProductSubcategoryField();
+      });
 
       createProductBtn.addEventListener('click', async () => {
         await createNewProduct();
