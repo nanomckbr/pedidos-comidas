@@ -578,12 +578,33 @@
           .from('store_settings')
           .select('logo_image')
           .eq('store_id', 1)
-          .maybeSingle();
+          .order('id', { ascending: false })
+          .limit(1);
 
         if (error) {
           console.error('No se pudo cargar el logo:', error);
+          logoImageEl.style.display = 'none';
+          logoFallbackEl.style.display = 'flex';
           return;
         }
+
+        const logoImage = data && data.length ? data[0].logo_image : null;
+
+        if (logoImage) {
+          logoImageEl.onload = () => {
+            logoImageEl.style.display = 'block';
+            logoFallbackEl.style.display = 'none';
+          };
+          logoImageEl.onerror = () => {
+            logoImageEl.style.display = 'none';
+            logoFallbackEl.style.display = 'flex';
+          };
+          logoImageEl.src = logoImage;
+        } else {
+          logoImageEl.style.display = 'none';
+          logoFallbackEl.style.display = 'flex';
+        }
+      }
 
         if (data?.logo_image) {
           logoImageEl.src = data.logo_image;
