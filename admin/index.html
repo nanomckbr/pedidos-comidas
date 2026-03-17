@@ -624,6 +624,7 @@
       @media (max-width: 768px) {
         .mobile-tabs {
           display: flex;
+          display: flex;
           gap: 8px;
           overflow-x: auto;
           padding: 4px 0 14px;
@@ -737,6 +738,14 @@
 
 </head>
   <body>
+    <div class="mobile-tabs" id="mobile-tabs">
+        <button type="button" class="mobile-tab-btn" data-tab="nuevos" id="tab-nuevos">Nuevos</button>
+        <button type="button" class="mobile-tab-btn" data-tab="preparando" id="tab-preparando">Preparando</button>
+        <button type="button" class="mobile-tab-btn" data-tab="despacho" id="tab-despacho">Despacho</button>
+        <button type="button" class="mobile-tab-btn" data-tab="finalizados" id="tab-finalizados">Finalizados</button>
+        <button type="button" class="mobile-tab-btn" data-tab="cancelados" id="tab-cancelados">Cancelados</button>
+      </div>
+
 <header class="hero">
       <div class="container hero-inner">
         <div class="brand">
