@@ -379,10 +379,83 @@
       .checkbox-row {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
         margin-top: 10px;
         color: #fff;
         font-size: 13px;
+      }
+
+      .switch-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 12px;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: rgba(255,255,255,0.03);
+      }
+
+      .switch-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .switch-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+      }
+
+      .switch-help {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 52px;
+        height: 30px;
+        flex-shrink: 0;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .switch-slider {
+        position: absolute;
+        inset: 0;
+        cursor: pointer;
+        background: #3f3f46;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 999px;
+        transition: .2s ease;
+      }
+
+      .switch-slider:before {
+        content: "";
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        left: 3px;
+        top: 3px;
+        background: #fff;
+        border-radius: 50%;
+        transition: .2s ease;
+      }
+
+      .switch input:checked + .switch-slider {
+        background: var(--accent);
+      }
+
+      .switch input:checked + .switch-slider:before {
+        transform: translateX(22px);
       }
 
       .subgroup {
@@ -522,14 +595,26 @@
           </div>
         </div>
 
-        <div class="checkbox-row">
-          <input type="checkbox" id="new-product-active" checked />
-          <label for="new-product-active">Producto activo</label>
+        <div class="switch-row">
+          <div class="switch-copy">
+            <span class="switch-label">Disponible</span>
+            <span class="switch-help">El producto aparecerá visible en el menú</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="new-product-active" checked />
+            <span class="switch-slider"></span>
+          </label>
         </div>
 
-        <div class="checkbox-row">
-          <input type="checkbox" id="new-product-promo" />
-          <label for="new-product-promo">Marcar como promo</label>
+        <div class="switch-row">
+          <div class="switch-copy">
+            <span class="switch-label">Promo</span>
+            <span class="switch-help">Activa esta opción si quieres destacarlo</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="new-product-promo" />
+            <span class="switch-slider"></span>
+          </label>
         </div>
 
         <div class="bulk-actions">
@@ -847,14 +932,26 @@
                       </div>
                     </div>
 
-                    <div class="checkbox-row">
-                      <input type="checkbox" id="active-${product.id}" ${product.is_active ? 'checked' : ''} data-product-id="${product.id}" data-field="is_active" class="product-checkbox" />
-                      <label for="active-${product.id}">Producto activo</label>
+                    <div class="switch-row">
+                      <div class="switch-copy">
+                        <span class="switch-label">Disponible</span>
+                        <span class="switch-help">Oculta o muestra este producto en el menú</span>
+                      </div>
+                      <label class="switch">
+                        <input type="checkbox" id="active-${product.id}" ${product.is_active ? 'checked' : ''} data-product-id="${product.id}" data-field="is_active" class="product-checkbox" />
+                        <span class="switch-slider"></span>
+                      </label>
                     </div>
 
-                    <div class="checkbox-row">
-                      <input type="checkbox" id="promo-${product.id}" ${product.is_promo ? 'checked' : ''} data-product-id="${product.id}" data-field="is_promo" class="product-checkbox" />
-                      <label for="promo-${product.id}">Marcar como promo</label>
+                    <div class="switch-row">
+                      <div class="switch-copy">
+                        <span class="switch-label">Promo</span>
+                        <span class="switch-help">Marca este producto como promoción destacada</span>
+                      </div>
+                      <label class="switch">
+                        <input type="checkbox" id="promo-${product.id}" ${product.is_promo ? 'checked' : ''} data-product-id="${product.id}" data-field="is_promo" class="product-checkbox" />
+                        <span class="switch-slider"></span>
+                      </label>
                     </div>
                   </article>
                 `).join('')}
