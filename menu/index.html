@@ -1820,7 +1820,11 @@
             productsCache = productsCache.filter(item => item.id !== id);
             dirtyProducts.delete(id);
 
-            if (selectedCategoryId && !productsCache.some(item => item.category_id === selectedCategoryId)) {
+            if (selectedCategoryId === 'promos') {
+              if (!productsCache.some(item => item.is_promo)) {
+                selectedCategoryId = null;
+              }
+            } else if (selectedCategoryId && !productsCache.some(item => item.category_id === selectedCategoryId && !item.is_promo)) {
               selectedCategoryId = null;
             }
 
