@@ -570,8 +570,35 @@
         .container { width: min(100%, calc(100% - 20px)); }
       }
     </style>
-  </head>
+  
+<style>
+@media (max-width: 768px){
+  .columns-container{display:block;}
+  .column{display:none;}
+  .column.active{display:block;}
+  .mobile-tabs{
+    position:sticky; top:0; z-index:999;
+    background:#111; padding:8px; display:flex; gap:6px; overflow-x:auto;
+  }
+  .mobile-tabs button{
+    flex:1; padding:8px; border:none; border-radius:8px; color:#fff; background:#333;
+  }
+  .mobile-tabs button.active{background:#00c853;}
+  .order-card{padding:8px; font-size:14px;}
+}
+</style>
+
+</head>
   <body>
+
+<div class="mobile-tabs">
+  <button onclick="showTab('nuevos')" id="tab-nuevos">Nuevos</button>
+  <button onclick="showTab('preparando')" id="tab-preparando">Preparando</button>
+  <button onclick="showTab('despacho')" id="tab-despacho">Despacho</button>
+  <button onclick="showTab('finalizados')" id="tab-finalizados">Finalizados</button>
+  <button onclick="showTab('cancelados')" id="tab-cancelados">Cancelados</button>
+</div>
+
     <header class="hero">
       <div class="container hero-inner">
         <div class="brand">
@@ -1438,5 +1465,30 @@
         startAutoRefresh();
       })();
     </script>
-  </body>
+  
+<script>
+function showTab(tab){
+  const columns = document.querySelectorAll('.column');
+  columns.forEach(c=>{
+    if(c.dataset.status === tab){
+      c.classList.add('active');
+    }else{
+      c.classList.remove('active');
+    }
+  });
+  document.querySelectorAll('.mobile-tabs button').forEach(b=>b.classList.remove('active'));
+  const activeBtn = document.getElementById('tab-'+tab);
+  if(activeBtn) activeBtn.classList.add('active');
+}
+
+window.addEventListener('load', ()=>{
+  if(window.innerWidth <= 768){
+    showTab('nuevos');
+  } else {
+    document.querySelectorAll('.column').forEach(c=>c.classList.add('active'));
+  }
+});
+</script>
+
+</body>
 </html>
