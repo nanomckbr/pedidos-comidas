@@ -14,14 +14,21 @@
         --muted: #a1a1aa;
         --accent: #f97316;
         --red: #ef4444;
+        --green: #22c55e;
+        --yellow: #eab308;
+        --blue: #3b82f6;
+        --orange: #fb923c;
       }
+
       * { box-sizing: border-box; }
+
       body {
         margin: 0;
         font-family: Arial, Helvetica, sans-serif;
         background: var(--bg);
         color: var(--text);
       }
+
       .hero {
         position: sticky;
         top: 0;
@@ -30,10 +37,12 @@
         backdrop-filter: blur(10px);
         border-bottom: 1px solid rgba(255,255,255,0.08);
       }
+
       .container {
-        width: min(1280px, calc(100% - 32px));
+        width: min(1600px, calc(100% - 32px));
         margin: 0 auto;
       }
+
       .hero-inner {
         padding: 32px 0 24px;
         display: flex;
@@ -42,14 +51,17 @@
         align-items: flex-end;
         flex-wrap: wrap;
       }
+
       .brand h1 {
         margin: 0;
         font-size: clamp(28px, 5vw, 48px);
       }
+
       .brand p {
         margin: 10px 0 0;
         color: #d4d4d8;
       }
+
       .top-actions {
         display: flex;
         gap: 10px;
@@ -57,6 +69,7 @@
         align-items: center;
         justify-content: flex-end;
       }
+
       .logo-tools {
         display: inline-flex;
         align-items: center;
@@ -66,6 +79,7 @@
         border: 1px solid var(--border);
         background: rgba(255,255,255,0.04);
       }
+
       .logo-thumb {
         width: 54px;
         height: 54px;
@@ -76,6 +90,7 @@
         padding: 6px;
         display: none;
       }
+
       .logo-thumb.is-empty {
         display: inline-flex;
         align-items: center;
@@ -86,6 +101,7 @@
         text-align: center;
         line-height: 1.1;
       }
+
       button, .link-btn {
         border: 0;
         border-radius: 16px;
@@ -97,41 +113,135 @@
         align-items: center;
         justify-content: center;
       }
+
+      button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
       .btn-accent {
         background: var(--accent);
         color: #000;
       }
+
       .btn-dark {
         background: #18181b;
         color: #fff;
         border: 1px solid var(--border);
       }
+
       .btn-danger {
         background: var(--red);
         color: #fff;
       }
+
+      .btn-green {
+        background: var(--green);
+        color: #04110a;
+      }
+
+      .btn-outline {
+        background: transparent;
+        color: #fff;
+        border: 1px solid var(--border);
+      }
+
       .stats {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 14px;
         padding: 22px 0;
       }
+
       .stat-card {
         background: var(--card);
         border: 1px solid var(--border);
         border-radius: 22px;
         padding: 18px;
       }
+
       .stat-card small {
         display: block;
         color: var(--muted);
         margin-bottom: 8px;
       }
+
       .stat-card strong {
         font-size: 28px;
       }
+
       .content { padding: 8px 0 40px; }
-      .orders-grid { display: grid; gap: 16px; }
+
+      .kanban-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(280px, 1fr));
+        gap: 16px;
+        align-items: start;
+        overflow-x: auto;
+        padding-bottom: 12px;
+      }
+
+      .kanban-column {
+        min-height: 240px;
+        background: rgba(255, 255, 255, 0.025);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 24px;
+        padding: 14px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      }
+
+      .column-header {
+        position: sticky;
+        top: 120px;
+        z-index: 5;
+        background: rgba(9, 9, 11, 0.92);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 18px;
+        padding: 14px;
+        margin-bottom: 14px;
+      }
+
+      .column-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .column-title {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .column-count {
+        min-width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        background: rgba(255,255,255,0.08);
+      }
+
+      .column-subtitle {
+        color: var(--muted);
+        margin-top: 8px;
+        font-size: 13px;
+      }
+
+      .column-nuevos .column-count { background: rgba(59,130,246,0.18); color: #bfdbfe; }
+      .column-preparando .column-count { background: rgba(234,179,8,0.18); color: #fde68a; }
+      .column-despacho .column-count { background: rgba(249,115,22,0.18); color: #fed7aa; }
+      .column-finalizados .column-count { background: rgba(34,197,94,0.18); color: #bbf7d0; }
+      .column-cancelados .column-count { background: rgba(239,68,68,0.18); color: #fecaca; }
+
+      .column-body {
+        display: grid;
+        gap: 14px;
+      }
+
       .order-card {
         background: rgba(24,24,27,0.92);
         border: 1px solid rgba(255,255,255,0.08);
@@ -141,65 +251,58 @@
           0 20px 50px rgba(0,0,0,0.45),
           inset 0 1px 0 rgba(255,255,255,0.05);
         backdrop-filter: blur(6px);
-        transition: transform .15s ease, box-shadow .15s ease;
+        transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
       }
+
       .order-card:hover{
         transform: translateY(-2px);
         box-shadow:
           0 25px 60px rgba(0,0,0,0.55),
           inset 0 1px 0 rgba(255,255,255,0.08);
       }
+
+      .order-card.is-new-highlight {
+        border-color: rgba(59,130,246,0.55);
+        box-shadow:
+          0 0 0 1px rgba(59,130,246,0.12),
+          0 20px 50px rgba(0,0,0,0.45),
+          inset 0 1px 0 rgba(255,255,255,0.05);
+      }
+
       .order-top {
         display: flex;
         justify-content: space-between;
         gap: 14px;
         align-items: flex-start;
-        flex-wrap: wrap;
       }
+
       .order-id {
-        font-size: 28px;
+        font-size: 24px;
         font-weight: 800;
         margin: 0;
       }
+
       .order-meta {
         margin-top: 10px;
         display: grid;
         gap: 6px;
         color: #e4e4e7;
+        font-size: 14px;
       }
+
       .muted { color: var(--muted); }
-      .items {
-        margin-top: 18px;
-        padding: 14px;
-        border-radius: 18px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid var(--border);
-      }
-      .items h4 {
-        margin: 0 0 10px;
-        font-size: 16px;
-      }
-      .items ul {
-        margin: 0;
-        padding-left: 18px;
-      }
-      .items li { margin-bottom: 8px; }
-      .order-footer {
-        margin-top: 18px;
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        align-items: center;
-        flex-wrap: wrap;
-      }
+
       .status-pill {
         display: inline-flex;
         align-items: center;
         border-radius: 999px;
         padding: 8px 12px;
-        font-size: 13px;
-        font-weight: 700;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
       }
+
       .status-nuevo {
         background: rgba(59, 130, 246, 0.18);
         color: #bfdbfe;
@@ -220,14 +323,123 @@
         background: rgba(239, 68, 68, 0.18);
         color: #fecaca;
       }
-      select {
+
+      .items {
+        margin-top: 18px;
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border);
+      }
+
+      .items h4,
+      .dispatch-box h4,
+      .action-box h4 {
+        margin: 0 0 10px;
+        font-size: 15px;
+      }
+
+      .items ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      .items li { margin-bottom: 8px; }
+
+      .action-box,
+      .dispatch-box,
+      .summary-box {
+        margin-top: 14px;
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border);
+      }
+
+      .action-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .field-row {
+        display: grid;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .field-row.two-cols {
+        grid-template-columns: 1fr auto;
+        align-items: end;
+      }
+
+      label.small-label {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+
+      input[type="number"] {
+        width: 100%;
         border-radius: 14px;
         border: 1px solid var(--border);
         background: #18181b;
         color: #fff;
-        padding: 10px 12px;
+        padding: 12px;
         font-size: 14px;
       }
+
+      .checkbox-line {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 12px;
+        color: #f4f4f5;
+      }
+
+      .checkbox-line input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--green);
+      }
+
+      .price-preview {
+        display: grid;
+        gap: 6px;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+
+      .price-preview strong {
+        font-size: 18px;
+      }
+
+      .badge-confirmed,
+      .badge-soft {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 7px 11px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-top: 10px;
+      }
+
+      .badge-confirmed {
+        background: rgba(34,197,94,0.16);
+        color: #bbf7d0;
+      }
+
+      .badge-soft {
+        background: rgba(255,255,255,0.08);
+        color: #e4e4e7;
+      }
+
       .empty {
         padding: 24px;
         border: 1px dashed var(--border);
@@ -235,27 +447,45 @@
         color: var(--muted);
         text-align: center;
       }
+
+      .column-empty {
+        padding: 18px 14px;
+        border: 1px dashed rgba(255,255,255,0.08);
+        border-radius: 18px;
+        color: var(--muted);
+        text-align: center;
+        font-size: 14px;
+      }
+
       .loading {
         color: var(--muted);
         padding: 18px 0;
       }
+
       .updated-at, .day-cut {
         color: var(--muted);
         font-size: 13px;
         margin-top: 6px;
       }
+
       .save-note {
         margin-top: 12px;
         font-size: 13px;
       }
+
       .save-note.ok { color: #86efac; }
       .save-note.error { color: #fca5a5; }
 
-      @media (max-width: 700px) {
-        .order-id { font-size: 24px; }
-        .top-actions {
-          justify-content: flex-start;
+      @media (max-width: 1400px) {
+        .kanban-grid {
+          grid-template-columns: repeat(5, minmax(300px, 1fr));
         }
+      }
+
+      @media (max-width: 700px) {
+        .order-id { font-size: 22px; }
+        .top-actions { justify-content: flex-start; }
+        .container { width: min(100%, calc(100% - 20px)); }
       }
     </style>
   </head>
@@ -264,7 +494,7 @@
       <div class="container hero-inner">
         <div class="brand">
           <h1>Admin — Pedidos Comidas</h1>
-          <p>Panel de pedidos en tiempo real</p>
+          <p>Flujo operativo de pedidos en tiempo real</p>
         </div>
 
         <div class="top-actions">
@@ -286,7 +516,7 @@
     <main class="container content">
       <section class="stats">
         <div class="stat-card">
-          <small>Total pedidos</small>
+          <small>Total visibles</small>
           <strong id="stat-total">0</strong>
         </div>
         <div class="stat-card">
@@ -298,6 +528,10 @@
           <strong id="stat-preparando">0</strong>
         </div>
         <div class="stat-card">
+          <small>Despacho</small>
+          <strong id="stat-despacho">0</strong>
+        </div>
+        <div class="stat-card">
           <small>Ventas del día</small>
           <strong id="stat-ventas">$0</strong>
         </div>
@@ -307,7 +541,7 @@
       <div class="day-cut" id="day-cut-info">Corte del día: no definido.</div>
       <div id="save-logo-feedback" class="save-note"></div>
 
-      <div id="orders-container" class="orders-grid">
+      <div id="orders-container" class="kanban-grid">
         <div class="loading">Cargando pedidos...</div>
       </div>
     </main>
@@ -317,6 +551,8 @@
       const supabaseUrl = 'https://ylvmzavgebttklblidcd.supabase.co';
       const supabaseKey = 'sb_publishable_rFS54R3Uw06tOJ0qxoFhBA_uoEHW457';
       const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+      const WORKFLOW_STORAGE_KEY = 'pedidoscomidas_order_workflow_v1';
 
       async function requireAuth() {
         const { data, error } = await supabaseClient.auth.getSession();
@@ -338,6 +574,7 @@
       const statTotal = document.getElementById('stat-total');
       const statNuevo = document.getElementById('stat-nuevo');
       const statPreparando = document.getElementById('stat-preparando');
+      const statDespacho = document.getElementById('stat-despacho');
       const statVentas = document.getElementById('stat-ventas');
       const editLogoBtn = document.getElementById('edit-logo-btn');
       const logoImageInput = document.getElementById('logo-image-input');
@@ -348,13 +585,64 @@
       let autoRefreshEnabled = true;
       let autoRefreshInterval = null;
       let knownOrderIds = new Set();
+      let workflowMeta = loadWorkflowMeta();
+
+      function loadWorkflowMeta() {
+        try {
+          return JSON.parse(localStorage.getItem(WORKFLOW_STORAGE_KEY) || '{}');
+        } catch {
+          return {};
+        }
+      }
+
+      function saveWorkflowMeta() {
+        localStorage.setItem(WORKFLOW_STORAGE_KEY, JSON.stringify(workflowMeta));
+      }
+
+      function getOrderMeta(orderId) {
+        return workflowMeta[String(orderId)] || {
+          deliveryFee: 0,
+          finalPriceConfirmed: false,
+          delivered: false,
+          paid: false,
+          finalTotal: null
+        };
+      }
+
+      function setOrderMeta(orderId, patch) {
+        const key = String(orderId);
+        workflowMeta[key] = {
+          ...getOrderMeta(orderId),
+          ...patch
+        };
+        saveWorkflowMeta();
+      }
+
+      function getEnrichedOrder(order) {
+        const meta = getOrderMeta(order.id);
+        const deliveryFee = Number(meta.deliveryFee || 0);
+        const baseTotal = Number(order.total || 0);
+        const finalTotal = meta.finalPriceConfirmed
+          ? Number(meta.finalTotal || baseTotal + deliveryFee)
+          : baseTotal + deliveryFee;
+
+        return {
+          ...order,
+          workflow: {
+            ...meta,
+            deliveryFee,
+            baseTotal,
+            finalTotal
+          }
+        };
+      }
 
       function formatPrice(value) {
         return new Intl.NumberFormat('es-AR', {
           style: 'currency',
           currency: 'ARS',
           maximumFractionDigits: 0
-        }).format(value);
+        }).format(Number(value || 0));
       }
 
       function setLogoThumb(src) {
@@ -449,9 +737,7 @@
 
           const { error } = await supabaseClient
             .from('store_settings')
-            .update({
-              logo_image: compressedImage
-            })
+            .update({ logo_image: compressedImage })
             .eq('store_id', 1);
 
           if (error) {
@@ -558,31 +844,19 @@
       }
 
       function sortOrders(orders) {
-        const priority = {
-          nuevo: 1,
-          preparando: 2,
-          enviado: 3,
-          entregado: 4,
-          cancelado: 5
-        };
-
-        return [...orders].sort((a, b) => {
-          const pA = priority[a.status] || 99;
-          const pB = priority[b.status] || 99;
-          if (pA !== pB) return pA - pB;
-          return new Date(b.created_at) - new Date(a.created_at);
-        });
+        return [...orders].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       }
 
       function buildStats(orders) {
         const cut = getDayCut();
         const ventasDelDia = orders
           .filter(order => order.status === 'entregado' && new Date(order.created_at) >= cut)
-          .reduce((sum, order) => sum + (order.total || 0), 0);
+          .reduce((sum, order) => sum + Number(order.workflow?.finalTotal || order.total || 0), 0);
 
         statTotal.textContent = orders.length;
         statNuevo.textContent = orders.filter(o => o.status === 'nuevo').length;
         statPreparando.textContent = orders.filter(o => o.status === 'preparando').length;
+        statDespacho.textContent = orders.filter(o => o.status === 'enviado').length;
         statVentas.textContent = formatPrice(ventasDelDia);
       }
 
@@ -595,87 +869,330 @@
         if (error) {
           console.error(error);
           alert('No se pudo actualizar el estado.');
-          return;
+          return false;
         }
 
+        return true;
+      }
+
+      async function handleConfirmOrder(orderId) {
+        const ok = await updateStatus(orderId, 'preparando');
+        if (!ok) return;
         await loadOrders();
       }
 
-      function renderOrders(orders, items) {
-        const sortedOrders = sortOrders(orders);
-        buildStats(sortedOrders);
+      async function handleCancelOrder(orderId) {
+        const ok = await updateStatus(orderId, 'cancelado');
+        if (!ok) return;
+        await loadOrders();
+      }
 
-        if (!sortedOrders.length) {
+      async function handleReadyOrder(orderId) {
+        const ok = await updateStatus(orderId, 'enviado');
+        if (!ok) return;
+        await loadOrders();
+      }
+
+      function syncDispatchInputs() {
+        document.querySelectorAll('[data-delivery-fee-input]').forEach(input => {
+          input.addEventListener('input', (event) => {
+            const orderId = event.target.dataset.orderId;
+            const value = Number(event.target.value || 0);
+            setOrderMeta(orderId, {
+              deliveryFee: Math.max(0, value),
+              finalPriceConfirmed: false,
+              finalTotal: null
+            });
+
+            const orderCard = event.target.closest('.order-card');
+            const baseTotal = Number(orderCard?.dataset.baseTotal || 0);
+            const preview = orderCard?.querySelector('[data-final-price-preview]');
+            if (preview) preview.textContent = formatPrice(baseTotal + Math.max(0, value));
+
+            const confirmedBadge = orderCard?.querySelector('[data-final-price-badge]');
+            if (confirmedBadge) {
+              confirmedBadge.textContent = 'Precio final pendiente';
+              confirmedBadge.className = 'badge-soft';
+            }
+          });
+        });
+
+        document.querySelectorAll('[data-confirm-final-price]').forEach(button => {
+          button.addEventListener('click', async (event) => {
+            const orderId = Number(event.target.dataset.orderId);
+            const orderCard = event.target.closest('.order-card');
+            const feeInput = orderCard.querySelector('[data-delivery-fee-input]');
+            const baseTotal = Number(orderCard.dataset.baseTotal || 0);
+            const deliveryFee = Math.max(0, Number(feeInput?.value || 0));
+            const finalTotal = baseTotal + deliveryFee;
+
+            setOrderMeta(orderId, {
+              deliveryFee,
+              finalPriceConfirmed: true,
+              finalTotal
+            });
+
+            await loadOrders();
+          });
+        });
+
+        document.querySelectorAll('[data-paid-checkbox]').forEach(checkbox => {
+          checkbox.addEventListener('change', async (event) => {
+            const orderId = Number(event.target.dataset.orderId);
+            setOrderMeta(orderId, { paid: event.target.checked });
+            await maybeFinalizeOrder(orderId);
+            await loadOrders();
+          });
+        });
+
+        document.querySelectorAll('[data-delivered-btn]').forEach(button => {
+          button.addEventListener('click', async (event) => {
+            const orderId = Number(event.target.dataset.orderId);
+            setOrderMeta(orderId, { delivered: true });
+            await maybeFinalizeOrder(orderId);
+            await loadOrders();
+          });
+        });
+      }
+
+      async function maybeFinalizeOrder(orderId) {
+        const meta = getOrderMeta(orderId);
+        if (meta.finalPriceConfirmed && meta.paid && meta.delivered) {
+          await updateStatus(orderId, 'entregado');
+        }
+      }
+
+      function renderNewActions(order) {
+        return `
+          <div class="action-box">
+            <h4>Acciones</h4>
+            <div class="action-row">
+              <button class="btn-green" data-confirm-order="${order.id}">Confirmar</button>
+              <button class="btn-danger" data-cancel-order="${order.id}">Rechazar</button>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderPreparingActions(order) {
+        return `
+          <div class="action-box">
+            <h4>Cocina</h4>
+            <div class="action-row">
+              <button class="btn-accent" data-ready-order="${order.id}">Pedido listo</button>
+              <button class="btn-outline" data-cancel-order="${order.id}">Cancelar</button>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderDispatchActions(order) {
+        const workflow = order.workflow || {};
+        const badgeClass = workflow.finalPriceConfirmed ? 'badge-confirmed' : 'badge-soft';
+        const badgeText = workflow.finalPriceConfirmed ? 'Precio final confirmado' : 'Precio final pendiente';
+        const finalPreview = workflow.finalPriceConfirmed ? workflow.finalTotal : workflow.baseTotal + workflow.deliveryFee;
+
+        return `
+          <div class="dispatch-box">
+            <h4>Entrega / cobro</h4>
+
+            <div class="field-row two-cols">
+              <div>
+                <label class="small-label" for="delivery-fee-${order.id}">Costo de envío</label>
+                <input
+                  id="delivery-fee-${order.id}"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value="${workflow.deliveryFee || 0}"
+                  data-order-id="${order.id}"
+                  data-delivery-fee-input
+                />
+              </div>
+              <button class="btn-accent" data-order-id="${order.id}" data-confirm-final-price>
+                Confirmar precio
+              </button>
+            </div>
+
+            <div class="price-preview">
+              <div>Total productos: ${formatPrice(workflow.baseTotal)}</div>
+              <div>Envío: ${formatPrice(workflow.deliveryFee)}</div>
+              <strong>Total final: <span data-final-price-preview>${formatPrice(finalPreview)}</span></strong>
+            </div>
+
+            <div class="${badgeClass}" data-final-price-badge>${badgeText}</div>
+
+            <label class="checkbox-line">
+              <input type="checkbox" data-order-id="${order.id}" data-paid-checkbox ${workflow.paid ? 'checked' : ''} />
+              <span>Pagado</span>
+            </label>
+
+            <div class="action-row" style="margin-top: 12px;">
+              <button
+                class="btn-green"
+                data-order-id="${order.id}"
+                data-delivered-btn
+                ${workflow.delivered ? 'disabled' : ''}
+              >
+                ${workflow.delivered ? 'Entregado ✓' : 'Entregado'}
+              </button>
+            </div>
+
+            <div class="summary-box">
+              <div class="muted">Pasa a <strong>Finalizados</strong> cuando estén completos estos 3 pasos:</div>
+              <div class="price-preview" style="margin-top: 10px;">
+                <div>${workflow.finalPriceConfirmed ? '✅' : '⬜'} Precio final confirmado</div>
+                <div>${workflow.delivered ? '✅' : '⬜'} Pedido entregado</div>
+                <div>${workflow.paid ? '✅' : '⬜'} Pedido pagado</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderFinalizedSummary(order) {
+        const workflow = order.workflow || {};
+        return `
+          <div class="summary-box">
+            <div class="price-preview">
+              <div>Total productos: ${formatPrice(workflow.baseTotal)}</div>
+              <div>Envío: ${formatPrice(workflow.deliveryFee)}</div>
+              <strong>Total final: ${formatPrice(workflow.finalTotal)}</strong>
+            </div>
+            <div class="badge-confirmed">Pedido cobrado y entregado</div>
+          </div>
+        `;
+      }
+
+      function renderCancelledSummary() {
+        return `
+          <div class="summary-box">
+            <div class="muted">Este pedido fue rechazado o cancelado y ya no participa del flujo ni de las ventas del día.</div>
+          </div>
+        `;
+      }
+
+      function renderOrderCard(order, items) {
+        const orderItems = items.filter(item => item.order_id === order.id);
+        const itemsHtml = orderItems.length
+          ? `
+            <div class="items">
+              <h4>Productos</h4>
+              <ul>
+                ${orderItems.map(item => `
+                  <li>${item.quantity} x ${item.product_name} — ${formatPrice(item.subtotal)}</li>
+                `).join('')}
+              </ul>
+            </div>
+          `
+          : `
+            <div class="items">
+              <h4>Productos</h4>
+              <div class="muted">Sin detalle de productos.</div>
+            </div>
+          `;
+
+        let extraHtml = '';
+        if (order.status === 'nuevo') extraHtml = renderNewActions(order);
+        if (order.status === 'preparando') extraHtml = renderPreparingActions(order);
+        if (order.status === 'enviado') extraHtml = renderDispatchActions(order);
+        if (order.status === 'entregado') extraHtml = renderFinalizedSummary(order);
+        if (order.status === 'cancelado') extraHtml = renderCancelledSummary();
+
+        return `
+          <article class="order-card ${order.status === 'nuevo' ? 'is-new-highlight' : ''}" data-base-total="${Number(order.total || 0)}">
+            <div class="order-top">
+              <div>
+                <h3 class="order-id">Pedido #${order.id}</h3>
+                <div class="order-meta">
+                  <div><strong>Cliente:</strong> ${order.customer_name || '-'}</div>
+                  <div><strong>Tipo:</strong> ${order.order_type || '-'}</div>
+                  ${order.address ? `<div><strong>Dirección:</strong> ${order.address}</div>` : ''}
+                  <div><strong>Pago:</strong> ${order.payment_method || '-'}</div>
+                  <div><strong>Total base:</strong> ${formatPrice(order.total)}</div>
+                  <div><strong>Fecha:</strong> ${formatDate(order.created_at)}</div>
+                  <div><strong>Observaciones:</strong> ${order.notes || '-'}</div>
+                </div>
+              </div>
+              <div>
+                <span class="status-pill ${statusClass(order.status)}">${order.status.toUpperCase()}</span>
+              </div>
+            </div>
+
+            ${itemsHtml}
+            ${extraHtml}
+          </article>
+        `;
+      }
+
+      function renderColumn(columnClass, title, subtitle, orders, items) {
+        return `
+          <section class="kanban-column ${columnClass}">
+            <div class="column-header">
+              <div class="column-top">
+                <h2 class="column-title">${title}</h2>
+                <span class="column-count">${orders.length}</span>
+              </div>
+              <div class="column-subtitle">${subtitle}</div>
+            </div>
+            <div class="column-body">
+              ${orders.length
+                ? orders.map(order => renderOrderCard(order, items)).join('')
+                : '<div class="column-empty">No hay pedidos en esta columna.</div>'}
+            </div>
+          </section>
+        `;
+      }
+
+      function attachActionEvents() {
+        document.querySelectorAll('[data-confirm-order]').forEach(button => {
+          button.addEventListener('click', async (event) => {
+            const orderId = Number(event.target.dataset.confirmOrder);
+            await handleConfirmOrder(orderId);
+          });
+        });
+
+        document.querySelectorAll('[data-cancel-order]').forEach(button => {
+          button.addEventListener('click', async (event) => {
+            const orderId = Number(event.target.dataset.cancelOrder);
+            await handleCancelOrder(orderId);
+          });
+        });
+
+        document.querySelectorAll('[data-ready-order]').forEach(button => {
+          button.addEventListener('click', async (event) => {
+            const orderId = Number(event.target.dataset.readyOrder);
+            await handleReadyOrder(orderId);
+          });
+        });
+
+        syncDispatchInputs();
+      }
+
+      function renderOrders(orders, items) {
+        const enrichedOrders = sortOrders(orders).map(getEnrichedOrder);
+        buildStats(enrichedOrders);
+
+        if (!enrichedOrders.length) {
           ordersContainer.innerHTML = '<div class="empty">Todavía no hay pedidos guardados.</div>';
           return;
         }
 
-        ordersContainer.innerHTML = sortedOrders.map(order => {
-          const orderItems = items.filter(item => item.order_id === order.id);
+        const nuevos = enrichedOrders.filter(order => order.status === 'nuevo');
+        const preparando = enrichedOrders.filter(order => order.status === 'preparando');
+        const despacho = enrichedOrders.filter(order => order.status === 'enviado');
+        const finalizados = enrichedOrders.filter(order => order.status === 'entregado');
+        const cancelados = enrichedOrders.filter(order => order.status === 'cancelado');
 
-          const itemsHtml = orderItems.length
-            ? `
-              <div class="items">
-                <h4>Productos</h4>
-                <ul>
-                  ${orderItems.map(item => `
-                    <li>${item.quantity} x ${item.product_name} — ${formatPrice(item.subtotal)}</li>
-                  `).join('')}
-                </ul>
-              </div>
-            `
-            : `
-              <div class="items">
-                <h4>Productos</h4>
-                <div class="muted">Sin detalle de productos.</div>
-              </div>
-            `;
+        ordersContainer.innerHTML = [
+          renderColumn('column-nuevos', 'Pedidos nuevos', 'Confirmar o rechazar', nuevos, items),
+          renderColumn('column-preparando', 'Preparando', 'Pedidos aceptados en cocina', preparando, items),
+          renderColumn('column-despacho', 'Despacho', 'Entrega, envío y cobro', despacho, items),
+          renderColumn('column-finalizados', 'Finalizados', 'Solo pedidos entregados y pagados', finalizados, items),
+          renderColumn('column-cancelados', 'Cancelados', 'Pedidos rechazados o anulados', cancelados, items)
+        ].join('');
 
-          return `
-            <article class="order-card">
-              <div class="order-top">
-                <div>
-                  <h3 class="order-id">Pedido #${order.id}</h3>
-                  <div class="order-meta">
-                    <div><strong>Cliente:</strong> ${order.customer_name}</div>
-                    <div><strong>Tipo:</strong> ${order.order_type}</div>
-                    ${order.address ? `<div><strong>Dirección:</strong> ${order.address}</div>` : ''}
-                    <div><strong>Pago:</strong> ${order.payment_method}</div>
-                    <div><strong>Total:</strong> ${formatPrice(order.total)}</div>
-                    <div><strong>Fecha:</strong> ${formatDate(order.created_at)}</div>
-                    <div><strong>Observaciones:</strong> ${order.notes || '-'}</div>
-                  </div>
-                </div>
-                <div>
-                  <span class="status-pill ${statusClass(order.status)}">${order.status.toUpperCase()}</span>
-                </div>
-              </div>
-
-              ${itemsHtml}
-
-              <div class="order-footer">
-                <div>
-                  <label class="muted" for="status-${order.id}">Cambiar estado</label><br />
-                  <select id="status-${order.id}" data-order-id="${order.id}">
-                    <option value="nuevo" ${order.status === 'nuevo' ? 'selected' : ''}>nuevo</option>
-                    <option value="preparando" ${order.status === 'preparando' ? 'selected' : ''}>preparando</option>
-                    <option value="enviado" ${order.status === 'enviado' ? 'selected' : ''}>enviado</option>
-                    <option value="entregado" ${order.status === 'entregado' ? 'selected' : ''}>entregado</option>
-                    <option value="cancelado" ${order.status === 'cancelado' ? 'selected' : ''}>cancelado</option>
-                  </select>
-                </div>
-              </div>
-            </article>
-          `;
-        }).join('');
-
-        document.querySelectorAll('select[data-order-id]').forEach(select => {
-          select.addEventListener('change', async (e) => {
-            const orderId = Number(e.target.dataset.orderId);
-            const newStatus = e.target.value;
-            await updateStatus(orderId, newStatus);
-          });
-        });
+        attachActionEvents();
       }
 
       async function loadOrders() {
