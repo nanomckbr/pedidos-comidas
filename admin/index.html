@@ -668,6 +668,7 @@
       let autoRefreshInterval = null;
       let knownOrderIds = new Set();
       let workflowMeta = loadWorkflowMeta();
+      let openedOrderId = null;
 
       function loadWorkflowMeta() {
         try {
@@ -958,18 +959,21 @@
       }
 
       async function handleConfirmOrder(orderId) {
+        openedOrderId = String(orderId);
         const ok = await updateStatus(orderId, 'preparando');
         if (!ok) return;
         await loadOrders();
       }
 
       async function handleCancelOrder(orderId) {
+        openedOrderId = String(orderId);
         const ok = await updateStatus(orderId, 'cancelado');
         if (!ok) return;
         await loadOrders();
       }
 
       async function handleReadyOrder(orderId) {
+        openedOrderId = String(orderId);
         const ok = await updateStatus(orderId, 'enviado');
         if (!ok) return;
         await loadOrders();
@@ -1014,6 +1018,7 @@
               finalTotal
             });
 
+            openedOrderId = String(orderId);
             await loadOrders();
           });
         });
@@ -1022,6 +1027,7 @@
           checkbox.addEventListener('change', async (event) => {
             const orderId = Number(event.target.dataset.orderId);
             setOrderMeta(orderId, { paid: event.target.checked });
+            openedOrderId = String(orderId);
             await maybeFinalizeOrder(orderId);
             await loadOrders();
           });
@@ -1031,6 +1037,7 @@
           button.addEventListener('click', async (event) => {
             const orderId = Number(event.target.dataset.orderId);
             setOrderMeta(orderId, { delivered: true });
+            openedOrderId = String(orderId);
             await maybeFinalizeOrder(orderId);
             await loadOrders();
           });
@@ -1040,6 +1047,7 @@
       async function maybeFinalizeOrder(orderId) {
         const meta = getOrderMeta(orderId);
         if (meta.finalPriceConfirmed && meta.paid && meta.delivered) {
+          openedOrderId = String(orderId);
           await updateStatus(orderId, 'entregado');
         }
       }
@@ -1183,7 +1191,7 @@
         if (order.status === 'cancelado') extraHtml = renderCancelledSummary();
 
         return `
-          <article class="order-card ${order.status === 'nuevo' ? 'is-new-highlight' : ''}" data-base-total="${Number(order.total || 0)}">
+          <article class="order-card ${order.status === 'nuevo' ? 'is-new-highlight' : ''}" data-order-id="${order.id}" data-base-total="${Number(order.total || 0)}">
             <div class="order-header">
               <div class="order-summary">
                 <span class="order-summary-item"><strong>Pedido #${order.id}</strong></span>
@@ -1238,8 +1246,11 @@
 
       function enableOrderAccordion() {
         document.querySelectorAll('.order-header').forEach(header => {
-          header.addEventListener('click', () => {
+          header.addEventListener('click', (event) => {
+            if (event.target.closest('button, input, label, a, select, textarea')) return;
+
             const card = header.closest('.order-card');
+            const orderId = String(card.dataset.orderId || '');
             const isOpen = card.classList.contains('open');
 
             document.querySelectorAll('.order-card.open').forEach(openCard => {
@@ -1248,9 +1259,23 @@
 
             if (!isOpen) {
               card.classList.add('open');
+              openedOrderId = orderId;
+            } else {
+              openedOrderId = null;
             }
           });
         });
+      }
+
+      function restoreOpenedOrder() {
+        if (!openedOrderId) return;
+
+        const targetCard = document.querySelector(`.order-card[data-order-id="${openedOrderId}"]`);
+        if (targetCard) {
+          targetCard.classList.add('open');
+        } else {
+          openedOrderId = null;
+        }
       }
 
       function attachActionEvents() {
@@ -1303,6 +1328,7 @@
 
         attachActionEvents();
         enableOrderAccordion();
+        restoreOpenedOrder();
       }
 
       async function loadOrders() {
