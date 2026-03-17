@@ -817,6 +817,33 @@
         font-size: 12px;
       }
 
+      .promo-qty-controls {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 6px;
+      }
+
+      .promo-qty-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 10px;
+        padding: 0;
+        background: rgba(255,255,255,0.06);
+        color: #fff;
+        border: 1px solid var(--border);
+        font-size: 16px;
+        font-weight: 800;
+      }
+
+      .promo-qty-value {
+        min-width: 20px;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 800;
+        color: #fff;
+      }
+
       .promo-remove-btn {
         background: rgba(239,68,68,0.12);
         color: #fecaca;
@@ -1046,8 +1073,8 @@
               </div>
 
               <div class="field" style="grid-column: 1 / -1;">
-                <label for="promo-description">Descripción</label>
-                <textarea id="promo-description" placeholder="Describe qué incluye la promo"></textarea>
+                <label for="promo-description">Descripción automática</label>
+                <textarea id="promo-description" placeholder="La descripción se genera sola según los productos elegidos" readonly></textarea>
               </div>
             </div>
 
@@ -1152,8 +1179,26 @@
 
       function getPromoSelectedProducts() {
         return promoDraftItems
-          .map(id => productsCache.find(product => product.id === id))
+          .map(entry => {
+            const product = productsCache.find(item => item.id === entry.id);
+            if (!product) return null;
+            return { ...product, promo_qty: entry.qty };
+          })
           .filter(Boolean);
+      }
+
+      function syncPromoDescription() {
+        if (!promoDescription) return;
+
+        const selectedProducts = getPromoSelectedProducts();
+        if (!selectedProducts.length) {
+          promoDescription.value = '';
+          return;
+        }
+
+        promoDescription.value = selectedProducts
+          .map(product => product.promo_qty > 1 ? `${product.promo_qty}x ${product.name}` : product.name)
+          .join(' + ');
       }
 
       function renderPromoSelectedList() {
@@ -1163,6 +1208,7 @@
         if (!selectedProducts.length) {
           promoSelectedList.innerHTML = '<div class="empty">Todavía no agregaste productos a la promo.</div>';
           if (promoBaseTotalLine) promoBaseTotalLine.textContent = 'Total base de productos: ' + formatPrice(0);
+          syncPromoDescription();
           return;
         }
 
@@ -1170,20 +1216,44 @@
           <div class="promo-selected-item">
             <div class="promo-selected-meta">
               <strong>${product.name}</strong>
-              <small>${formatPrice(product.price || 0)}</small>
+              <small>${formatPrice(product.price || 0)} c/u</small>
+              <div class="promo-qty-controls">
+                <button type="button" class="promo-qty-btn" data-promo-qty-minus="${product.id}">−</button>
+                <span class="promo-qty-value">${product.promo_qty}</span>
+                <button type="button" class="promo-qty-btn" data-promo-qty-plus="${product.id}">+</button>
+              </div>
             </div>
             <button type="button" class="promo-remove-btn" data-promo-remove-id="${product.id}">Quitar</button>
           </div>
         `).join('');
 
-        const baseTotal = selectedProducts.reduce((sum, product) => sum + Number(product.price || 0), 0);
+        const baseTotal = selectedProducts.reduce((sum, product) => sum + (Number(product.price || 0) * Number(product.promo_qty || 1)), 0);
         if (promoBaseTotalLine) promoBaseTotalLine.textContent = 'Total base de productos: ' + formatPrice(baseTotal);
+        syncPromoDescription();
 
         document.querySelectorAll('[data-promo-remove-id]').forEach(btn => {
           btn.addEventListener('click', () => {
             const id = Number(btn.dataset.promoRemoveId);
-            promoDraftItems = promoDraftItems.filter(itemId => itemId !== id);
+            promoDraftItems = promoDraftItems.filter(item => item.id !== id);
             renderPromoProductsGrid();
+            renderPromoSelectedList();
+          });
+        });
+
+        document.querySelectorAll('[data-promo-qty-minus]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = Number(btn.dataset.promoQtyMinus);
+            promoDraftItems = promoDraftItems
+              .map(item => item.id === id ? { ...item, qty: Math.max(1, item.qty - 1) } : item);
+            renderPromoSelectedList();
+          });
+        });
+
+        document.querySelectorAll('[data-promo-qty-plus]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = Number(btn.dataset.promoQtyPlus);
+            promoDraftItems = promoDraftItems
+              .map(item => item.id === id ? { ...item, qty: item.qty + 1 } : item);
             renderPromoSelectedList();
           });
         });
@@ -1210,22 +1280,30 @@
           return;
         }
 
-        promoProductsGrid.innerHTML = categoryProducts.map(product => `
-          <article class="promo-product-card ${promoDraftItems.includes(product.id) ? 'selected' : ''}" data-promo-product-id="${product.id}">
-            <h4>${product.name}</h4>
-            <p>${product.description || 'Sin descripción'}</p>
-            <span class="promo-product-price">${formatPrice(product.price || 0)}</span>
-          </article>
-        `).join('');
+        promoProductsGrid.innerHTML = categoryProducts.map(product => {
+          const selected = promoDraftItems.find(item => item.id === product.id);
+          return `
+            <article class="promo-product-card ${selected ? 'selected' : ''}" data-promo-product-id="${product.id}">
+              <h4>${product.name}</h4>
+              <p>${product.description || 'Sin descripción'}</p>
+              <span class="promo-product-price">${formatPrice(product.price || 0)}</span>
+            </article>
+          `;
+        }).join('');
 
         document.querySelectorAll('[data-promo-product-id]').forEach(card => {
           card.addEventListener('click', () => {
             const id = Number(card.dataset.promoProductId);
-            if (promoDraftItems.includes(id)) {
-              promoDraftItems = promoDraftItems.filter(itemId => itemId !== id);
+            const existing = promoDraftItems.find(item => item.id === id);
+
+            if (existing) {
+              promoDraftItems = promoDraftItems.map(item =>
+                item.id === id ? { ...item, qty: item.qty + 1 } : item
+              );
             } else {
-              promoDraftItems.push(id);
+              promoDraftItems.push({ id, qty: 1 });
             }
+
             renderPromoProductsGrid();
             renderPromoSelectedList();
           });
@@ -1419,7 +1497,7 @@
 
         const category = categoriesCache.find(cat => cat.id === selectedCategoryId);
         const categoryProducts = productsCache
-          .filter(product => product.category_id === selectedCategoryId)
+          .filter(product => product.category_id === selectedCategoryId && !product.is_promo)
           .sort((a, b) => {
             const subA = (a.subcategory || '').localeCompare(b.subcategory || '');
             if (subA !== 0) return subA;
@@ -1803,7 +1881,7 @@
       // Estado inicial: no mostrar ninguna sección hasta elegir un modo
       setMenuMode('');
 
-      document.getElementById('save-promo-draft-btn')?.addEventListener('click', () => {
+      document.getElementById('save-promo-draft-btn')?.addEventListener('click', async () => {
         const selectedProducts = getPromoSelectedProducts();
         const name = promoName?.value.trim();
         const price = Number(promoPrice?.value || 0);
@@ -1828,7 +1906,45 @@
         }
 
         promoBuilderFeedback.className = 'bulk-save-feedback';
-        promoBuilderFeedback.textContent = `Promo armada en borrador: "${name}" · ${formatPrice(price)} · ${selectedProducts.length} producto(s) incluidos.`;
+        promoBuilderFeedback.textContent = 'Guardando promo...';
+
+        const categoryIdForPromo = selectedProducts[0]?.category_id || promoSelectedCategoryId || categoriesCache[0]?.id;
+        const maxSortOrder = productsCache
+          .filter(product => product.category_id === categoryIdForPromo)
+          .reduce((max, product) => Math.max(max, Number(product.sort_order || 0)), 0);
+
+        const { error } = await supabaseClient
+          .from('products')
+          .insert([{
+            store_id: 1,
+            category_id: categoryIdForPromo,
+            subcategory: null,
+            name,
+            description,
+            price,
+            is_promo: true,
+            promo_label: 'Promo',
+            is_active: true,
+            sort_order: maxSortOrder + 1
+          }]);
+
+        if (error) {
+          console.error(error);
+          promoBuilderFeedback.className = 'bulk-save-feedback error';
+          promoBuilderFeedback.textContent = 'No se pudo guardar la promo.';
+          return;
+        }
+
+        promoDraftItems = [];
+        promoName.value = '';
+        promoPrice.value = '';
+        promoDescription.value = '';
+
+        promoBuilderFeedback.className = 'bulk-save-feedback ok';
+        promoBuilderFeedback.textContent = 'Promo creada correctamente.';
+
+        await loadProductsAdmin();
+        setMenuMode('promo');
       });
 
       saveAllBtn.addEventListener('click', async () => {
