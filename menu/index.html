@@ -1479,7 +1479,13 @@
           return;
         }
 
-        categoriesCache.forEach(category => {
+        const promoProducts = productsCache.filter(product => product.is_promo);
+        const editorCategories = [...categoriesCache];
+        if (promoProducts.length) {
+          editorCategories.push({ id: 'promos', name: 'Promos' });
+        }
+
+        editorCategories.forEach(category => {
           const chip = document.createElement('button');
           chip.className = `category-chip${category.id === selectedCategoryId ? ' active' : ''}`;
           chip.textContent = category.name;
@@ -1495,14 +1501,15 @@
           return;
         }
 
-        const category = categoriesCache.find(cat => cat.id === selectedCategoryId);
-        const categoryProducts = productsCache
-          .filter(product => product.category_id === selectedCategoryId )
-          .sort((a, b) => {
-            const subA = (a.subcategory || '').localeCompare(b.subcategory || '');
-            if (subA !== 0) return subA;
-            return (a.sort_order || 0) - (b.sort_order || 0);
-          });
+        const category = editorCategories.find(cat => cat.id === selectedCategoryId);
+        const categoryProducts = (selectedCategoryId === 'promos'
+          ? productsCache.filter(product => product.is_promo)
+          : productsCache.filter(product => product.category_id === selectedCategoryId && !product.is_promo)
+        ).sort((a, b) => {
+          const subA = (a.subcategory || '').localeCompare(b.subcategory || '');
+          if (subA !== 0) return subA;
+          return (a.sort_order || 0) - (b.sort_order || 0);
+        });
 
         if (!categoryProducts.length) {
           productsAdminContainer.innerHTML = `<div class="empty">No hay productos cargados en ${category ? category.name : 'esta categoría'}.</div>`;
