@@ -667,13 +667,13 @@
       <div class="panel-box menu-modes-header">
         <small class="menu-modes-title">Gestión de menú</small>
         <div class="menu-mode-nav">
-          <button type="button" class="menu-mode-btn active" data-menu-mode="edit">Editar producto</button>
+          <button type="button" class="menu-mode-btn" data-menu-mode="edit">Editar producto</button>
           <button type="button" class="menu-mode-btn" data-menu-mode="add">Agregar producto</button>
           <button type="button" class="menu-mode-btn" data-menu-mode="promo">Crear promo</button>
         </div>
       </div>
 
-      <section class="menu-mode-panel active" data-menu-panel="edit">
+      <section class="menu-mode-panel" data-menu-panel="edit">
         <div class="panel-box">
           <strong style="font-size:24px;">Editar productos</strong>
           <div class="updated-at" style="margin-top:8px;">
@@ -1485,6 +1485,8 @@
           setMenuMode(btn.dataset.menuMode);
         });
       });
+
+      setMenuMode('');
 
       document.getElementById('save-promo-draft-btn')?.addEventListener('click', () => {
         const selectedIds = [...document.querySelectorAll('#promo-products-list input:checked')].map(input => Number(input.value));
