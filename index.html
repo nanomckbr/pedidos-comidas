@@ -1100,15 +1100,15 @@
           return;
         }
 
-        if (!activeCategoryId || !categories.some(category => category.id === activeCategoryId)) {
-          activeCategoryId = categories[0].id;
-        }
-
-        const promos = products.filter(p => p.is_promo);
-
+        const promos = products.filter(product => product.is_promo && product.is_active);
         const extendedCategories = [...categories];
+
         if (promos.length) {
           extendedCategories.unshift({ id: 'promos', name: 'Promos' });
+        }
+
+        if (!activeCategoryId || !extendedCategories.some(category => category.id === activeCategoryId)) {
+          activeCategoryId = extendedCategories[0].id;
         }
 
         extendedCategories.forEach(category => {
@@ -1131,22 +1131,18 @@
           title.textContent = category.name;
           section.appendChild(title);
 
-          let categoryProducts;
-
-          if (category.id === 'promos') {
-            categoryProducts = products.filter(p => p.is_promo && p.is_active);
-          } else {
-            categoryProducts = products.filter(product => product.category_id === category.id && product.is_active);
-          }
-            .sort((a, b) => {
-              const subA = inferMenuSubcategory(category.name, a);
-              const subB = inferMenuSubcategory(category.name, b);
-              const cmpSub = subA.localeCompare(subB);
-              if (cmpSub !== 0) return cmpSub;
-              const nameA = (a.name || '').localeCompare(b.name || '');
-              if (nameA !== 0) return nameA;
-              return (a.sort_order || 0) - (b.sort_order || 0);
-            });
+          const categoryProducts = (category.id === 'promos'
+            ? products.filter(product => product.is_promo && product.is_active)
+            : products.filter(product => product.category_id === category.id && product.is_active)
+          ).sort((a, b) => {
+            const subA = inferMenuSubcategory(category.name, a);
+            const subB = inferMenuSubcategory(category.name, b);
+            const cmpSub = subA.localeCompare(subB);
+            if (cmpSub !== 0) return cmpSub;
+            const nameA = (a.name || '').localeCompare(b.name || '');
+            if (nameA !== 0) return nameA;
+            return (a.sort_order || 0) - (b.sort_order || 0);
+          });
 
           if (!categoryProducts.length) {
             section.innerHTML += '<div class="empty">Todavía no hay productos en esta categoría.</div>';
