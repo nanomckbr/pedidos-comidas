@@ -664,27 +664,36 @@
     </header>
 
     <main class="container container-main">
-      <div class="panel-box">
-        <small style="display:block;color:var(--muted);margin-bottom:8px;">Gestión de menú</small>
-        <strong style="font-size:24px;">Editar productos</strong>
-        <div class="updated-at" style="margin-top:8px;">
-          Elige una categoría para editar. Después puedes guardar todos los cambios con un solo botón.
-        </div>
-
-        <div id="category-nav" class="category-nav"></div>
-        <div id="subcategory-nav" class="subcategory-nav"></div>
-
-        <div class="bulk-actions">
-          <button class="btn-accent" id="save-all-btn">Guardar todos los cambios</button>
-          <div class="bulk-save-feedback" id="bulk-save-feedback"></div>
-        </div>
+      <div class="menu-mode-nav">
+        <button type="button" class="menu-mode-btn active" data-menu-mode="edit">Editar producto</button>
+        <button type="button" class="menu-mode-btn" data-menu-mode="add">Agregar producto</button>
+        <button type="button" class="menu-mode-btn" data-menu-mode="promo">Crear promo</button>
       </div>
 
-      <div id="products-admin-container">
-        <div class="empty">Elige una categoría para comenzar a editar.</div>
-      </div>
+      <section class="menu-mode-panel active" data-menu-panel="edit">
+        <div class="panel-box">
+          <small style="display:block;color:var(--muted);margin-bottom:8px;">Gestión de menú</small>
+          <strong style="font-size:24px;">Editar productos</strong>
+          <div class="updated-at" style="margin-top:8px;">
+            Elige una categoría para editar. Después puedes guardar todos los cambios con un solo botón.
+          </div>
 
-      <div class="new-product-box">
+          <div id="category-nav" class="category-nav"></div>
+          <div id="subcategory-nav" class="subcategory-nav"></div>
+
+          <div class="bulk-actions">
+            <button class="btn-accent" id="save-all-btn">Guardar todos los cambios</button>
+            <div class="bulk-save-feedback" id="bulk-save-feedback"></div>
+          </div>
+        </div>
+
+        <div id="products-admin-container">
+          <div class="empty">Elige una categoría para comenzar a editar.</div>
+        </div>
+      </section>
+
+      <section class="menu-mode-panel" data-menu-panel="add">
+        <div class="new-product-box">
         <small style="display:block;color:var(--muted);margin-bottom:8px;">Nuevo producto</small>
         <strong style="font-size:24px;">Agregar producto al menú</strong>
         <div class="updated-at" style="margin-top:8px;">
@@ -796,6 +805,44 @@
           <div class="new-product-feedback" id="new-product-feedback"></div>
         </div>
       </div>
+      </section>
+
+      <section class="menu-mode-panel" data-menu-panel="promo">
+        <div class="promo-builder-box">
+          <small style="display:block;color:var(--muted);margin-bottom:8px;">Promociones</small>
+          <strong style="font-size:24px;">Crear promo</strong>
+          <div class="updated-at" style="margin-top:8px;">
+            Arma una promo aparte del menú general con nombre, descripción, precio y productos incluidos.
+          </div>
+
+          <div class="promo-builder-grid">
+            <div class="field">
+              <label for="promo-name">Nombre de la promo</label>
+              <input type="text" id="promo-name" placeholder="Ej: Combo noche" />
+            </div>
+
+            <div class="field">
+              <label for="promo-price">Precio promo</label>
+              <input type="number" id="promo-price" min="0" placeholder="Ej: 15900" />
+            </div>
+
+            <div class="field" style="grid-column: 1 / -1;">
+              <label for="promo-description">Descripción</label>
+              <textarea id="promo-description" placeholder="Describe qué incluye la promo"></textarea>
+            </div>
+          </div>
+
+          <div class="updated-at" style="margin-top:16px;">Selecciona productos del menú para incluir en la promo:</div>
+          <div id="promo-products-list" class="promo-products-list">
+            <div class="empty">Cargando productos...</div>
+          </div>
+
+          <div class="promo-builder-actions">
+            <button class="btn-accent" id="save-promo-draft-btn" type="button">Guardar promo</button>
+            <div id="promo-builder-feedback" class="bulk-save-feedback">Interfaz lista. Para guardar promos como entidad separada faltaría conectar una tabla específica.</div>
+          </div>
+        </div>
+      </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -818,6 +865,11 @@
       const subcategoryNav = document.getElementById('subcategory-nav');
       const saveAllBtn = document.getElementById('save-all-btn');
       const bulkSaveFeedback = document.getElementById('bulk-save-feedback');
+      const promoName = document.getElementById('promo-name');
+      const promoPrice = document.getElementById('promo-price');
+      const promoDescription = document.getElementById('promo-description');
+      const promoProductsList = document.getElementById('promo-products-list');
+      const promoBuilderFeedback = document.getElementById('promo-builder-feedback');
       const quickProductName = document.getElementById('quick-product-name');
       const quickProductPrice = document.getElementById('quick-product-price');
       const quickProductCategory = document.getElementById('quick-product-category');
@@ -865,6 +917,34 @@
         if (!product) return;
         product[field] = value;
         markDirty(productId);
+      }
+
+      function setMenuMode(mode) {
+        document.querySelectorAll('.menu-mode-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.menuMode === mode);
+        });
+
+        document.querySelectorAll('.menu-mode-panel').forEach(panel => {
+          panel.classList.toggle('active', panel.dataset.menuPanel === mode);
+        });
+      }
+
+      function renderPromoBuilderProducts() {
+        if (!promoProductsList) return;
+        if (!productsCache.length) {
+          promoProductsList.innerHTML = '<div class="empty">No hay productos para incluir todavía.</div>';
+          return;
+        }
+
+        promoProductsList.innerHTML = productsCache.map(product => `
+          <label class="promo-product-chip">
+            <input type="checkbox" value="${product.id}" />
+            <span>
+              <strong>${product.name}</strong><br>
+              <small>${formatPrice(product.price || 0)}</small>
+            </span>
+          </label>
+        `).join('');
       }
 
       async function loadCategoriesForNewProduct() {
@@ -972,6 +1052,7 @@
         bulkSaveFeedback.textContent = '';
 
         renderCategoryEditor();
+        renderPromoBuilderProducts();
       }
 
       function bindProductAccordions() {
@@ -1395,6 +1476,34 @@
 
       createProductBtn.addEventListener('click', async () => {
         await createNewProduct();
+      });
+
+      document.querySelectorAll('.menu-mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          setMenuMode(btn.dataset.menuMode);
+        });
+      });
+
+      document.getElementById('save-promo-draft-btn')?.addEventListener('click', () => {
+        const selectedIds = [...document.querySelectorAll('#promo-products-list input:checked')].map(input => Number(input.value));
+        const name = promoName?.value.trim();
+        const price = Number(promoPrice?.value || 0);
+        const description = promoDescription?.value.trim();
+
+        if (!name) {
+          promoBuilderFeedback.className = 'bulk-save-feedback error';
+          promoBuilderFeedback.textContent = 'Ponle un nombre a la promo.';
+          return;
+        }
+
+        if (!price || price < 0) {
+          promoBuilderFeedback.className = 'bulk-save-feedback error';
+          promoBuilderFeedback.textContent = 'Ingresa un precio válido para la promo.';
+          return;
+        }
+
+        promoBuilderFeedback.className = 'bulk-save-feedback';
+        promoBuilderFeedback.textContent = `Promo armada en borrador: "${name}" · ${formatPrice(price)} · ${selectedIds.length} producto(s) incluidos.`;
       });
 
       saveAllBtn.addEventListener('click', async () => {
