@@ -550,17 +550,7 @@
       }
 
       .product-toggle {
-        width: 28px;
-        height: 28px;
-        border-radius: 999px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.08);
-        color: #fff;
-        font-size: 12px;
-        transition: transform .18s ease;
+        display: none;
       }
 
       .product-card-body {
@@ -608,6 +598,19 @@
       .product-card {
         padding: 12px 12px !important;
         border-radius: 16px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
+        align-items: start;
+      }
+
+      .product-card {
+        min-height: 0 !important;
+      }
+
+      .product-card .delete-btn {
+        transform: scale(0.9);
       }
 
       .product-card small {
@@ -972,21 +975,23 @@
       }
 
       function bindProductAccordions() {
-        document.querySelectorAll('.product-card-header').forEach(header => {
-          header.addEventListener('click', (event) => {
+        document.querySelectorAll('.product-card-header-left').forEach(trigger => {
+          trigger.onclick = (event) => {
             if (event.target.closest('.delete-btn, input, label, button, select, textarea')) return;
 
-            const card = header.closest('.product-card');
+            const card = trigger.closest('.product-card');
+            if (!card) return;
+
             const isOpen = card.classList.contains('open');
 
-            document.querySelectorAll('.product-card.open').forEach(openCard => {
-              openCard.classList.remove('open');
+            document.querySelectorAll('.product-card').forEach(item => {
+              item.classList.remove('open');
             });
 
             if (!isOpen) {
               card.classList.add('open');
             }
-          });
+          };
         });
       }
 
@@ -1101,7 +1106,6 @@
 
                       <div class="product-card-header-right">
                         <button class="delete-btn" data-delete-id="${product.id}" type="button">✕</button>
-                        <span class="product-toggle">▼</span>
                       </div>
                     </div>
 
@@ -1152,6 +1156,7 @@
           `;
         }).join('');
 
+        document.querySelectorAll('.product-card').forEach(card => card.classList.remove('open'));
         bindProductAccordions();
 
         document.querySelectorAll('.product-input').forEach(input => {
