@@ -103,6 +103,42 @@
       .panel-box { margin-bottom: 18px; }
       .new-product-box { margin-top: 24px; }
 
+      .quick-add-box {
+        margin-top: 20px;
+        margin-bottom: 22px;
+        padding: 16px;
+        border: 1px solid rgba(249, 115, 22, 0.18);
+        border-radius: 20px;
+        background: rgba(249, 115, 22, 0.05);
+      }
+
+      .quick-add-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+      }
+
+      .quick-add-head strong {
+        font-size: 20px;
+      }
+
+      .quick-add-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 10px;
+      }
+
+      .quick-add-actions {
+        margin-top: 14px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
       .updated-at, .muted {
         color: var(--muted);
         font-size: 13px;
@@ -408,6 +444,45 @@
           Puedes crear productos nuevos y ubicarlos directamente en su categoría y subcategoría.
         </div>
 
+        <div class="quick-add-box">
+          <div class="quick-add-head">
+            <div>
+              <small style="display:block;color:var(--muted);margin-bottom:6px;">Modo rápido</small>
+              <strong>Agregar rápido</strong>
+            </div>
+            <div class="updated-at">Carga nombre, precio y categoría. Después editas el resto si hace falta.</div>
+          </div>
+
+          <div class="quick-add-grid">
+            <div class="field">
+              <label for="quick-product-name">Nombre</label>
+              <input type="text" id="quick-product-name" placeholder="Ej: Pizza Muzzarella" />
+            </div>
+
+            <div class="field">
+              <label for="quick-product-price">Precio</label>
+              <input type="number" id="quick-product-price" min="0" placeholder="Ej: 8500" />
+            </div>
+
+            <div class="field">
+              <label for="quick-product-category">Categoría</label>
+              <select id="quick-product-category"></select>
+            </div>
+
+            <div class="field" id="quick-product-subcategory-wrap" style="display:none;">
+              <label for="quick-product-subcategory">Subcategoría</label>
+              <select id="quick-product-subcategory">
+                <option value="">Selecciona una subcategoría</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="quick-add-actions">
+            <button class="btn-accent" id="create-quick-product-btn">Crear rápido</button>
+            <div class="new-product-feedback" id="quick-product-feedback"></div>
+          </div>
+        </div>
+
         <div class="new-product-grid">
           <div class="field">
             <label for="new-product-name">Nombre</label>
@@ -484,6 +559,14 @@
       const subcategoryNav = document.getElementById('subcategory-nav');
       const saveAllBtn = document.getElementById('save-all-btn');
       const bulkSaveFeedback = document.getElementById('bulk-save-feedback');
+      const quickProductName = document.getElementById('quick-product-name');
+      const quickProductPrice = document.getElementById('quick-product-price');
+      const quickProductCategory = document.getElementById('quick-product-category');
+      const quickProductSubcategory = document.getElementById('quick-product-subcategory');
+      const quickProductSubcategoryWrap = document.getElementById('quick-product-subcategory-wrap');
+      const createQuickProductBtn = document.getElementById('create-quick-product-btn');
+      const quickProductFeedback = document.getElementById('quick-product-feedback');
+
       const newProductName = document.getElementById('new-product-name');
       const newProductPrice = document.getElementById('new-product-price');
       const newProductCategory = document.getElementById('new-product-category');
@@ -544,10 +627,13 @@
           return;
         }
 
-        newProductCategory.innerHTML = categoriesCache.map(category => `
+        const categoryOptionsHtml = categoriesCache.map(category => `
           <option value="${category.id}">${category.name}</option>
         `).join('');
+        newProductCategory.innerHTML = categoryOptionsHtml;
+        quickProductCategory.innerHTML = categoryOptionsHtml;
         updateNewProductSubcategoryField();
+        updateQuickProductSubcategoryField();
       }
 
 
@@ -578,6 +664,24 @@
 
         subcategoryWrap.style.display = 'block';
         newProductSubcategory.innerHTML = `
+          <option value="">Selecciona una subcategoría</option>
+          ${options.map(option => `<option value="${option}">${option}</option>`).join('')}
+        `;
+      }
+
+      function updateQuickProductSubcategoryField() {
+        const selectedOption = quickProductCategory.options[quickProductCategory.selectedIndex];
+        const categoryName = selectedOption ? selectedOption.text : '';
+        const options = getSubcategoryOptionsByCategoryName(categoryName);
+
+        if (!options.length) {
+          quickProductSubcategoryWrap.style.display = 'none';
+          quickProductSubcategory.innerHTML = '<option value="">Selecciona una subcategoría</option>';
+          return;
+        }
+
+        quickProductSubcategoryWrap.style.display = 'block';
+        quickProductSubcategory.innerHTML = `
           <option value="">Selecciona una subcategoría</option>
           ${options.map(option => `<option value="${option}">${option}</option>`).join('')}
         `;
@@ -846,6 +950,71 @@
         await loadProductsAdmin();
       }
 
+      async function createQuickProduct() {
+        const name = quickProductName.value.trim();
+        const price = Number(quickProductPrice.value || 0);
+        const categoryId = Number(quickProductCategory.value || 0);
+        const subcategory = quickProductSubcategory.value.trim();
+
+        if (!name) {
+          quickProductFeedback.className = 'new-product-feedback error';
+          quickProductFeedback.textContent = 'Escribe un nombre para el producto.';
+          return;
+        }
+
+        if (!categoryId) {
+          quickProductFeedback.className = 'new-product-feedback error';
+          quickProductFeedback.textContent = 'Selecciona una categoría.';
+          return;
+        }
+
+        if (!price || price < 0) {
+          quickProductFeedback.className = 'new-product-feedback error';
+          quickProductFeedback.textContent = 'Ingresa un precio válido.';
+          return;
+        }
+
+        quickProductFeedback.className = 'new-product-feedback';
+        quickProductFeedback.textContent = 'Creando producto...';
+
+        const categoryProducts = productsCache.filter(item => item.category_id === categoryId);
+        const nextSortOrder = categoryProducts.length
+          ? Math.max(...categoryProducts.map(item => Number(item.sort_order || 0))) + 1
+          : 1;
+
+        const { error } = await supabaseClient
+          .from('products')
+          .insert([{
+            store_id: 1,
+            category_id: categoryId,
+            subcategory: subcategory || null,
+            name,
+            description: null,
+            price,
+            is_promo: false,
+            promo_label: null,
+            is_active: true,
+            sort_order: nextSortOrder
+          }]);
+
+        if (error) {
+          console.error(error);
+          quickProductFeedback.className = 'new-product-feedback error';
+          quickProductFeedback.textContent = 'No se pudo crear el producto.';
+          return;
+        }
+
+        quickProductName.value = '';
+        quickProductPrice.value = '';
+        quickProductSubcategory.value = '';
+        updateQuickProductSubcategoryField();
+
+        quickProductFeedback.className = 'new-product-feedback ok';
+        quickProductFeedback.textContent = 'Producto creado correctamente.';
+
+        await loadProductsAdmin();
+      }
+
       async function createNewProduct() {
         const name = newProductName.value.trim();
         const price = Number(newProductPrice.value || 0);
@@ -918,6 +1087,14 @@
 
       newProductCategory.addEventListener('change', () => {
         updateNewProductSubcategoryField();
+      });
+
+      quickProductCategory.addEventListener('change', () => {
+        updateQuickProductSubcategoryField();
+      });
+
+      createQuickProductBtn.addEventListener('click', async () => {
+        await createQuickProduct();
       });
 
       createProductBtn.addEventListener('click', async () => {
