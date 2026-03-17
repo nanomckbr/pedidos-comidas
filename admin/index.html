@@ -146,6 +146,53 @@
         border: 1px solid var(--border);
       }
 
+
+      .hero-tools-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        align-items: stretch;
+        width: 100%;
+      }
+
+      .sales-inline-row {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .sales-inline-card {
+        min-width: 220px;
+        max-width: 320px;
+        background: rgba(24, 24, 27, 0.92);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 16px 18px;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
+      }
+
+      .sales-inline-card small {
+        display: block;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      .sales-inline-card strong {
+        font-size: 34px;
+        line-height: 1;
+      }
+
+      @media (max-width: 900px) {
+        .sales-inline-row {
+          justify-content: stretch;
+        }
+
+        .sales-inline-card {
+          width: 100%;
+          max-width: none;
+          min-width: 0;
+        }
+      }
+
       .stats {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -606,31 +653,33 @@
           <p>Flujo operativo de pedidos en tiempo real</p>
         </div>
 
-        <div class="top-actions">
-          <div class="logo-tools">
-            <button class="btn-dark" id="edit-logo-btn" type="button">Editar logo</button>
-            <img id="logo-thumb" class="logo-thumb" alt="Logo actual" />
-            <div id="logo-thumb-empty" class="logo-thumb is-empty">Sin logo</div>
-            <input id="logo-image-input" type="file" accept="image/*" hidden />
+        <div class="hero-tools-wrap">
+          <div class="top-actions">
+            <div class="logo-tools">
+              <button class="btn-dark" id="edit-logo-btn" type="button">Editar logo</button>
+              <img id="logo-thumb" class="logo-thumb" alt="Logo actual" />
+              <div id="logo-thumb-empty" class="logo-thumb is-empty">Sin logo</div>
+              <input id="logo-image-input" type="file" accept="image/*" hidden />
+            </div>
+            <button class="btn-dark" id="refresh-btn">Actualizar</button>
+            <a href="/menu" class="btn-dark link-btn">Panel menú</a>
+            <button class="btn-dark" id="logout-btn">Salir</button>
+            <button class="btn-accent" id="toggle-autorefresh">Auto refresh: ON</button>
+            <button class="btn-danger" id="reset-day-btn">Reset día</button>
           </div>
-          <button class="btn-dark" id="refresh-btn">Actualizar</button>
-          <a href="/menu" class="btn-dark link-btn">Panel menú</a>
-          <button class="btn-dark" id="logout-btn">Salir</button>
-          <button class="btn-accent" id="toggle-autorefresh">Auto refresh: ON</button>
-          <button class="btn-danger" id="reset-day-btn">Reset día</button>
+
+          <div class="sales-inline-row">
+            <section class="sales-inline-card">
+              <small>Ventas del día</small>
+              <strong id="stat-ventas">$0</strong>
+            </section>
+          </div>
         </div>
       </div>
     </header>
 
     <main class="container content">
-      <section class="stats">
-        <div class="stat-card">
-          <small>Ventas del día</small>
-          <strong id="stat-ventas">$0</strong>
-        </div>
-      </section>
-
-      <div class="updated-at" id="updated-at">Sin actualizar todavía.</div>
+<div class="updated-at" id="updated-at">Sin actualizar todavía.</div>
       <div class="day-cut" id="day-cut-info">Corte del día: no definido.</div>
       <div id="save-logo-feedback" class="save-note"></div>
 
