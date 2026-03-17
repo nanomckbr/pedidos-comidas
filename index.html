@@ -395,6 +395,38 @@
         letter-spacing: 0.02em;
       }
 
+      .size-options {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+        flex-wrap: wrap;
+      }
+
+      .size-btn {
+        flex: 1 1 120px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        color: #fff;
+        border-radius: 16px;
+        padding: 12px 14px;
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+      }
+
+      .size-btn span {
+        color: #d4d4d8;
+        font-size: 13px;
+      }
+
+      .size-btn strong {
+        color: #fff7ed;
+        font-size: 14px;
+      }
+
 
       @media (max-width: 920px) {
         .layout {
@@ -606,6 +638,89 @@
         renderCart();
       }
 
+
+      function normalizeSubcategory(value) {
+        return (value || '').trim().toLowerCase();
+      }
+
+      function isPizzaCategory(category) {
+        return (category?.name || '').trim().toLowerCase() === 'pizzas';
+      }
+
+      function renderStandardProductCard(item, grid) {
+        const article = document.createElement('article');
+        article.className = 'card';
+        article.innerHTML = `
+          <div>
+            <div class="card-top">
+              <div>
+                <h3>${item.name}</h3>
+                ${item.is_promo && item.promo_label ? `<div class="promo-badge">${item.promo_label}</div>` : ''}
+              </div>
+              <span class="price-tag">${formatPrice(item.price)}</span>
+            </div>
+            <p class="desc">${item.description || ''}</p>
+          </div>
+          <button class="btn-accent" data-id="${item.id}">Agregar al pedido</button>
+        `;
+
+        article
+          .querySelector('button')
+          .addEventListener('click', () => addToCart(item.id));
+
+        grid.appendChild(article);
+      }
+
+      function renderPizzaCards(items, grid) {
+        const pizzaGroups = {};
+
+        items.forEach(item => {
+          const key = (item.name || '').trim().toLowerCase();
+          if (!pizzaGroups[key]) pizzaGroups[key] = [];
+          pizzaGroups[key].push(item);
+        });
+
+        Object.values(pizzaGroups).forEach(groupItems => {
+          const sortedGroup = [...groupItems].sort((a, b) => {
+            const orderMap = { 'entera': 1, 'mitad': 2 };
+            const subA = orderMap[normalizeSubcategory(a.subcategory)] || 99;
+            const subB = orderMap[normalizeSubcategory(b.subcategory)] || 99;
+            if (subA !== subB) return subA - subB;
+            return (a.sort_order || 0) - (b.sort_order || 0);
+          });
+
+          const baseItem = sortedGroup[0];
+          const article = document.createElement('article');
+          article.className = 'card';
+
+          const optionsHtml = sortedGroup.map(item => `
+            <button class="size-btn" data-id="${item.id}">
+              <span>${item.subcategory || 'Opción'}</span>
+              <strong>${formatPrice(item.price)}</strong>
+            </button>
+          `).join('');
+
+          article.innerHTML = `
+            <div>
+              <div class="card-top">
+                <div>
+                  <h3>${baseItem.name}</h3>
+                  ${baseItem.is_promo && baseItem.promo_label ? `<div class="promo-badge">${baseItem.promo_label}</div>` : ''}
+                </div>
+              </div>
+              <p class="desc">${baseItem.description || 'Elige si la quieres entera o mitad.'}</p>
+              <div class="size-options">${optionsHtml}</div>
+            </div>
+          `;
+
+          article.querySelectorAll('.size-btn').forEach(button => {
+            button.addEventListener('click', () => addToCart(Number(button.dataset.id)));
+          });
+
+          grid.appendChild(article);
+        });
+      }
+
       function renderMenu() {
         categoryNav.innerHTML = '';
         menuPanels.innerHTML = '';
@@ -644,6 +759,8 @@
             .sort((a, b) => {
               const subA = (a.subcategory || '').localeCompare(b.subcategory || '');
               if (subA !== 0) return subA;
+              const nameA = (a.name || '').localeCompare(b.name || '');
+              if (nameA !== 0) return nameA;
               return (a.sort_order || 0) - (b.sort_order || 0);
             });
 
@@ -674,29 +791,11 @@
             const grid = document.createElement('div');
             grid.className = 'grid';
 
-            items.forEach(item => {
-              const article = document.createElement('article');
-              article.className = 'card';
-              article.innerHTML = `
-                <div>
-                  <div class="card-top">
-                    <div>
-                      <h3>${item.name}</h3>
-                      ${item.is_promo && item.promo_label ? `<div class="promo-badge">${item.promo_label}</div>` : ''}
-                    </div>
-                    <span class="price-tag">${formatPrice(item.price)}</span>
-                  </div>
-                  <p class="desc">${item.description || ''}</p>
-                </div>
-                <button class="btn-accent" data-id="${item.id}">Agregar al pedido</button>
-              `;
-
-              article
-                .querySelector('button')
-                .addEventListener('click', () => addToCart(item.id));
-
-              grid.appendChild(article);
-            });
+            if (isPizzaCategory(category) && ['entera', 'mitad'].includes(normalizeSubcategory(subgroupName))) {
+              renderPizzaCards(items, grid);
+            } else {
+              items.forEach(item => renderStandardProductCard(item, grid));
+            }
 
             subgroup.appendChild(grid);
             section.appendChild(subgroup);
@@ -706,6 +805,7 @@
           menuPanels.appendChild(panel);
         });
       }
+
 
       function findItem(id) {
         return products.find(item => item.id === id);
