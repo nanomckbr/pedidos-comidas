@@ -1019,14 +1019,15 @@
 
       function renderCategoryPanel(section, category, categoryProducts) {
         const groupedMap = new Map();
-        const fallbackEntries = [];
+        const fallbackMap = new Map();
 
         categoryProducts.forEach(item => {
           const originalKey = item.subcategory && item.subcategory.trim() ? item.subcategory.trim() : '__sin_subcategoria__';
           const normalizedKey = inferMenuSubcategory(category.name, item);
 
           if (normalizedKey === '__sin_subcategoria__') {
-            fallbackEntries.push([originalKey, [item]]);
+            if (!fallbackMap.has(originalKey)) fallbackMap.set(originalKey, []);
+            fallbackMap.get(originalKey).push(item);
             return;
           }
 
@@ -1035,6 +1036,7 @@
         });
 
         const subgroupEntries = [...groupedMap.entries()];
+        const fallbackEntries = [...fallbackMap.entries()];
 
         if (shouldUseSubtabs(category.name, subgroupEntries)) {
           renderTabbedSubcategories(section, category, subgroupEntries, fallbackEntries);
