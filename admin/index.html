@@ -1416,7 +1416,10 @@
         detectNewOrders(visibleOrders);
         renderOrders(visibleOrders, visibleItems);
 
-        updatedAtEl.textContent = `<div class="mobile-tabs">
+        updatedAtEl.textContent = `
+
+
+<div class="mobile-tabs">
   <button onclick="showTab('nuevos')" id="tab-nuevos">Nuevos</button>
   <button onclick="showTab('preparando')" id="tab-preparando">Preparando</button>
   <button onclick="showTab('despacho')" id="tab-despacho">Despacho</button>
@@ -1424,7 +1427,8 @@
   <button onclick="showTab('cancelados')" id="tab-cancelados">Cancelados</button>
 </div>
 
-Última actualización: ${new Date().toLocaleTimeString('es-AR')}`;
+Última actualización:
+ ${new Date().toLocaleTimeString('es-AR')}`;
         updateDayCutInfo();
       }
 
