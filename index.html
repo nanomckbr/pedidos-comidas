@@ -1104,7 +1104,14 @@
           activeCategoryId = categories[0].id;
         }
 
-        categories.forEach(category => {
+        const promos = products.filter(p => p.is_promo);
+
+        const extendedCategories = [...categories];
+        if (promos.length) {
+          extendedCategories.unshift({ id: 'promos', name: 'Promos' });
+        }
+
+        extendedCategories.forEach(category => {
           const chip = document.createElement('button');
           chip.className = `category-chip${category.id === activeCategoryId ? ' active' : ''}`;
           chip.textContent = category.name;
@@ -1124,8 +1131,13 @@
           title.textContent = category.name;
           section.appendChild(title);
 
-          const categoryProducts = products
-            .filter(product => product.category_id === category.id && product.is_active)
+          let categoryProducts;
+
+          if (category.id === 'promos') {
+            categoryProducts = products.filter(p => p.is_promo && p.is_active);
+          } else {
+            categoryProducts = products.filter(product => product.category_id === category.id && product.is_active);
+          }
             .sort((a, b) => {
               const subA = inferMenuSubcategory(category.name, a);
               const subB = inferMenuSubcategory(category.name, b);
