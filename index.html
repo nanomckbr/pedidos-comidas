@@ -428,6 +428,56 @@
       }
 
 
+      
+      .floating-cart-btn {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        z-index: 60;
+        width: 62px;
+        height: 62px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: var(--accent);
+        color: #000;
+        box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        font-weight: 900;
+      }
+
+      .floating-cart-badge {
+        position: absolute;
+        top: -6px;
+        right: -4px;
+        min-width: 24px;
+        height: 24px;
+        padding: 0 6px;
+        border-radius: 999px;
+        background: #fff;
+        color: #000;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      @media (max-width: 920px) {
+        .floating-cart-btn {
+          width: 58px;
+          height: 58px;
+          right: 14px;
+          bottom: 14px;
+        }
+      }
+
       @media (max-width: 920px) {
         .layout {
           grid-template-columns: 1fr;
@@ -551,7 +601,7 @@
         <div id="menu-panels"></div>
       </section>
 
-      <aside class="sidebar">
+      <aside class="sidebar" id="checkout-panel">
         <h2>Tu pedido</h2>
         <p class="sub">El total se calcula solo y luego se manda por WhatsApp.</p>
 
@@ -601,6 +651,8 @@
       </aside>
     </main>
 
+    <button id="floating-cart-btn" class="floating-cart-btn" type="button" aria-label="Ir al pedido">🛒<span id="floating-cart-badge" class="floating-cart-badge">0</span></button>
+
     <div id="toast" class="toast">Producto agregado al carrito</div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -626,6 +678,9 @@
       const toastEl = document.getElementById('toast');
       const logoImageEl = document.getElementById('logo-image');
       const logoFallbackEl = document.getElementById('logo-fallback');
+      const floatingCartBtn = document.getElementById('floating-cart-btn');
+      const floatingCartBadge = document.getElementById('floating-cart-badge');
+      const checkoutPanel = document.getElementById('checkout-panel');
 
       let toastTimeout = null;
 
@@ -683,13 +738,73 @@
 
 
 
+
       function normalizeSubcategory(value) {
-        return (value || '').trim().toLowerCase();
+        return (value || '')
+          .trim()
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '');
+      }
+
+      function normalizeMenuSubcategory(categoryName, subgroupName) {
+        const category = normalizeSubcategory(categoryName);
+        const sub = normalizeSubcategory(subgroupName);
+
+        if (!sub || sub === '__sin_subcategoria__') return '__sin_subcategoria__';
+
+        if (category === 'pizzas') {
+          if (sub.includes('entera')) return 'entera';
+          if (sub.includes('mitad')) return 'mitad';
+        }
+
+        if (category === 'empanadas') {
+          const isMedia = sub.includes('media');
+          const isDocena = sub.includes('docena');
+          const isHorno = sub.includes('horno');
+          const isFrita = sub.includes('frita');
+
+          if (isMedia && isHorno) return 'media docena al horno';
+          if (isMedia && isFrita) return 'media docena fritas';
+          if (isDocena && isHorno) return 'docena al horno';
+          if (isDocena && isFrita) return 'docena fritas';
+        }
+
+        if (category === 'sandwiches' || category === 'sandwichs' || category === 'sanguiches') {
+          if (sub.includes('lomito')) return 'lomito';
+          if (sub.includes('clasico')) return 'clasicos';
+          if (sub.includes('clasicos')) return 'clasicos';
+        }
+
+        return sub;
+      }
+
+      function getDisplaySubcategory(categoryName, normalizedSubcategory) {
+        const category = normalizeSubcategory(categoryName);
+
+        if (category === 'pizzas') {
+          if (normalizedSubcategory === 'entera') return 'Entera';
+          if (normalizedSubcategory === 'mitad') return 'Mitad';
+        }
+
+        if (category === 'empanadas') {
+          if (normalizedSubcategory === 'media docena al horno') return 'Media docena al horno';
+          if (normalizedSubcategory === 'media docena fritas') return 'Media docena fritas';
+          if (normalizedSubcategory === 'docena al horno') return 'Docena al horno';
+          if (normalizedSubcategory === 'docena fritas') return 'Docena fritas';
+        }
+
+        if (category === 'sandwiches' || category === 'sandwichs' || category === 'sanguiches') {
+          if (normalizedSubcategory === 'clasicos') return 'Clásicos';
+          if (normalizedSubcategory === 'lomito') return 'Lomito';
+        }
+
+        return normalizedSubcategory === '__sin_subcategoria__' ? 'Otros' : normalizedSubcategory;
       }
 
       function getDefaultSubcategory(categoryName, entries) {
         const normalizedCategory = normalizeSubcategory(categoryName);
-        const normalizedEntries = entries.map(([name]) => normalizeSubcategory(name));
+        const normalizedEntries = entries.map(([name]) => name);
 
         if (normalizedCategory === 'pizzas') {
           if (normalizedEntries.includes('entera')) return 'entera';
@@ -703,13 +818,12 @@
           if (normalizedEntries.includes('docena fritas')) return 'docena fritas';
         }
 
-        if (normalizedCategory === 'sandwiches' || normalizedCategory === 'sándwiches') {
-          if (normalizedEntries.includes('clásicos')) return 'clásicos';
+        if (normalizedCategory === 'sandwiches' || normalizedCategory === 'sandwichs' || normalizedCategory === 'sanguiches') {
           if (normalizedEntries.includes('clasicos')) return 'clasicos';
           if (normalizedEntries.includes('lomito')) return 'lomito';
         }
 
-        return normalizeSubcategory(entries[0]?.[0] || '');
+        return entries[0]?.[0] || '';
       }
 
       function shouldUseSubtabs(categoryName, entries) {
@@ -717,12 +831,13 @@
         const allowed = {
           'pizzas': ['entera', 'mitad'],
           'empanadas': ['media docena al horno', 'media docena fritas', 'docena al horno', 'docena fritas'],
-          'sandwiches': ['clásicos', 'clasicos', 'lomito'],
-          'sándwiches': ['clásicos', 'clasicos', 'lomito']
+          'sandwiches': ['clasicos', 'lomito'],
+          'sandwichs': ['clasicos', 'lomito'],
+          'sanguiches': ['clasicos', 'lomito']
         };
 
         if (!allowed[normalizedCategory]) return false;
-        const normalizedEntries = entries.map(([name]) => normalizeSubcategory(name));
+        const normalizedEntries = entries.map(([name]) => name);
         return normalizedEntries.some(name => allowed[normalizedCategory].includes(name));
       }
 
@@ -757,36 +872,33 @@
         return grid;
       }
 
-      function renderTabbedSubcategories(section, category, subgroupEntries) {
+      function renderTabbedSubcategories(section, category, subgroupEntries, fallbackEntries) {
         const nav = document.createElement('div');
         nav.className = 'subcategory-nav';
 
         const categoryKey = String(category.id);
         const defaultSubcategory = getDefaultSubcategory(category.name, subgroupEntries);
         const savedSubcategory = activeSubcategoryByCategory[categoryKey];
-        const validSavedSubcategory = subgroupEntries.some(([name]) => normalizeSubcategory(name) === savedSubcategory);
+        const validSavedSubcategory = subgroupEntries.some(([name]) => name === savedSubcategory);
         const activeSubcategory = validSavedSubcategory ? savedSubcategory : defaultSubcategory;
         activeSubcategoryByCategory[categoryKey] = activeSubcategory;
 
-        subgroupEntries.forEach(([subgroupName, items]) => {
-          const normalized = normalizeSubcategory(subgroupName);
+        subgroupEntries.forEach(([normalizedName, items]) => {
           const chip = document.createElement('button');
           chip.type = 'button';
-          chip.className = `subcategory-chip${normalized === activeSubcategory ? ' active' : ''}`;
-          chip.textContent = subgroupName;
+          chip.className = `subcategory-chip${normalizedName === activeSubcategory ? ' active' : ''}`;
+          chip.textContent = getDisplaySubcategory(category.name, normalizedName);
           chip.addEventListener('click', () => {
-            activeSubcategoryByCategory[categoryKey] = normalized;
+            activeSubcategoryByCategory[categoryKey] = normalizedName;
 
-            nav.querySelectorAll('.subcategory-chip').forEach(btn => {
-              btn.classList.remove('active');
-            });
+            nav.querySelectorAll('.subcategory-chip').forEach(btn => btn.classList.remove('active'));
             chip.classList.add('active');
 
             section.querySelectorAll('.subcategory-panel[data-subcategory]').forEach(panel => {
               panel.classList.remove('active');
             });
 
-            const targetPanel = section.querySelector(`.subcategory-panel[data-subcategory="${normalized}"]`);
+            const targetPanel = section.querySelector(`.subcategory-panel[data-subcategory="${normalizedName}"]`);
             if (targetPanel) targetPanel.classList.add('active');
           });
           nav.appendChild(chip);
@@ -794,11 +906,10 @@
 
         section.appendChild(nav);
 
-        subgroupEntries.forEach(([subgroupName, items]) => {
-          const normalized = normalizeSubcategory(subgroupName);
+        subgroupEntries.forEach(([normalizedName, items]) => {
           const panel = document.createElement('div');
-          panel.className = `subcategory-panel${normalized === activeSubcategory ? ' active' : ''}`;
-          panel.dataset.subcategory = normalized;
+          panel.className = `subcategory-panel${normalizedName === activeSubcategory ? ' active' : ''}`;
+          panel.dataset.subcategory = normalizedName;
 
           const subgroup = document.createElement('div');
           subgroup.className = 'subgroup';
@@ -806,30 +917,85 @@
           panel.appendChild(subgroup);
           section.appendChild(panel);
         });
-      }
 
-      function renderCategoryPanel(section, category, categoryProducts) {
-        const groups = {};
-        categoryProducts.forEach(item => {
-          const key = item.subcategory && item.subcategory.trim() ? item.subcategory.trim() : '__sin_subcategoria__';
-          if (!groups[key]) groups[key] = [];
-          groups[key].push(item);
-        });
-
-        const subgroupEntries = Object.entries(groups);
-
-        if (shouldUseSubtabs(category.name, subgroupEntries)) {
-          renderTabbedSubcategories(section, category, subgroupEntries);
-          return;
-        }
-
-        subgroupEntries.forEach(([subgroupName, items]) => {
+        fallbackEntries.forEach(([originalName, items]) => {
           const subgroup = document.createElement('div');
           subgroup.className = 'subgroup';
 
-          if (subgroupName !== '__sin_subcategoria__') {
+          if (originalName && originalName !== '__sin_subcategoria__') {
             const subgroupTitle = document.createElement('h3');
-            subgroupTitle.textContent = subgroupName;
+            subgroupTitle.textContent = originalName;
+            subgroup.appendChild(subgroupTitle);
+          }
+
+          subgroup.appendChild(buildProductsGrid(items));
+          section.appendChild(subgroup);
+        });
+      }
+
+      function renderCategoryPanel(section, category, categoryProducts) {
+        const groupedMap = new Map();
+        const fallbackEntries = [];
+
+        categoryProducts.forEach(item => {
+          const originalKey = item.subcategory && item.subcategory.trim() ? item.subcategory.trim() : '__sin_subcategoria__';
+          const normalizedKey = normalizeMenuSubcategory(category.name, originalKey);
+
+          if (normalizedKey === '__sin_subcategoria__') {
+            fallbackEntries.push([originalKey, [item]]);
+            return;
+          }
+
+          if (!groupedMap.has(normalizedKey)) groupedMap.set(normalizedKey, []);
+          groupedMap.get(normalizedKey).push(item);
+        });
+
+        const subgroupEntries = [...groupedMap.entries()];
+
+        if (shouldUseSubtabs(category.name, subgroupEntries)) {
+          renderTabbedSubcategories(section, category, subgroupEntries, fallbackEntries);
+          return;
+        }
+
+        if (!subgroupEntries.length && fallbackEntries.length) {
+          fallbackEntries.forEach(([originalName, items]) => {
+            const subgroup = document.createElement('div');
+            subgroup.className = 'subgroup';
+
+            if (originalName && originalName !== '__sin_subcategoria__') {
+              const subgroupTitle = document.createElement('h3');
+              subgroupTitle.textContent = originalName;
+              subgroup.appendChild(subgroupTitle);
+            }
+
+            subgroup.appendChild(buildProductsGrid(items));
+            section.appendChild(subgroup);
+          });
+          return;
+        }
+
+        subgroupEntries.forEach(([normalizedName, items]) => {
+          const subgroup = document.createElement('div');
+          subgroup.className = 'subgroup';
+
+          const displayName = getDisplaySubcategory(category.name, normalizedName);
+          if (displayName && displayName !== 'Otros') {
+            const subgroupTitle = document.createElement('h3');
+            subgroupTitle.textContent = displayName;
+            subgroup.appendChild(subgroupTitle);
+          }
+
+          subgroup.appendChild(buildProductsGrid(items));
+          section.appendChild(subgroup);
+        });
+
+        fallbackEntries.forEach(([originalName, items]) => {
+          const subgroup = document.createElement('div');
+          subgroup.className = 'subgroup';
+
+          if (originalName && originalName !== '__sin_subcategoria__') {
+            const subgroupTitle = document.createElement('h3');
+            subgroupTitle.textContent = originalName;
             subgroup.appendChild(subgroupTitle);
           }
 
@@ -874,8 +1040,10 @@
           const categoryProducts = products
             .filter(product => product.category_id === category.id && product.is_active)
             .sort((a, b) => {
-              const subA = (a.subcategory || '').localeCompare(b.subcategory || '');
-              if (subA !== 0) return subA;
+              const subA = normalizeMenuSubcategory(category.name, a.subcategory || '');
+              const subB = normalizeMenuSubcategory(category.name, b.subcategory || '');
+              const cmpSub = subA.localeCompare(subB);
+              if (cmpSub !== 0) return cmpSub;
               const nameA = (a.name || '').localeCompare(b.name || '');
               if (nameA !== 0) return nameA;
               return (a.sort_order || 0) - (b.sort_order || 0);
@@ -933,7 +1101,14 @@
         return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
       }
 
+      function updateFloatingCart() {
+        const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
+        if (floatingCartBadge) floatingCartBadge.textContent = totalQty;
+      }
+
       function renderCart() {
+        updateFloatingCart();
+
         if (!cart.length) {
           cartList.innerHTML = '<div class="empty">Carrito vacío.</div>';
           totalEl.textContent = formatPrice(0);
@@ -1112,6 +1287,12 @@
         document.getElementById(id).addEventListener('input', renderCart);
         document.getElementById(id).addEventListener('change', renderCart);
       });
+
+      if (floatingCartBtn && checkoutPanel) {
+        floatingCartBtn.addEventListener('click', () => {
+          checkoutPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
 
       loadBranding();
       loadMenu();
