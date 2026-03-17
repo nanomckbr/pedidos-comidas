@@ -691,6 +691,155 @@
         display: block;
       }
 
+      .promo-builder-box {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 18px;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
+      }
+
+      .promo-step {
+        margin-top: 18px;
+      }
+
+      .promo-step h3 {
+        margin: 0 0 10px;
+        font-size: 18px;
+      }
+
+      .promo-categories-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .promo-category-btn {
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .promo-category-btn.active {
+        background: var(--accent);
+        color: #000;
+        border-color: transparent;
+      }
+
+      .promo-products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .promo-product-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 14px;
+        cursor: pointer;
+        transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+      }
+
+      .promo-product-card:hover {
+        transform: translateY(-1px);
+        border-color: rgba(249,115,22,0.35);
+      }
+
+      .promo-product-card.selected {
+        border-color: rgba(249,115,22,0.5);
+        background: rgba(249,115,22,0.08);
+      }
+
+      .promo-product-card h4 {
+        margin: 0 0 8px;
+        font-size: 16px;
+        line-height: 1.2;
+      }
+
+      .promo-product-card p {
+        margin: 0 0 10px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .promo-product-price {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(249,115,22,0.16);
+        color: #ffedd5;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .promo-selected-panel {
+        margin-top: 18px;
+        padding: 16px;
+        border: 1px solid rgba(249,115,22,0.18);
+        border-radius: 20px;
+        background: rgba(249,115,22,0.05);
+      }
+
+      .promo-selected-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .promo-selected-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.03);
+      }
+
+      .promo-selected-meta strong {
+        display: block;
+        font-size: 14px;
+        line-height: 1.2;
+      }
+
+      .promo-selected-meta small {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .promo-remove-btn {
+        background: rgba(239,68,68,0.12);
+        color: #fecaca;
+        border: 1px solid rgba(239,68,68,0.35);
+        border-radius: 12px;
+        padding: 8px 10px;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .promo-builder-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .promo-summary-line {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
     </style>
   </head>
   <body>
@@ -860,34 +1009,52 @@
           <small style="display:block;color:var(--muted);margin-bottom:8px;">Promociones</small>
           <strong style="font-size:24px;">Crear promo</strong>
           <div class="updated-at" style="margin-top:8px;">
-            Arma una promo aparte del menú general con nombre, descripción, precio y productos incluidos.
+            Elige una categoría, toca los productos que quieras incluir y arma tu promo abajo.
           </div>
 
-          <div class="promo-builder-grid">
-            <div class="field">
-              <label for="promo-name">Nombre de la promo</label>
-              <input type="text" id="promo-name" placeholder="Ej: Combo noche" />
-            </div>
+          <div class="promo-step">
+            <h3>1. Elegir categoría</h3>
+            <div id="promo-categories-nav" class="promo-categories-nav"></div>
+          </div>
 
-            <div class="field">
-              <label for="promo-price">Precio promo</label>
-              <input type="number" id="promo-price" min="0" placeholder="Ej: 15900" />
-            </div>
-
-            <div class="field" style="grid-column: 1 / -1;">
-              <label for="promo-description">Descripción</label>
-              <textarea id="promo-description" placeholder="Describe qué incluye la promo"></textarea>
+          <div class="promo-step">
+            <h3>2. Elegir productos</h3>
+            <div id="promo-products-grid" class="promo-products-grid">
+              <div class="empty">Elige una categoría para ver sus productos.</div>
             </div>
           </div>
 
-          <div class="updated-at" style="margin-top:16px;">Selecciona productos del menú para incluir en la promo:</div>
-          <div id="promo-products-list" class="promo-products-list">
-            <div class="empty">Cargando productos...</div>
-          </div>
+          <div class="promo-selected-panel">
+            <h3 style="margin:0 0 6px;">3. Armar promo</h3>
+            <div class="updated-at">Los productos que toques aparecerán acá abajo.</div>
 
-          <div class="promo-builder-actions">
-            <button class="btn-accent" id="save-promo-draft-btn" type="button">Guardar promo</button>
-            <div id="promo-builder-feedback" class="bulk-save-feedback">Interfaz lista. Para guardar promos como entidad separada faltaría conectar una tabla específica.</div>
+            <div id="promo-selected-list" class="promo-selected-list">
+              <div class="empty">Todavía no agregaste productos a la promo.</div>
+            </div>
+
+            <div class="promo-summary-line" id="promo-base-total-line">Total base de productos: $0</div>
+
+            <div class="promo-builder-grid">
+              <div class="field">
+                <label for="promo-name">Nombre de la promo</label>
+                <input type="text" id="promo-name" placeholder="Ej: Combo noche" />
+              </div>
+
+              <div class="field">
+                <label for="promo-price">Precio promo</label>
+                <input type="number" id="promo-price" min="0" placeholder="Ej: 15900" />
+              </div>
+
+              <div class="field" style="grid-column: 1 / -1;">
+                <label for="promo-description">Descripción</label>
+                <textarea id="promo-description" placeholder="Describe qué incluye la promo"></textarea>
+              </div>
+            </div>
+
+            <div class="bulk-actions">
+              <button class="btn-accent" id="save-promo-draft-btn" type="button">Crear promo</button>
+              <div id="promo-builder-feedback" class="bulk-save-feedback">La promo se arma como borrador visual. Si te gusta, después conectamos el guardado real.</div>
+            </div>
           </div>
         </div>
       </section>
@@ -913,6 +1080,10 @@
       const subcategoryNav = document.getElementById('subcategory-nav');
       const saveAllBtn = document.getElementById('save-all-btn');
       const bulkSaveFeedback = document.getElementById('bulk-save-feedback');
+      const promoCategoriesNav = document.getElementById('promo-categories-nav');
+      const promoProductsGrid = document.getElementById('promo-products-grid');
+      const promoSelectedList = document.getElementById('promo-selected-list');
+      const promoBaseTotalLine = document.getElementById('promo-base-total-line');
       const promoName = document.getElementById('promo-name');
       const promoPrice = document.getElementById('promo-price');
       const promoDescription = document.getElementById('promo-description');
@@ -945,6 +1116,8 @@
       let selectedCategoryId = null;
       let selectedSubcategoryByCategory = {};
       let dirtyProducts = new Set();
+      let promoSelectedCategoryId = null;
+      let promoDraftItems = [];
 
       function formatPrice(value) {
         return new Intl.NumberFormat('es-AR', {
@@ -977,22 +1150,117 @@
         });
       }
 
-      function renderPromoBuilderProducts() {
-        if (!promoProductsList) return;
-        if (!productsCache.length) {
-          promoProductsList.innerHTML = '<div class="empty">No hay productos para incluir todavía.</div>';
+      function getPromoSelectedProducts() {
+        return promoDraftItems
+          .map(id => productsCache.find(product => product.id === id))
+          .filter(Boolean);
+      }
+
+      function renderPromoSelectedList() {
+        if (!promoSelectedList) return;
+
+        const selectedProducts = getPromoSelectedProducts();
+        if (!selectedProducts.length) {
+          promoSelectedList.innerHTML = '<div class="empty">Todavía no agregaste productos a la promo.</div>';
+          if (promoBaseTotalLine) promoBaseTotalLine.textContent = 'Total base de productos: ' + formatPrice(0);
           return;
         }
 
-        promoProductsList.innerHTML = productsCache.map(product => `
-          <label class="promo-product-chip">
-            <input type="checkbox" value="${product.id}" />
-            <span>
-              <strong>${product.name}</strong><br>
+        promoSelectedList.innerHTML = selectedProducts.map(product => `
+          <div class="promo-selected-item">
+            <div class="promo-selected-meta">
+              <strong>${product.name}</strong>
               <small>${formatPrice(product.price || 0)}</small>
-            </span>
-          </label>
+            </div>
+            <button type="button" class="promo-remove-btn" data-promo-remove-id="${product.id}">Quitar</button>
+          </div>
         `).join('');
+
+        const baseTotal = selectedProducts.reduce((sum, product) => sum + Number(product.price || 0), 0);
+        if (promoBaseTotalLine) promoBaseTotalLine.textContent = 'Total base de productos: ' + formatPrice(baseTotal);
+
+        document.querySelectorAll('[data-promo-remove-id]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = Number(btn.dataset.promoRemoveId);
+            promoDraftItems = promoDraftItems.filter(itemId => itemId !== id);
+            renderPromoProductsGrid();
+            renderPromoSelectedList();
+          });
+        });
+      }
+
+      function renderPromoProductsGrid() {
+        if (!promoProductsGrid) return;
+
+        if (!promoSelectedCategoryId) {
+          promoProductsGrid.innerHTML = '<div class="empty">Elige una categoría para ver sus productos.</div>';
+          return;
+        }
+
+        const categoryProducts = productsCache
+          .filter(product => product.category_id === promoSelectedCategoryId && !product.is_promo)
+          .sort((a, b) => {
+            const nameA = (a.name || '').localeCompare(b.name || '');
+            if (nameA !== 0) return nameA;
+            return Number(a.sort_order || 0) - Number(b.sort_order || 0);
+          });
+
+        if (!categoryProducts.length) {
+          promoProductsGrid.innerHTML = '<div class="empty">No hay productos en esta categoría.</div>';
+          return;
+        }
+
+        promoProductsGrid.innerHTML = categoryProducts.map(product => `
+          <article class="promo-product-card ${promoDraftItems.includes(product.id) ? 'selected' : ''}" data-promo-product-id="${product.id}">
+            <h4>${product.name}</h4>
+            <p>${product.description || 'Sin descripción'}</p>
+            <span class="promo-product-price">${formatPrice(product.price || 0)}</span>
+          </article>
+        `).join('');
+
+        document.querySelectorAll('[data-promo-product-id]').forEach(card => {
+          card.addEventListener('click', () => {
+            const id = Number(card.dataset.promoProductId);
+            if (promoDraftItems.includes(id)) {
+              promoDraftItems = promoDraftItems.filter(itemId => itemId !== id);
+            } else {
+              promoDraftItems.push(id);
+            }
+            renderPromoProductsGrid();
+            renderPromoSelectedList();
+          });
+        });
+      }
+
+      function renderPromoBuilderProducts() {
+        if (!promoCategoriesNav) return;
+
+        if (!categoriesCache.length) {
+          promoCategoriesNav.innerHTML = '<div class="empty">No hay categorías disponibles.</div>';
+          renderPromoProductsGrid();
+          renderPromoSelectedList();
+          return;
+        }
+
+        if (!promoSelectedCategoryId || !categoriesCache.some(category => category.id === promoSelectedCategoryId)) {
+          promoSelectedCategoryId = categoriesCache[0].id;
+        }
+
+        promoCategoriesNav.innerHTML = categoriesCache.map(category => `
+          <button type="button" class="promo-category-btn ${category.id === promoSelectedCategoryId ? 'active' : ''}" data-promo-category-id="${category.id}">
+            ${category.name}
+          </button>
+        `).join('');
+
+        document.querySelectorAll('[data-promo-category-id]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            promoSelectedCategoryId = Number(btn.dataset.promoCategoryId);
+            renderPromoBuilderProducts();
+          });
+        });
+
+        renderPromoProductsGrid();
+        renderPromoSelectedList();
       }
 
       async function loadCategoriesForNewProduct() {
@@ -1536,10 +1804,16 @@
       setMenuMode('');
 
       document.getElementById('save-promo-draft-btn')?.addEventListener('click', () => {
-        const selectedIds = [...document.querySelectorAll('#promo-products-list input:checked')].map(input => Number(input.value));
+        const selectedProducts = getPromoSelectedProducts();
         const name = promoName?.value.trim();
         const price = Number(promoPrice?.value || 0);
         const description = promoDescription?.value.trim();
+
+        if (!selectedProducts.length) {
+          promoBuilderFeedback.className = 'bulk-save-feedback error';
+          promoBuilderFeedback.textContent = 'Agrega al menos un producto a la promo.';
+          return;
+        }
 
         if (!name) {
           promoBuilderFeedback.className = 'bulk-save-feedback error';
@@ -1554,7 +1828,7 @@
         }
 
         promoBuilderFeedback.className = 'bulk-save-feedback';
-        promoBuilderFeedback.textContent = `Promo armada en borrador: "${name}" · ${formatPrice(price)} · ${selectedIds.length} producto(s) incluidos.`;
+        promoBuilderFeedback.textContent = `Promo armada en borrador: "${name}" · ${formatPrice(price)} · ${selectedProducts.length} producto(s) incluidos.`;
       });
 
       saveAllBtn.addEventListener('click', async () => {
