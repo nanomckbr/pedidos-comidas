@@ -971,7 +971,6 @@
         renderCategoryEditor();
       }
 
-
       function bindProductAccordions() {
         document.querySelectorAll('.product-card-header').forEach(header => {
           header.addEventListener('click', (event) => {
@@ -1093,58 +1092,59 @@
               ${subgroupTitle}
               <div class="grid">
                 ${items.map(product => `
-                  <article class="card">
-                    <div>
-                      <div class="card-top">
-                        <div>
-                          <h4>${product.name}</h4>
+                  <article class="card product-card" data-product-card-id="${product.id}">
+                    <div class="product-card-header">
+                      <div class="product-card-header-left">
+                        <span class="product-card-title">${product.name}</span>
+                        <span class="product-card-price">$${Number(product.price || 0).toLocaleString('es-AR')}</span>
+                      </div>
+
+                      <div class="product-card-header-right">
+                        <button class="delete-btn" data-delete-id="${product.id}" type="button">✕</button>
+                        <span class="product-toggle">▼</span>
+                      </div>
+                    </div>
+
+                    <div class="product-card-body">
+                      <p class="desc">${product.description || ''}</p>
+
+                      <div class="edit-grid">
+                        <div class="field price-field-highlight">
+                          <label>Precio</label>
+                          <input type="number" min="0" value="${product.price || 0}" data-product-id="${product.id}" data-field="price" class="product-input" />
+                        </div>
+
+                        <div class="field">
+                          <label>Orden</label>
+                          <input type="number" min="0" value="${product.sort_order || 0}" data-product-id="${product.id}" data-field="sort_order" class="product-input" />
+                        </div>
+
+                        <div class="field" style="grid-column: 1 / -1;">
+                          <label>Texto promo</label>
+                          <input type="text" value="${product.promo_label || ''}" placeholder="Ej: 2x1 / Combo / Promo" data-product-id="${product.id}" data-field="promo_label" class="product-input" />
                         </div>
                       </div>
 
-                      <button class="delete-btn" data-delete-id="${product.id}">✕</button>
+                      <div class="switch-row compact">
+                        <div class="switch-copy">
+                          <span class="switch-label">Mostrar / ocultar</span>
+                        </div>
+                        <label class="switch compact">
+                          <input type="checkbox" id="active-${product.id}" ${product.is_active ? 'checked' : ''} data-product-id="${product.id}" data-field="is_active" class="product-checkbox" />
+                          <span class="switch-slider"></span>
+                        </label>
+                      </div>
 
-                      <p class="desc">${product.description || ''}</p>
+                      <div class="switch-row compact">
+                        <div class="switch-copy">
+                          <span class="switch-label">Promo</span>
+                        </div>
+                        <label class="switch compact">
+                          <input type="checkbox" id="promo-${product.id}" ${product.is_promo ? 'checked' : ''} data-product-id="${product.id}" data-field="is_promo" class="product-checkbox" />
+                          <span class="switch-slider"></span>
+                        </label>
+                      </div>
                     </div>
-
-                    <div class="edit-grid">
-                      <div class="field price-field-highlight">
-                        <label>Precio</label>
-                        <input type="number" min="0" value="${product.price || 0}" data-product-id="${product.id}" data-field="price" class="product-input" />
-                      </div>
-
-                      <div class="field">
-                        <label>Orden</label>
-                        <input type="number" min="0" value="${product.sort_order || 0}" data-product-id="${product.id}" data-field="sort_order" class="product-input" />
-                      </div>
-
-                      <div class="field" style="grid-column: 1 / -1;">
-                        <label>Texto promo</label>
-                        <input type="text" value="${product.promo_label || ''}" placeholder="Ej: 2x1 / Combo / Promo" data-product-id="${product.id}" data-field="promo_label" class="product-input" />
-                      </div>
-                    </div>
-
-                    <div class="switch-row">
-                      <div class="switch-copy">
-                        <span class="switch-label">Disponible</span>
-                        <span class="switch-help">Oculta o muestra este producto en el menú</span>
-                      </div>
-                      <label class="switch">
-                        <input type="checkbox" id="active-${product.id}" ${product.is_active ? 'checked' : ''} data-product-id="${product.id}" data-field="is_active" class="product-checkbox" />
-                        <span class="switch-slider"></span>
-                      </label>
-                    </div>
-
-                    <div class="switch-row">
-                      <div class="switch-copy">
-                        <span class="switch-label">Promo</span>
-                        <span class="switch-help">Marca este producto como promoción destacada</span>
-                      </div>
-                      <label class="switch">
-                        <input type="checkbox" id="promo-${product.id}" ${product.is_promo ? 'checked' : ''} data-product-id="${product.id}" data-field="is_promo" class="product-checkbox" />
-                        <span class="switch-slider"></span>
-                      </label>
-                    </div>
-                                      </div>
                   </article>
                 `).join('')}
               </div>
