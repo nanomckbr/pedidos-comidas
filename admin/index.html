@@ -625,22 +625,6 @@
     <main class="container content">
       <section class="stats">
         <div class="stat-card">
-          <small>Total visibles</small>
-          <strong id="stat-total">0</strong>
-        </div>
-        <div class="stat-card">
-          <small>Nuevos</small>
-          <strong id="stat-nuevo">0</strong>
-        </div>
-        <div class="stat-card">
-          <small>Preparando</small>
-          <strong id="stat-preparando">0</strong>
-        </div>
-        <div class="stat-card">
-          <small>Despacho</small>
-          <strong id="stat-despacho">0</strong>
-        </div>
-        <div class="stat-card">
           <small>Ventas del día</small>
           <strong id="stat-ventas">$0</strong>
         </div>
@@ -680,10 +664,6 @@
       const updatedAtEl = document.getElementById('updated-at');
       const dayCutInfoEl = document.getElementById('day-cut-info');
 
-      const statTotal = document.getElementById('stat-total');
-      const statNuevo = document.getElementById('stat-nuevo');
-      const statPreparando = document.getElementById('stat-preparando');
-      const statDespacho = document.getElementById('stat-despacho');
       const statVentas = document.getElementById('stat-ventas');
       const editLogoBtn = document.getElementById('edit-logo-btn');
       const logoImageInput = document.getElementById('logo-image-input');
@@ -963,11 +943,9 @@
           .filter(order => order.status === 'entregado' && new Date(order.created_at) >= cut)
           .reduce((sum, order) => sum + Number(order.workflow?.finalTotal || order.total || 0), 0);
 
-        statTotal.textContent = orders.length;
-        statNuevo.textContent = orders.filter(o => o.status === 'nuevo').length;
-        statPreparando.textContent = orders.filter(o => o.status === 'preparando').length;
-        statDespacho.textContent = orders.filter(o => o.status === 'enviado').length;
-        statVentas.textContent = formatPrice(ventasDelDia);
+        if (statVentas) {
+          statVentas.textContent = formatPrice(ventasDelDia);
+        }
       }
 
       async function updateStatus(orderId, newStatus) {
