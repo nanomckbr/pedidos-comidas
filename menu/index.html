@@ -458,6 +458,42 @@
         transform: translateX(22px);
       }
 
+      .price-field-highlight input,
+      .field.price-field-highlight input {
+        border-color: rgba(249, 115, 22, 0.35);
+        background: rgba(249, 115, 22, 0.08);
+        color: #fff7ed;
+        font-weight: 800;
+        font-size: 18px;
+      }
+
+      .price-field-highlight label,
+      .field.price-field-highlight label {
+        color: #fed7aa;
+      }
+
+      .product-price-highlight {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(249, 115, 22, 0.16);
+        color: #ffedd5;
+        font-weight: 800;
+        font-size: 18px;
+        line-height: 1;
+      }
+
+      .product-price-highlight small {
+        font-size: 11px;
+        color: #fdba74;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
       .subgroup {
         display: none;
       }
@@ -532,7 +568,7 @@
               <input type="text" id="quick-product-name" placeholder="Ej: Pizza Muzzarella" />
             </div>
 
-            <div class="field">
+            <div class="field price-field-highlight">
               <label for="quick-product-price">Precio</label>
               <input type="number" id="quick-product-price" min="0" placeholder="Ej: 8500" />
             </div>
@@ -562,7 +598,7 @@
             <input type="text" id="new-product-name" placeholder="Ej: Pizza Muzzarella" />
           </div>
 
-          <div class="field">
+          <div class="field price-field-highlight">
             <label for="new-product-price">Precio</label>
             <input type="number" id="new-product-price" min="0" placeholder="Ej: 8500" />
           </div>
@@ -916,7 +952,7 @@
                     </div>
 
                     <div class="edit-grid">
-                      <div class="field">
+                      <div class="field price-field-highlight">
                         <label>Precio</label>
                         <input type="number" min="0" value="${product.price || 0}" data-product-id="${product.id}" data-field="price" class="product-input" />
                       </div>
