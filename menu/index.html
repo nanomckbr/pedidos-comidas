@@ -1080,7 +1080,7 @@
 
             <div class="bulk-actions">
               <button class="btn-accent" id="save-promo-draft-btn" type="button">Crear promo</button>
-              <div id="promo-builder-feedback" class="bulk-save-feedback">La promo se arma como borrador visual. Si te gusta, después conectamos el guardado real.</div>
+              <div id="promo-builder-feedback" class="bulk-save-feedback"></div>
             </div>
           </div>
         </div>
@@ -1268,7 +1268,7 @@
         }
 
         const categoryProducts = productsCache
-          .filter(product => product.category_id === promoSelectedCategoryId && !product.is_promo)
+          .filter(product => product.category_id === promoSelectedCategoryId )
           .sort((a, b) => {
             const nameA = (a.name || '').localeCompare(b.name || '');
             if (nameA !== 0) return nameA;
@@ -1497,7 +1497,7 @@
 
         const category = categoriesCache.find(cat => cat.id === selectedCategoryId);
         const categoryProducts = productsCache
-          .filter(product => product.category_id === selectedCategoryId && !product.is_promo)
+          .filter(product => product.category_id === selectedCategoryId )
           .sort((a, b) => {
             const subA = (a.subcategory || '').localeCompare(b.subcategory || '');
             if (subA !== 0) return subA;
