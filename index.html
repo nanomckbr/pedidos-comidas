@@ -129,8 +129,9 @@
 
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 16px;
+        align-items: stretch;
       }
 
       .card {
@@ -142,6 +143,8 @@
         flex-direction: column;
         justify-content: space-between;
         box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
+        min-height: 100%;
+        height: 100%;
       }
 
       .card-top {
@@ -154,6 +157,8 @@
       .card h3 {
         margin: 0;
         font-size: 23px;
+        line-height: 1.2;
+        overflow-wrap: anywhere;
       }
 
       .price-tag {
@@ -164,13 +169,18 @@
         padding: 8px 12px;
         border-radius: 999px;
         white-space: nowrap;
+        flex-shrink: 0;
       }
 
       .desc {
         color: var(--muted);
         font-size: 14px;
-        line-height: 1.65;
+        line-height: 1.45;
         margin: 12px 0 18px;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        flex: 1 1 auto;
       }
 
       button,
@@ -526,15 +536,17 @@
           right: 14px;
           bottom: 14px;
         }
-      }
 
-      @media (max-width: 920px) {
         .layout {
           grid-template-columns: 1fr;
         }
 
         .sidebar {
           width: min(420px, 100vw);
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
         }
       }
     
@@ -806,6 +818,19 @@
           .replace(/[\u0300-\u036f]/g, '');
       }
 
+      function inferMenuSubcategory(categoryName, item) {
+        const category = normalizeSubcategory(categoryName);
+        const name = normalizeSubcategory(item?.name || '');
+        const rawSub = normalizeSubcategory(item?.subcategory || '');
+
+        if (category === 'sandwiches' || category === 'sandwichs' || category === 'sanguiches') {
+          if (rawSub.includes('lomito') || name.includes('lomito')) return 'lomito';
+          if (rawSub.includes('clasico') || rawSub.includes('clasicos') || name.includes('mila') || name.includes('milanesa')) return 'clasicos';
+        }
+
+        return normalizeMenuSubcategory(categoryName, item?.subcategory || '');
+      }
+
       function normalizeMenuSubcategory(categoryName, subgroupName) {
         const category = normalizeSubcategory(categoryName);
         const sub = normalizeSubcategory(subgroupName);
@@ -998,7 +1023,7 @@
 
         categoryProducts.forEach(item => {
           const originalKey = item.subcategory && item.subcategory.trim() ? item.subcategory.trim() : '__sin_subcategoria__';
-          const normalizedKey = normalizeMenuSubcategory(category.name, originalKey);
+          const normalizedKey = inferMenuSubcategory(category.name, item);
 
           if (normalizedKey === '__sin_subcategoria__') {
             fallbackEntries.push([originalKey, [item]]);
@@ -1099,8 +1124,8 @@
           const categoryProducts = products
             .filter(product => product.category_id === category.id && product.is_active)
             .sort((a, b) => {
-              const subA = normalizeMenuSubcategory(category.name, a.subcategory || '');
-              const subB = normalizeMenuSubcategory(category.name, b.subcategory || '');
+              const subA = inferMenuSubcategory(category.name, a);
+              const subB = inferMenuSubcategory(category.name, b);
               const cmpSub = subA.localeCompare(subB);
               if (cmpSub !== 0) return cmpSub;
               const nameA = (a.name || '').localeCompare(b.name || '');
