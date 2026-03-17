@@ -502,6 +502,108 @@
         display: block;
       }
 
+
+      .product-card {
+        overflow: hidden;
+      }
+
+      .product-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        cursor: pointer;
+        margin-bottom: 0;
+      }
+
+      .product-card-summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        flex-wrap: wrap;
+      }
+
+      .product-card-title {
+        font-size: 15px;
+        font-weight: 800;
+        color: #fff;
+      }
+
+      .product-card-mini-price {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: rgba(249, 115, 22, 0.14);
+        color: #ffedd5;
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .product-card-header-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+
+      .product-toggle {
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.08);
+        color: #fff;
+        font-size: 12px;
+        transition: transform .18s ease;
+      }
+
+      .product-card-body {
+        display: none;
+        margin-top: 12px;
+      }
+
+      .product-card.open .product-card-body {
+        display: block;
+      }
+
+      .product-card.open .product-toggle {
+        transform: rotate(180deg);
+      }
+
+      .switch-row.compact {
+        padding: 8px 10px;
+      }
+
+      .switch-row.compact .switch-label {
+        font-size: 12px;
+      }
+
+      .switch-row.compact .switch-help {
+        display: none;
+      }
+
+      .switch.compact {
+        width: 44px;
+        height: 26px;
+      }
+
+      .switch.compact .switch-slider:before {
+        width: 18px;
+        height: 18px;
+        left: 3px;
+        top: 3px;
+      }
+
+      .switch.compact input:checked + .switch-slider:before {
+        transform: translateX(18px);
+      }
+
       @media (max-width: 920px) {
         .grid {
           grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -989,6 +1091,7 @@
                         <span class="switch-slider"></span>
                       </label>
                     </div>
+                                      </div>
                   </article>
                 `).join('')}
               </div>
