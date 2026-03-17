@@ -788,7 +788,43 @@
       </div>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+// --- DAY RESET GLOBAL (SUPABASE) ---
+async function fetchDayReset() {
+  const { data, error } = await supabase
+    .from('store_settings')
+    .select('day_reset_at')
+    .limit(1)
+    .single();
+
+  if (!error && data) {
+    window.__dayResetAt = data.day_reset_at;
+  }
+}
+
+async function setDayReset() {
+  const now = new Date().toISOString();
+  const { error } = await supabase
+    .from('store_settings')
+    .update({ day_reset_at: now })
+    .neq('id', 0);
+
+  if (!error) {
+    window.__dayResetAt = now;
+    await loadOrders(); // refresh UI
+  }
+}
+
+// override reset button
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.querySelector('[data-reset-day]');
+  if (btn) {
+    btn.onclick = setDayReset;
+  }
+  fetchDayReset();
+});
+
+</script>
     <script>
       const supabaseUrl = 'https://ylvmzavgebttklblidcd.supabase.co';
       const supabaseKey = 'sb_publishable_rFS54R3Uw06tOJ0qxoFhBA_uoEHW457';
@@ -828,14 +864,14 @@
 
       function loadWorkflowMeta() {
         try {
-          return JSON.parse(localStorage.getItem(WORKFLOW_STORAGE_KEY) || '{}');
+          return JSON.parse(window.__dayResetAt || '{}');
         } catch {
           return {};
         }
       }
 
       function saveWorkflowMeta() {
-        localStorage.setItem(WORKFLOW_STORAGE_KEY, JSON.stringify(workflowMeta));
+        // replaced by supabase);
       }
 
       function getOrderMeta(orderId) {
@@ -1009,29 +1045,29 @@
       }
 
       function getDayCut() {
-        const saved = localStorage.getItem('pedidoscomidas_day_cut');
+        const saved = window.__dayResetAt;
         if (saved) return new Date(saved);
 
         const now = new Date();
         now.setHours(0, 0, 0, 0);
-        localStorage.setItem('pedidoscomidas_day_cut', now.toISOString());
+        // replaced by supabase);
         return now;
       }
 
       function getDayReset() {
-        const saved = localStorage.getItem('pedidoscomidas_day_reset');
+        const saved = window.__dayResetAt;
         if (saved) return new Date(saved);
 
         const now = new Date();
         now.setHours(0, 0, 0, 0);
-        localStorage.setItem('pedidoscomidas_day_reset', now.toISOString());
+        // replaced by supabase);
         return now;
       }
 
       function setDayCutNow() {
         const now = new Date();
-        localStorage.setItem('pedidoscomidas_day_cut', now.toISOString());
-        localStorage.setItem('pedidoscomidas_day_reset', now.toISOString());
+        // replaced by supabase);
+        // replaced by supabase);
         updateDayCutInfo();
       }
 
@@ -1649,7 +1685,43 @@
         await loadOrders();
         startAutoRefresh();
       })();
-    </script>
+    
+// --- DAY RESET GLOBAL (SUPABASE) ---
+async function fetchDayReset() {
+  const { data, error } = await supabase
+    .from('store_settings')
+    .select('day_reset_at')
+    .limit(1)
+    .single();
+
+  if (!error && data) {
+    window.__dayResetAt = data.day_reset_at;
+  }
+}
+
+async function setDayReset() {
+  const now = new Date().toISOString();
+  const { error } = await supabase
+    .from('store_settings')
+    .update({ day_reset_at: now })
+    .neq('id', 0);
+
+  if (!error) {
+    window.__dayResetAt = now;
+    await loadOrders(); // refresh UI
+  }
+}
+
+// override reset button
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.querySelector('[data-reset-day]');
+  if (btn) {
+    btn.onclick = setDayReset;
+  }
+  fetchDayReset();
+});
+
+</script>
   
 
 <script>
@@ -1690,6 +1762,42 @@
       setActiveMobileTab('');
     }
   });
+
+// --- DAY RESET GLOBAL (SUPABASE) ---
+async function fetchDayReset() {
+  const { data, error } = await supabase
+    .from('store_settings')
+    .select('day_reset_at')
+    .limit(1)
+    .single();
+
+  if (!error && data) {
+    window.__dayResetAt = data.day_reset_at;
+  }
+}
+
+async function setDayReset() {
+  const now = new Date().toISOString();
+  const { error } = await supabase
+    .from('store_settings')
+    .update({ day_reset_at: now })
+    .neq('id', 0);
+
+  if (!error) {
+    window.__dayResetAt = now;
+    await loadOrders(); // refresh UI
+  }
+}
+
+// override reset button
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.querySelector('[data-reset-day]');
+  if (btn) {
+    btn.onclick = setDayReset;
+  }
+  fetchDayReset();
+});
+
 </script>
 
 </body>
