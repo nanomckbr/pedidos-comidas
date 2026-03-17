@@ -198,163 +198,6 @@
         font-size: 13px;
       }
 
-
-      .bulk-save-feedback,
-      .new-product-feedback {
-        display: inline-flex;
-        align-items: center;
-        min-height: 40px;
-        padding: 8px 12px;
-        border-radius: 12px;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.08);
-      }
-
-      .bulk-save-feedback.pending {
-        color: #fde68a;
-        border-color: rgba(234,179,8,0.35);
-        background: rgba(234,179,8,0.08);
-      }
-
-      .bulk-save-feedback.ok,
-      .new-product-feedback.ok {
-        color: #86efac;
-        border-color: rgba(34,197,94,0.28);
-        background: rgba(34,197,94,0.08);
-      }
-
-      .bulk-save-feedback.error,
-      .new-product-feedback.error {
-        color: #fca5a5;
-        border-color: rgba(239,68,68,0.3);
-        background: rgba(239,68,68,0.08);
-      }
-
-      .quick-add-box {
-        margin-top: 18px;
-        padding: 16px;
-        border-radius: 20px;
-        border: 1px solid rgba(249,115,22,0.18);
-        background: rgba(249,115,22,0.05);
-      }
-
-      .quick-add-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr 1.2fr auto;
-        gap: 10px;
-        margin-top: 12px;
-      }
-
-      .quick-add-grid .field {
-        margin: 0;
-      }
-
-      .quick-add-grid button {
-        align-self: end;
-        min-height: 44px;
-      }
-
-      .price-hero {
-        display: inline-flex;
-        align-items: center;
-        margin-top: 10px;
-        padding: 7px 12px;
-        border-radius: 999px;
-        background: rgba(249,115,22,0.12);
-        color: #ffedd5;
-        font-size: 16px;
-        font-weight: 800;
-      }
-
-      .switch-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-top: 10px;
-        color: #fff;
-        font-size: 13px;
-      }
-
-      .switch {
-        position: relative;
-        width: 48px;
-        height: 28px;
-        display: inline-block;
-      }
-
-      .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-        position: absolute;
-      }
-
-      .switch-slider {
-        position: absolute;
-        inset: 0;
-        border-radius: 999px;
-        background: rgba(255,255,255,0.12);
-        border: 1px solid rgba(255,255,255,0.12);
-        transition: .2s ease;
-      }
-
-      .switch-slider::before {
-        content: '';
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        left: 3px;
-        top: 3px;
-        border-radius: 999px;
-        background: #fff;
-        transition: .2s ease;
-      }
-
-      .switch input:checked + .switch-slider {
-        background: rgba(249,115,22,0.8);
-        border-color: rgba(249,115,22,0.8);
-      }
-
-      .switch input:checked + .switch-slider::before {
-        transform: translateX(20px);
-        background: #111;
-      }
-
-      .promo-badge-admin {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        margin-top: 8px;
-        background: rgba(249,115,22,0.16);
-        color: #fed7aa;
-        font-size: 11px;
-        font-weight: 800;
-        padding: 5px 9px;
-        border-radius: 999px;
-      }
-
-      .card-actions {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-top: 12px;
-      }
-
-      .mini-btn {
-        border-radius: 12px;
-        padding: 8px 10px;
-        font-size: 12px;
-        min-height: 36px;
-      }
-
-      @media (max-width: 920px) {
-        .quick-add-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
-
       .bulk-save-feedback.ok,
       .new-product-feedback.ok { color: #86efac; }
 
@@ -550,35 +393,7 @@
 
         <div class="bulk-actions">
           <button class="btn-accent" id="save-all-btn">Guardar todos los cambios</button>
-          <div class="bulk-save-feedback" id="bulk-save-feedback">No hay cambios pendientes.</div>
-        </div>
-
-        <div class="quick-add-box">
-          <small style="display:block;color:var(--muted);margin-bottom:6px;">Modo rápido</small>
-          <strong style="font-size:20px;">Agregar producto rápido</strong>
-          <div class="updated-at" style="margin-top:6px;">
-            Crea un producto con lo mínimo: nombre, precio y categoría. Luego lo completas si quieres.
-          </div>
-
-          <div class="quick-add-grid">
-            <div class="field">
-              <label for="quick-product-name">Nombre</label>
-              <input type="text" id="quick-product-name" placeholder="Ej: Lomito completo" />
-            </div>
-
-            <div class="field">
-              <label for="quick-product-price">Precio</label>
-              <input type="number" id="quick-product-price" min="0" placeholder="Ej: 12000" />
-            </div>
-
-            <div class="field">
-              <label for="quick-product-category">Categoría</label>
-              <select id="quick-product-category"></select>
-            </div>
-
-            <button class="btn-accent" id="quick-create-btn" type="button">+ Agregar rápido</button>
-          </div>
-          <div class="new-product-feedback" id="quick-product-feedback" style="margin-top:10px;"></div>
+          <div class="bulk-save-feedback" id="bulk-save-feedback"></div>
         </div>
       </div>
 
@@ -680,11 +495,6 @@
       const newProductActive = document.getElementById('new-product-active');
       const createProductBtn = document.getElementById('create-product-btn');
       const newProductFeedback = document.getElementById('new-product-feedback');
-      const quickProductName = document.getElementById('quick-product-name');
-      const quickProductPrice = document.getElementById('quick-product-price');
-      const quickProductCategory = document.getElementById('quick-product-category');
-      const quickCreateBtn = document.getElementById('quick-create-btn');
-      const quickProductFeedback = document.getElementById('quick-product-feedback');
       const refreshBtn = document.getElementById('refresh-btn');
       const logoutBtn = document.getElementById('logout-btn');
 
@@ -704,8 +514,8 @@
 
       function markDirty(productId) {
         dirtyProducts.add(productId);
-        bulkSaveFeedback.className = 'bulk-save-feedback pending';
-        bulkSaveFeedback.textContent = `⚠️ ${dirtyProducts.size} cambio(s) sin guardar`;
+        bulkSaveFeedback.className = 'bulk-save-feedback';
+        bulkSaveFeedback.textContent = `${dirtyProducts.size} cambio(s) pendiente(s).`;
       }
 
       function updateProductDraft(productId, field, value) {
@@ -734,11 +544,9 @@
           return;
         }
 
-        const categoryOptions = categoriesCache.map(category => `
+        newProductCategory.innerHTML = categoriesCache.map(category => `
           <option value="${category.id}">${category.name}</option>
         `).join('');
-        newProductCategory.innerHTML = categoryOptions;
-        quickProductCategory.innerHTML = categoryOptions;
         updateNewProductSubcategoryField();
       }
 
@@ -910,8 +718,6 @@
                       <div class="card-top">
                         <div>
                           <h4>${product.name}</h4>
-                          <div class="price-hero">${formatPrice(product.price || 0)}</div>
-                          ${product.is_promo ? `<div class="promo-badge-admin">🔥 ${product.promo_label || 'PROMO'}</div>` : ''}
                         </div>
                       </div>
 
@@ -937,24 +743,14 @@
                       </div>
                     </div>
 
-                    <div class="switch-row">
-                      <span>Disponible</span>
-                      <label class="switch">
-                        <input type="checkbox" id="active-${product.id}" ${product.is_active ? 'checked' : ''} data-product-id="${product.id}" data-field="is_active" class="product-checkbox" />
-                        <span class="switch-slider"></span>
-                      </label>
+                    <div class="checkbox-row">
+                      <input type="checkbox" id="active-${product.id}" ${product.is_active ? 'checked' : ''} data-product-id="${product.id}" data-field="is_active" class="product-checkbox" />
+                      <label for="active-${product.id}">Producto activo</label>
                     </div>
 
-                    <div class="switch-row">
-                      <span>Promo</span>
-                      <label class="switch">
-                        <input type="checkbox" id="promo-${product.id}" ${product.is_promo ? 'checked' : ''} data-product-id="${product.id}" data-field="is_promo" class="product-checkbox" />
-                        <span class="switch-slider"></span>
-                      </label>
-                    </div>
-
-                    <div class="card-actions">
-                      <button class="btn-dark mini-btn duplicate-btn" data-duplicate-id="${product.id}" type="button">📄 Duplicar</button>
+                    <div class="checkbox-row">
+                      <input type="checkbox" id="promo-${product.id}" ${product.is_promo ? 'checked' : ''} data-product-id="${product.id}" data-field="is_promo" class="product-checkbox" />
+                      <label for="promo-${product.id}">Marcar como promo</label>
                     </div>
                   </article>
                 `).join('')}
@@ -1002,40 +798,6 @@
           });
         });
 
-        document.querySelectorAll('.duplicate-btn').forEach(btn => {
-          btn.addEventListener('click', async (event) => {
-            const productId = Number(event.currentTarget.dataset.duplicateId);
-            const original = productsCache.find(item => item.id === productId);
-            if (!original) return;
-
-            const { error } = await supabaseClient
-              .from('products')
-              .insert([{
-                store_id: original.store_id || 1,
-                category_id: original.category_id,
-                subcategory: original.subcategory || null,
-                name: `${original.name} copia`,
-                description: original.description || null,
-                price: Number(original.price || 0),
-                is_promo: !!original.is_promo,
-                promo_label: original.promo_label || null,
-                is_active: !!original.is_active,
-                sort_order: Number(original.sort_order || 0) + 1
-              }]);
-
-            if (error) {
-              console.error(error);
-              bulkSaveFeedback.className = 'bulk-save-feedback error';
-              bulkSaveFeedback.textContent = 'No se pudo duplicar el producto.';
-              return;
-            }
-
-            bulkSaveFeedback.className = 'bulk-save-feedback ok';
-            bulkSaveFeedback.textContent = 'Producto duplicado correctamente.';
-            await loadProductsAdmin();
-          });
-        });
-
         document.querySelectorAll('.product-checkbox').forEach(input => {
           input.addEventListener('change', (event) => {
             const productId = Number(event.target.dataset.productId);
@@ -1052,7 +814,7 @@
           return;
         }
 
-        bulkSaveFeedback.className = 'bulk-save-feedback pending';
+        bulkSaveFeedback.className = 'bulk-save-feedback';
         bulkSaveFeedback.textContent = 'Guardando cambios...';
 
         for (const productId of dirtyProducts) {
@@ -1081,58 +843,6 @@
         dirtyProducts = new Set();
         bulkSaveFeedback.className = 'bulk-save-feedback ok';
         bulkSaveFeedback.textContent = 'Todos los cambios se guardaron correctamente.';
-        await loadProductsAdmin();
-      }
-
-      async function createQuickProduct() {
-        const name = quickProductName.value.trim();
-        const price = Number(quickProductPrice.value || 0);
-        const categoryId = Number(quickProductCategory.value || 0);
-
-        if (!name) {
-          quickProductFeedback.className = 'new-product-feedback error';
-          quickProductFeedback.textContent = 'Escribe un nombre para el producto.';
-          return;
-        }
-
-        if (!categoryId) {
-          quickProductFeedback.className = 'new-product-feedback error';
-          quickProductFeedback.textContent = 'Selecciona una categoría.';
-          return;
-        }
-
-        if (!price || price < 0) {
-          quickProductFeedback.className = 'new-product-feedback error';
-          quickProductFeedback.textContent = 'Ingresa un precio válido.';
-          return;
-        }
-
-        quickProductFeedback.className = 'new-product-feedback';
-        quickProductFeedback.textContent = 'Creando producto...';
-
-        const { error } = await supabaseClient
-          .from('products')
-          .insert([{
-            store_id: 1,
-            category_id: categoryId,
-            name,
-            price,
-            is_active: true,
-            is_promo: false,
-            sort_order: 0
-          }]);
-
-        if (error) {
-          console.error(error);
-          quickProductFeedback.className = 'new-product-feedback error';
-          quickProductFeedback.textContent = 'No se pudo crear el producto rápido.';
-          return;
-        }
-
-        quickProductName.value = '';
-        quickProductPrice.value = '';
-        quickProductFeedback.className = 'new-product-feedback ok';
-        quickProductFeedback.textContent = 'Producto rápido creado correctamente.';
         await loadProductsAdmin();
       }
 
@@ -1212,10 +922,6 @@
 
       createProductBtn.addEventListener('click', async () => {
         await createNewProduct();
-      });
-
-      quickCreateBtn.addEventListener('click', async () => {
-        await createQuickProduct();
       });
 
       saveAllBtn.addEventListener('click', async () => {
