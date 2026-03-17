@@ -1154,6 +1154,17 @@
               confirmedBadge.textContent = 'Precio final pendiente';
               confirmedBadge.className = 'badge-soft';
             }
+
+            const steps = orderCard?.querySelector('[data-dispatch-steps]');
+            if (steps) {
+              const paid = getOrderMeta(orderId).paid;
+              const delivered = getOrderMeta(orderId).delivered;
+              steps.innerHTML = `
+                <div>⬜ Precio final confirmado</div>
+                <div>${delivered ? '✅' : '⬜'} Pedido entregado</div>
+                <div>${paid ? '✅' : '⬜'} Pedido pagado</div>
+              `;
+            }
           });
         });
 
@@ -1172,8 +1183,27 @@
               finalTotal
             });
 
-            openedOrderId = String(orderId);
-            await loadOrders();
+            const preview = orderCard?.querySelector('[data-final-price-preview]');
+            if (preview) preview.textContent = formatPrice(finalTotal);
+
+            const confirmedBadge = orderCard?.querySelector('[data-final-price-badge]');
+            if (confirmedBadge) {
+              confirmedBadge.textContent = 'Precio final confirmado';
+              confirmedBadge.className = 'badge-confirmed';
+            }
+
+            const summaryTotal = orderCard?.querySelector('[data-order-summary-total]');
+            if (summaryTotal) summaryTotal.textContent = formatPrice(finalTotal);
+
+            const steps = orderCard?.querySelector('[data-dispatch-steps]');
+            if (steps) {
+              const meta = getOrderMeta(orderId);
+              steps.innerHTML = `
+                <div>${meta.finalPriceConfirmed ? '✅' : '⬜'} Precio final confirmado</div>
+                <div>${meta.delivered ? '✅' : '⬜'} Pedido entregado</div>
+                <div>${meta.paid ? '✅' : '⬜'} Pedido pagado</div>
+              `;
+            }
           });
         });
 
@@ -1181,9 +1211,19 @@
           checkbox.addEventListener('change', async (event) => {
             const orderId = Number(event.target.dataset.orderId);
             setOrderMeta(orderId, { paid: event.target.checked });
-            openedOrderId = String(orderId);
-            await maybeFinalizeOrder(orderId);
-            await loadOrders();
+
+            const orderCard = event.target.closest('.order-card');
+            const steps = orderCard?.querySelector('[data-dispatch-steps]');
+            if (steps) {
+              const meta = getOrderMeta(orderId);
+              steps.innerHTML = `
+                <div>${meta.finalPriceConfirmed ? '✅' : '⬜'} Precio final confirmado</div>
+                <div>${meta.delivered ? '✅' : '⬜'} Pedido entregado</div>
+                <div>${meta.paid ? '✅' : '⬜'} Pedido pagado</div>
+              `;
+            }
+
+            await maybeFinalizeOrder(orderId, orderCard);
           });
         });
 
@@ -1191,18 +1231,34 @@
           button.addEventListener('click', async (event) => {
             const orderId = Number(event.target.dataset.orderId);
             setOrderMeta(orderId, { delivered: true });
-            openedOrderId = String(orderId);
-            await maybeFinalizeOrder(orderId);
-            await loadOrders();
+
+            const orderCard = event.target.closest('.order-card');
+            event.target.disabled = true;
+            event.target.textContent = 'Entregado ✓';
+
+            const steps = orderCard?.querySelector('[data-dispatch-steps]');
+            if (steps) {
+              const meta = getOrderMeta(orderId);
+              steps.innerHTML = `
+                <div>${meta.finalPriceConfirmed ? '✅' : '⬜'} Precio final confirmado</div>
+                <div>${meta.delivered ? '✅' : '⬜'} Pedido entregado</div>
+                <div>${meta.paid ? '✅' : '⬜'} Pedido pagado</div>
+              `;
+            }
+
+            await maybeFinalizeOrder(orderId, orderCard);
           });
         });
       }
 
-      async function maybeFinalizeOrder(orderId) {
+      async function maybeFinalizeOrder(orderId, orderCard = null) {
         const meta = getOrderMeta(orderId);
         if (meta.finalPriceConfirmed && meta.paid && meta.delivered) {
           openedOrderId = String(orderId);
-          await updateStatus(orderId, 'entregado');
+          const ok = await updateStatus(orderId, 'entregado');
+          if (ok) {
+            await loadOrders();
+          }
         }
       }
 
@@ -1284,7 +1340,7 @@
 
             <div class="summary-box">
               <div class="muted">Pasa a <strong>Finalizados</strong> cuando estén completos estos 3 pasos:</div>
-              <div class="price-preview" style="margin-top: 10px;">
+              <div class="price-preview" style="margin-top: 10px;" data-dispatch-steps>
                 <div>${workflow.finalPriceConfirmed ? '✅' : '⬜'} Precio final confirmado</div>
                 <div>${workflow.delivered ? '✅' : '⬜'} Pedido entregado</div>
                 <div>${workflow.paid ? '✅' : '⬜'} Pedido pagado</div>
@@ -1353,7 +1409,7 @@
                 <span class="order-summary-item muted">${order.customer_name || 'Cliente sin nombre'}</span>
                 <span class="order-summary-item muted">${new Date(order.created_at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</span>
                 <span class="order-summary-item muted">${orderItemsCount} ítem${orderItemsCount === 1 ? '' : 's'}</span>
-                <span class="order-summary-item"><strong>${formatPrice(order.workflow?.finalTotal || order.total)}</strong></span>
+                <span class="order-summary-item"><strong data-order-summary-total>${formatPrice(order.workflow?.finalTotal || order.total)}</strong></span>
               </div>
 
               <div class="order-right">
