@@ -198,6 +198,163 @@
         font-size: 13px;
       }
 
+
+      .bulk-save-feedback,
+      .new-product-feedback {
+        display: inline-flex;
+        align-items: center;
+        min-height: 40px;
+        padding: 8px 12px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+
+      .bulk-save-feedback.pending {
+        color: #fde68a;
+        border-color: rgba(234,179,8,0.35);
+        background: rgba(234,179,8,0.08);
+      }
+
+      .bulk-save-feedback.ok,
+      .new-product-feedback.ok {
+        color: #86efac;
+        border-color: rgba(34,197,94,0.28);
+        background: rgba(34,197,94,0.08);
+      }
+
+      .bulk-save-feedback.error,
+      .new-product-feedback.error {
+        color: #fca5a5;
+        border-color: rgba(239,68,68,0.3);
+        background: rgba(239,68,68,0.08);
+      }
+
+      .quick-add-box {
+        margin-top: 18px;
+        padding: 16px;
+        border-radius: 20px;
+        border: 1px solid rgba(249,115,22,0.18);
+        background: rgba(249,115,22,0.05);
+      }
+
+      .quick-add-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1.2fr auto;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .quick-add-grid .field {
+        margin: 0;
+      }
+
+      .quick-add-grid button {
+        align-self: end;
+        min-height: 44px;
+      }
+
+      .price-hero {
+        display: inline-flex;
+        align-items: center;
+        margin-top: 10px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: rgba(249,115,22,0.12);
+        color: #ffedd5;
+        font-size: 16px;
+        font-weight: 800;
+      }
+
+      .switch-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 10px;
+        color: #fff;
+        font-size: 13px;
+      }
+
+      .switch {
+        position: relative;
+        width: 48px;
+        height: 28px;
+        display: inline-block;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        position: absolute;
+      }
+
+      .switch-slider {
+        position: absolute;
+        inset: 0;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.12);
+        transition: .2s ease;
+      }
+
+      .switch-slider::before {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        left: 3px;
+        top: 3px;
+        border-radius: 999px;
+        background: #fff;
+        transition: .2s ease;
+      }
+
+      .switch input:checked + .switch-slider {
+        background: rgba(249,115,22,0.8);
+        border-color: rgba(249,115,22,0.8);
+      }
+
+      .switch input:checked + .switch-slider::before {
+        transform: translateX(20px);
+        background: #111;
+      }
+
+      .promo-badge-admin {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 8px;
+        background: rgba(249,115,22,0.16);
+        color: #fed7aa;
+        font-size: 11px;
+        font-weight: 800;
+        padding: 5px 9px;
+        border-radius: 999px;
+      }
+
+      .card-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+
+      .mini-btn {
+        border-radius: 12px;
+        padding: 8px 10px;
+        font-size: 12px;
+        min-height: 36px;
+      }
+
+      @media (max-width: 920px) {
+        .quick-add-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+
       .bulk-save-feedback.ok,
       .new-product-feedback.ok { color: #86efac; }
 
@@ -362,160 +519,6 @@
           grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
         }
       }
-    
-      .save-state {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 14px;
-        border-radius: 14px;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.08);
-        min-height: 44px;
-      }
-
-      .save-state.pending {
-        color: #fde68a;
-        border-color: rgba(234,179,8,0.35);
-        background: rgba(234,179,8,0.08);
-      }
-
-      .save-state.ok {
-        color: #86efac;
-        border-color: rgba(34,197,94,0.28);
-        background: rgba(34,197,94,0.08);
-      }
-
-      .save-state.error {
-        color: #fca5a5;
-        border-color: rgba(239,68,68,0.3);
-        background: rgba(239,68,68,0.08);
-      }
-
-      .quick-add-box {
-        margin-top: 18px;
-        padding: 16px;
-        border-radius: 20px;
-        border: 1px solid rgba(249,115,22,0.18);
-        background: rgba(249,115,22,0.05);
-      }
-
-      .quick-add-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr 1.2fr auto;
-        gap: 10px;
-        margin-top: 12px;
-      }
-
-      .quick-add-grid .field {
-        margin: 0;
-      }
-
-      .quick-add-grid button {
-        align-self: end;
-        min-height: 44px;
-      }
-
-      .price-hero {
-        display: inline-flex;
-        align-items: center;
-        margin-top: 10px;
-        padding: 7px 12px;
-        border-radius: 999px;
-        background: rgba(249,115,22,0.12);
-        color: #ffedd5;
-        font-size: 18px;
-        font-weight: 800;
-      }
-
-      .card-actions {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-top: 10px;
-      }
-
-      .mini-btn {
-        border-radius: 12px;
-        padding: 8px 10px;
-        font-size: 12px;
-        min-height: 36px;
-      }
-
-      .switch-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-top: 10px;
-        color: #fff;
-        font-size: 13px;
-      }
-
-      .switch {
-        position: relative;
-        width: 48px;
-        height: 28px;
-        display: inline-block;
-      }
-
-      .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-        position: absolute;
-      }
-
-      .switch-slider {
-        position: absolute;
-        inset: 0;
-        border-radius: 999px;
-        background: rgba(255,255,255,0.12);
-        border: 1px solid rgba(255,255,255,0.12);
-        transition: .2s ease;
-      }
-
-      .switch-slider::before {
-        content: '';
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        left: 3px;
-        top: 3px;
-        border-radius: 999px;
-        background: #fff;
-        transition: .2s ease;
-      }
-
-      .switch input:checked + .switch-slider {
-        background: rgba(249,115,22,0.75);
-        border-color: rgba(249,115,22,0.75);
-      }
-
-      .switch input:checked + .switch-slider::before {
-        transform: translateX(20px);
-        background: #111;
-      }
-
-      .promo-badge-admin {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        margin-top: 8px;
-        background: rgba(249,115,22,0.16);
-        color: #fed7aa;
-        font-size: 11px;
-        font-weight: 800;
-        padding: 5px 9px;
-        border-radius: 999px;
-      }
-
-      @media (max-width: 920px) {
-        .quick-add-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
     </style>
   </head>
   <body>
@@ -547,7 +550,35 @@
 
         <div class="bulk-actions">
           <button class="btn-accent" id="save-all-btn">Guardar todos los cambios</button>
-          <div class="save-state" id="bulk-save-feedback"></div>
+          <div class="bulk-save-feedback" id="bulk-save-feedback">No hay cambios pendientes.</div>
+        </div>
+
+        <div class="quick-add-box">
+          <small style="display:block;color:var(--muted);margin-bottom:6px;">Modo rápido</small>
+          <strong style="font-size:20px;">Agregar producto rápido</strong>
+          <div class="updated-at" style="margin-top:6px;">
+            Crea un producto con lo mínimo: nombre, precio y categoría. Luego lo completas si quieres.
+          </div>
+
+          <div class="quick-add-grid">
+            <div class="field">
+              <label for="quick-product-name">Nombre</label>
+              <input type="text" id="quick-product-name" placeholder="Ej: Lomito completo" />
+            </div>
+
+            <div class="field">
+              <label for="quick-product-price">Precio</label>
+              <input type="number" id="quick-product-price" min="0" placeholder="Ej: 12000" />
+            </div>
+
+            <div class="field">
+              <label for="quick-product-category">Categoría</label>
+              <select id="quick-product-category"></select>
+            </div>
+
+            <button class="btn-accent" id="quick-create-btn" type="button">+ Agregar rápido</button>
+          </div>
+          <div class="new-product-feedback" id="quick-product-feedback" style="margin-top:10px;"></div>
         </div>
       </div>
 
@@ -673,7 +704,7 @@
 
       function markDirty(productId) {
         dirtyProducts.add(productId);
-        bulkSaveFeedback.className = 'save-state pending';
+        bulkSaveFeedback.className = 'bulk-save-feedback pending';
         bulkSaveFeedback.textContent = `⚠️ ${dirtyProducts.size} cambio(s) sin guardar`;
       }
 
@@ -971,38 +1002,35 @@
           });
         });
 
-
         document.querySelectorAll('.duplicate-btn').forEach(btn => {
-          btn.addEventListener('click', async (e) => {
-            const id = Number(e.currentTarget.dataset.duplicateId);
-            const original = productsCache.find(item => item.id === id);
+          btn.addEventListener('click', async (event) => {
+            const productId = Number(event.currentTarget.dataset.duplicateId);
+            const original = productsCache.find(item => item.id === productId);
             if (!original) return;
-
-            const payload = {
-              store_id: original.store_id || 1,
-              category_id: original.category_id,
-              subcategory: original.subcategory || null,
-              name: `${original.name} copia`,
-              description: original.description || null,
-              price: Number(original.price || 0),
-              is_promo: !!original.is_promo,
-              promo_label: original.promo_label || null,
-              is_active: !!original.is_active,
-              sort_order: Number(original.sort_order || 0) + 1
-            };
 
             const { error } = await supabaseClient
               .from('products')
-              .insert([payload]);
+              .insert([{
+                store_id: original.store_id || 1,
+                category_id: original.category_id,
+                subcategory: original.subcategory || null,
+                name: `${original.name} copia`,
+                description: original.description || null,
+                price: Number(original.price || 0),
+                is_promo: !!original.is_promo,
+                promo_label: original.promo_label || null,
+                is_active: !!original.is_active,
+                sort_order: Number(original.sort_order || 0) + 1
+              }]);
 
             if (error) {
               console.error(error);
-              bulkSaveFeedback.className = 'save-state error';
+              bulkSaveFeedback.className = 'bulk-save-feedback error';
               bulkSaveFeedback.textContent = 'No se pudo duplicar el producto.';
               return;
             }
 
-            bulkSaveFeedback.className = 'save-state ok';
+            bulkSaveFeedback.className = 'bulk-save-feedback ok';
             bulkSaveFeedback.textContent = 'Producto duplicado correctamente.';
             await loadProductsAdmin();
           });
@@ -1019,12 +1047,12 @@
 
       async function saveAllProductChanges() {
         if (!dirtyProducts.size) {
-          bulkSaveFeedback.className = 'save-state';
+          bulkSaveFeedback.className = 'bulk-save-feedback';
           bulkSaveFeedback.textContent = 'No hay cambios pendientes.';
           return;
         }
 
-        bulkSaveFeedback.className = 'save-state pending';
+        bulkSaveFeedback.className = 'bulk-save-feedback pending';
         bulkSaveFeedback.textContent = 'Guardando cambios...';
 
         for (const productId of dirtyProducts) {
@@ -1044,18 +1072,17 @@
 
           if (error) {
             console.error(error);
-            bulkSaveFeedback.className = 'save-state error';
+            bulkSaveFeedback.className = 'bulk-save-feedback error';
             bulkSaveFeedback.textContent = 'No se pudieron guardar todos los cambios.';
             return;
           }
         }
 
         dirtyProducts = new Set();
-        bulkSaveFeedback.className = 'save-state ok';
+        bulkSaveFeedback.className = 'bulk-save-feedback ok';
         bulkSaveFeedback.textContent = 'Todos los cambios se guardaron correctamente.';
         await loadProductsAdmin();
       }
-
 
       async function createQuickProduct() {
         const name = quickProductName.value.trim();
