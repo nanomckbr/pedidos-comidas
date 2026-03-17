@@ -738,6 +738,29 @@
         margin-top: 14px;
       }
 
+      .promo-subcategories-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .promo-subcategory-btn {
+        border: 1px solid rgba(249, 115, 22, 0.28);
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .promo-subcategory-btn.active {
+        background: var(--accent);
+        color: #000;
+        border-color: transparent;
+      }
+
       .promo-product-card {
         background: rgba(255,255,255,0.03);
         border: 1px solid var(--border);
@@ -1046,6 +1069,7 @@
 
           <div class="promo-step">
             <h3>2. Elegir productos</h3>
+            <div id="promo-subcategories-nav" class="promo-subcategories-nav"></div>
             <div id="promo-products-grid" class="promo-products-grid">
               <div class="empty">Elige una categoría para ver sus productos.</div>
             </div>
@@ -1109,6 +1133,7 @@
       const bulkSaveFeedback = document.getElementById('bulk-save-feedback');
       const promoCategoriesNav = document.getElementById('promo-categories-nav');
       const promoProductsGrid = document.getElementById('promo-products-grid');
+      const promoSubcategoriesNav = document.getElementById('promo-subcategories-nav');
       const promoSelectedList = document.getElementById('promo-selected-list');
       const promoBaseTotalLine = document.getElementById('promo-base-total-line');
       const promoName = document.getElementById('promo-name');
@@ -1144,6 +1169,7 @@
       let selectedSubcategoryByCategory = {};
       let dirtyProducts = new Set();
       let promoSelectedCategoryId = null;
+      let promoSelectedSubcategory = null;
       let promoDraftItems = [];
 
       function formatPrice(value) {
@@ -1175,6 +1201,82 @@
         document.querySelectorAll('.menu-mode-panel').forEach(panel => {
           panel.classList.toggle('active', panel.dataset.menuPanel === mode);
         });
+      }
+
+
+      function normalizePromoSubcategory(value) {
+        return (value || '')
+          .trim()
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '');
+      }
+
+      function getPromoNormalizedSubcategory(categoryName, product) {
+        const category = normalizePromoSubcategory(categoryName);
+        const rawSub = normalizePromoSubcategory(product?.subcategory || '');
+        const name = normalizePromoSubcategory(product?.name || '');
+
+        if (!rawSub || rawSub === '__sin_subcategoria__') return '__sin_subcategoria__';
+
+        if (category === 'pizzas') {
+          if (rawSub.includes('entera')) return 'entera';
+          if (rawSub.includes('mitad')) return 'mitad';
+        }
+
+        if (category === 'empanadas') {
+          const isMedia = rawSub.includes('media');
+          const isDocena = rawSub.includes('docena');
+          const isHorno = rawSub.includes('horno');
+          const isFrita = rawSub.includes('frita');
+          if (isMedia && isHorno) return 'media docena al horno';
+          if (isMedia && isFrita) return 'media docena fritas';
+          if (isDocena && isHorno) return 'docena al horno';
+          if (isDocena && isFrita) return 'docena fritas';
+        }
+
+        if (category === 'sandwiches' || category === 'sandwichs' || category === 'sanguiches') {
+          if (rawSub.includes('lomito') || name.includes('lomito')) return 'lomito';
+          if (rawSub.includes('clasico') || rawSub.includes('clasicos') || name.includes('mila') || name.includes('milanesa')) return 'clasicos';
+        }
+
+        return rawSub;
+      }
+
+      function getPromoDisplaySubcategory(categoryName, normalizedSubcategory) {
+        const category = normalizePromoSubcategory(categoryName);
+
+        if (category === 'pizzas') {
+          if (normalizedSubcategory === 'entera') return 'Entera';
+          if (normalizedSubcategory === 'mitad') return 'Mitad';
+        }
+
+        if (category === 'empanadas') {
+          if (normalizedSubcategory === 'media docena al horno') return 'Media docena al horno';
+          if (normalizedSubcategory === 'media docena fritas') return 'Media docena fritas';
+          if (normalizedSubcategory === 'docena al horno') return 'Docena al horno';
+          if (normalizedSubcategory === 'docena fritas') return 'Docena fritas';
+        }
+
+        if (category === 'sandwiches' || category === 'sandwichs' || category === 'sanguiches') {
+          if (normalizedSubcategory === 'clasicos') return 'Clásico';
+          if (normalizedSubcategory === 'lomito') return 'Lomito';
+        }
+
+        return normalizedSubcategory === '__sin_subcategoria__' ? 'General' : normalizedSubcategory;
+      }
+
+      function promoCategoryUsesSubtabs(categoryName, entries) {
+        const normalizedCategory = normalizePromoSubcategory(categoryName);
+        const allowed = {
+          'pizzas': ['entera', 'mitad'],
+          'empanadas': ['media docena al horno', 'media docena fritas', 'docena al horno', 'docena fritas'],
+          'sandwiches': ['clasicos', 'lomito'],
+          'sandwichs': ['clasicos', 'lomito'],
+          'sanguiches': ['clasicos', 'lomito']
+        };
+        if (!allowed[normalizedCategory]) return false;
+        return entries.some(([key]) => allowed[normalizedCategory].includes(key));
       }
 
       function getPromoSelectedProducts() {
@@ -1263,24 +1365,69 @@
         if (!promoProductsGrid) return;
 
         if (!promoSelectedCategoryId) {
+          if (promoSubcategoriesNav) promoSubcategoriesNav.innerHTML = '';
           promoProductsGrid.innerHTML = '<div class="empty">Elige una categoría para ver sus productos.</div>';
           return;
         }
 
-        const categoryProducts = productsCache
-          .filter(product => product.category_id === promoSelectedCategoryId )
+        const currentCategory = categoriesCache.find(category => category.id === promoSelectedCategoryId);
+        const rawCategoryProducts = productsCache
+          .filter(product => product.category_id === promoSelectedCategoryId && !product.is_promo)
           .sort((a, b) => {
+            const subA = getPromoNormalizedSubcategory(currentCategory?.name || '', a);
+            const subB = getPromoNormalizedSubcategory(currentCategory?.name || '', b);
+            const cmpSub = subA.localeCompare(subB);
+            if (cmpSub !== 0) return cmpSub;
             const nameA = (a.name || '').localeCompare(b.name || '');
             if (nameA !== 0) return nameA;
             return Number(a.sort_order || 0) - Number(b.sort_order || 0);
           });
 
-        if (!categoryProducts.length) {
+        if (!rawCategoryProducts.length) {
+          if (promoSubcategoriesNav) promoSubcategoriesNav.innerHTML = '';
           promoProductsGrid.innerHTML = '<div class="empty">No hay productos en esta categoría.</div>';
           return;
         }
 
-        promoProductsGrid.innerHTML = categoryProducts.map(product => {
+        const subgroupMap = new Map();
+        rawCategoryProducts.forEach(product => {
+          const key = getPromoNormalizedSubcategory(currentCategory?.name || '', product);
+          if (!subgroupMap.has(key)) subgroupMap.set(key, []);
+          subgroupMap.get(key).push(product);
+        });
+
+        const subgroupEntries = [...subgroupMap.entries()];
+        const useSubtabs = promoCategoryUsesSubtabs(currentCategory?.name || '', subgroupEntries);
+
+        let visibleProducts = rawCategoryProducts;
+
+        if (useSubtabs) {
+          if (!promoSelectedSubcategory || !subgroupMap.has(promoSelectedSubcategory)) {
+            promoSelectedSubcategory = subgroupEntries[0]?.[0] || null;
+          }
+
+          if (promoSubcategoriesNav) {
+            promoSubcategoriesNav.innerHTML = subgroupEntries.map(([key]) => `
+              <button type="button" class="promo-subcategory-btn ${key === promoSelectedSubcategory ? 'active' : ''}" data-promo-subcategory="${key}">
+                ${getPromoDisplaySubcategory(currentCategory?.name || '', key)}
+              </button>
+            `).join('');
+
+            document.querySelectorAll('[data-promo-subcategory]').forEach(btn => {
+              btn.addEventListener('click', () => {
+                promoSelectedSubcategory = btn.dataset.promoSubcategory;
+                renderPromoProductsGrid();
+              });
+            });
+          }
+
+          visibleProducts = subgroupMap.get(promoSelectedSubcategory) || [];
+        } else {
+          promoSelectedSubcategory = null;
+          if (promoSubcategoriesNav) promoSubcategoriesNav.innerHTML = '';
+        }
+
+        promoProductsGrid.innerHTML = visibleProducts.map(product => {
           const selected = promoDraftItems.find(item => item.id === product.id);
           return `
             <article class="promo-product-card ${selected ? 'selected' : ''}" data-promo-product-id="${product.id}">
@@ -1333,6 +1480,7 @@
         document.querySelectorAll('[data-promo-category-id]').forEach(btn => {
           btn.addEventListener('click', () => {
             promoSelectedCategoryId = Number(btn.dataset.promoCategoryId);
+            promoSelectedSubcategory = null;
             renderPromoBuilderProducts();
           });
         });
