@@ -645,6 +645,52 @@
           grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
         }
       }
+    
+      .menu-modes-header {
+        margin-bottom: 22px;
+        text-align: center;
+      }
+
+      .menu-modes-title {
+        display: block;
+        color: #fff;
+        font-size: 30px;
+        font-weight: 900;
+        line-height: 1.1;
+        margin-bottom: 16px;
+      }
+
+      .menu-mode-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+      }
+
+      .menu-mode-btn {
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        border-radius: 999px;
+        padding: 12px 16px;
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .menu-mode-btn.active {
+        background: var(--accent);
+        color: #000;
+        border-color: transparent;
+      }
+
+      .menu-mode-panel {
+        display: none;
+      }
+
+      .menu-mode-panel.active {
+        display: block;
+      }
+
     </style>
   </head>
   <body>
