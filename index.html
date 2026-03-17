@@ -933,6 +933,7 @@
             <div class="card-top">
               <div>
                 <h3>${item.name}</h3>
+                ${item.name && item.name.toLowerCase().includes('ingrediente') ? `<p class="desc" style="margin: 8px 0 0;">Especificar en observaciones</p>` : ''}
                 ${item.is_promo && item.promo_label ? `<div class="promo-badge">${item.promo_label}</div>` : ''}
               </div>
               <span class="price-tag">${formatPrice(item.price)}</span>
