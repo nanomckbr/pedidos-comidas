@@ -191,15 +191,14 @@
       }
 
       .column-header {
-        position: sticky;
-        top: 120px;
-        z-index: 5;
+        position: static;
+        z-index: 1;
         background: rgba(9, 9, 11, 0.92);
         backdrop-filter: blur(8px);
         border: 1px solid rgba(255,255,255,0.08);
         border-radius: 18px;
-        padding: 14px;
-        margin-bottom: 14px;
+        padding: 12px;
+        margin-bottom: 12px;
       }
 
       .column-top {
@@ -239,25 +238,25 @@
 
       .column-body {
         display: grid;
-        gap: 14px;
+        gap: 10px;
       }
 
       .order-card {
         background: rgba(24,24,27,0.92);
         border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 24px;
-        padding: 14px 16px;
+        border-radius: 20px;
+        padding: 10px 12px;
         box-shadow:
-          0 20px 50px rgba(0,0,0,0.45),
+          0 12px 28px rgba(0,0,0,0.30),
           inset 0 1px 0 rgba(255,255,255,0.05);
         backdrop-filter: blur(6px);
         transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
       }
 
       .order-card:hover{
-        transform: translateY(-2px);
+        transform: translateY(-1px);
         box-shadow:
-          0 25px 60px rgba(0,0,0,0.55),
+          0 16px 34px rgba(0,0,0,0.38),
           inset 0 1px 0 rgba(255,255,255,0.08);
       }
 
@@ -265,7 +264,7 @@
         border-color: rgba(59,130,246,0.55);
         box-shadow:
           0 0 0 1px rgba(59,130,246,0.12),
-          0 20px 50px rgba(0,0,0,0.45),
+          0 12px 28px rgba(0,0,0,0.30),
           inset 0 1px 0 rgba(255,255,255,0.05);
       }
 
@@ -296,11 +295,12 @@
         display: inline-flex;
         align-items: center;
         border-radius: 999px;
-        padding: 8px 12px;
-        font-size: 12px;
+        padding: 6px 10px;
+        font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.03em;
+        line-height: 1;
       }
 
       .status-nuevo {
@@ -325,9 +325,9 @@
       }
 
       .items {
-        margin-top: 18px;
-        padding: 14px;
-        border-radius: 18px;
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 16px;
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid var(--border);
       }
@@ -349,9 +349,9 @@
       .action-box,
       .dispatch-box,
       .summary-box {
-        margin-top: 14px;
-        padding: 14px;
-        border-radius: 18px;
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 16px;
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid var(--border);
       }
@@ -481,21 +481,22 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 12px;
+        gap: 8px;
         cursor: pointer;
       }
 
       .order-summary {
         display: flex;
-        gap: 12px;
+        gap: 8px;
         align-items: center;
         flex-wrap: wrap;
         min-width: 0;
       }
 
       .order-summary-item {
-        font-size: 14px;
+        font-size: 13px;
         color: #f4f4f5;
+        line-height: 1.2;
       }
 
       .order-summary-item.muted {
@@ -505,13 +506,13 @@
       .order-right {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
         flex-shrink: 0;
       }
 
       .order-toggle {
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
         border-radius: 999px;
         display: inline-flex;
         align-items: center;
@@ -519,13 +520,13 @@
         background: rgba(255,255,255,0.06);
         border: 1px solid rgba(255,255,255,0.08);
         color: #fff;
-        font-size: 14px;
+        font-size: 12px;
         transition: transform .18s ease;
       }
 
       .order-body {
         display: none;
-        margin-top: 16px;
+        margin-top: 12px;
       }
 
       .order-card.open .order-body {
@@ -534,6 +535,27 @@
 
       .order-card.open .order-toggle {
         transform: rotate(180deg);
+      }
+
+      @media (max-width: 1200px) {
+        .kanban-grid {
+          grid-template-columns: repeat(5, minmax(260px, 1fr));
+        }
+      }
+
+      @media (max-width: 900px) {
+        .order-summary {
+          gap: 6px;
+        }
+
+        .order-summary-item {
+          font-size: 12px;
+        }
+
+        .status-pill {
+          padding: 5px 8px;
+          font-size: 10px;
+        }
       }
 
       @media (max-width: 1400px) {
