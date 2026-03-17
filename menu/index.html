@@ -971,6 +971,26 @@
         renderCategoryEditor();
       }
 
+
+      function bindProductAccordions() {
+        document.querySelectorAll('.product-card-header').forEach(header => {
+          header.addEventListener('click', (event) => {
+            if (event.target.closest('.delete-btn, input, label, button, select, textarea')) return;
+
+            const card = header.closest('.product-card');
+            const isOpen = card.classList.contains('open');
+
+            document.querySelectorAll('.product-card.open').forEach(openCard => {
+              openCard.classList.remove('open');
+            });
+
+            if (!isOpen) {
+              card.classList.add('open');
+            }
+          });
+        });
+      }
+
       function renderCategoryEditor() {
         categoryNav.innerHTML = '';
         subcategoryNav.innerHTML = '';
@@ -1131,6 +1151,8 @@
             </section>
           `;
         }).join('');
+
+        bindProductAccordions();
 
         document.querySelectorAll('.product-input').forEach(input => {
           input.addEventListener('input', (event) => {
