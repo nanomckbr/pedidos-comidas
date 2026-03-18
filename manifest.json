@@ -1,7 +1,7 @@
 {
   "name": "Pedidos Comidas",
   "short_name": "Pedidos",
-  "start_url": "./index_cliente_pwa.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#000000",
