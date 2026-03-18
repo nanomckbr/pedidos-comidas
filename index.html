@@ -653,6 +653,14 @@
         gap: 8px;
       }
 
+
+      @media (min-width: 921px) {
+        .install-app-btn,
+        .install-app-btn.show {
+          display: none !important;
+        }
+      }
+
 </style>
   </head>
   <body>
@@ -1478,17 +1486,21 @@
       let deferredInstallPrompt = null;
       const installAppBtn = document.getElementById('install-app-btn');
 
+      function isMobileDevice() {
+        return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+      }
+
       window.addEventListener('beforeinstallprompt', (event) => {
         event.preventDefault();
         deferredInstallPrompt = event;
-        if (installAppBtn) {
+        if (installAppBtn && isMobileDevice()) {
           installAppBtn.classList.add('show');
         }
       });
 
       if (installAppBtn) {
         installAppBtn.addEventListener('click', async () => {
-          if (!deferredInstallPrompt) return;
+          if (!deferredInstallPrompt || !isMobileDevice()) return;
           deferredInstallPrompt.prompt();
           await deferredInstallPrompt.userChoice;
           deferredInstallPrompt = null;
