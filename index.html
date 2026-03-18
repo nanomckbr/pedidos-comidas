@@ -795,6 +795,41 @@
         }
       }
 
+      async function getVisibleDailyOrderNumber(orderData) {
+        const { data: storeSettings, error: settingsError } = await supabaseClient
+          .from('store_settings')
+          .select('day_reset_at')
+          .eq('store_id', 1)
+          .maybeSingle();
+
+        if (settingsError) {
+          console.error('No se pudo leer day_reset_at:', settingsError);
+        }
+
+        const resetAt = storeSettings?.day_reset_at || null;
+        let query = supabaseClient
+          .from('orders')
+          .select('id, created_at')
+          .eq('store_id', 1)
+          .lte('created_at', orderData.created_at)
+          .order('created_at', { ascending: true })
+          .order('id', { ascending: true });
+
+        if (resetAt) {
+          query = query.gte('created_at', resetAt);
+        }
+
+        const { data: visibleOrders, error: visibleOrdersError } = await query;
+
+        if (visibleOrdersError) {
+          console.error('No se pudo calcular el número visible del pedido:', visibleOrdersError);
+          return orderData.id;
+        }
+
+        const index = (visibleOrders || []).findIndex(order => order.id === orderData.id);
+        return index >= 0 ? index + 1 : orderData.id;
+      }
+
       function resetOrderForm() {
         cart.length = 0;
         document.getElementById('name').value = '';
@@ -1327,8 +1362,10 @@
           .map(item => `- ${item.quantity} x ${item.name} = ${formatPrice(item.price * item.quantity)}`)
           .join('\n');
 
+        const visibleDailyOrderNumber = await getVisibleDailyOrderNumber(orderData);
+
         let message = `🍔 Nuevo pedido desde el menú web\n\n`;
-        message += `Pedido N°: ${orderData.id}\n`;
+        message += `Pedido N°: ${visibleDailyOrderNumber}\n`;
         message += `Nombre: ${name}\n`;
         message += `Tipo: ${type}\n`;
 
