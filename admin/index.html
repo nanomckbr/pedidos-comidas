@@ -788,43 +788,7 @@
       </div>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-// --- DAY RESET GLOBAL (SUPABASE) ---
-async function fetchDayReset() {
-  const { data, error } = await supabase
-    .from('store_settings')
-    .select('day_reset_at')
-    .limit(1)
-    .single();
-
-  if (!error && data) {
-    window.__dayResetAt = data.day_reset_at;
-  }
-}
-
-async function setDayReset() {
-  const now = new Date().toISOString();
-  const { error } = await supabase
-    .from('store_settings')
-    .update({ day_reset_at: now })
-    .neq('id', 0);
-
-  if (!error) {
-    window.__dayResetAt = now;
-    await loadOrders(); // refresh UI
-  }
-}
-
-// override reset button
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.querySelector('[data-reset-day]');
-  if (btn) {
-    btn.onclick = setDayReset;
-  }
-  fetchDayReset();
-});
-
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
       const supabaseUrl = 'https://ylvmzavgebttklblidcd.supabase.co';
       const supabaseKey = 'sb_publishable_rFS54R3Uw06tOJ0qxoFhBA_uoEHW457';
@@ -1674,7 +1638,8 @@ document.addEventListener('DOMContentLoaded', () => {
       resetDayBtn.addEventListener('click', async () => {
         const ok = confirm('¿Seguro que quieres reiniciar el día? Se ocultarán de la vista todos los pedidos recibidos hasta este momento.');
         if (!ok) return;
-        setDayCutNow();
+        const success = await setDayCutNow();
+        if (!success) return;
         await loadOrders();
       });
 
@@ -1682,6 +1647,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const allowed = await requireAuth();
         if (!allowed) return;
         await loadBrandingSettings();
+        await fetchDayReset();
         await loadOrders();
         startAutoRefresh();
       })();
