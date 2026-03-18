@@ -828,14 +828,14 @@
 
       function loadWorkflowMeta() {
         try {
-          return JSON.parse(window.__dayResetAt || '{}');
+          return JSON.parse(localStorage.getItem(WORKFLOW_STORAGE_KEY) || '{}');
         } catch {
           return {};
         }
       }
 
       function saveWorkflowMeta() {
-        // replaced by supabase);
+        localStorage.setItem(WORKFLOW_STORAGE_KEY, JSON.stringify(workflowMeta));
       }
 
       function getOrderMeta(orderId) {
@@ -1014,25 +1014,46 @@
 
         const now = new Date();
         now.setHours(0, 0, 0, 0);
-        // replaced by supabase);
         return now;
       }
 
       function getDayReset() {
-        const saved = window.__dayResetAt;
-        if (saved) return new Date(saved);
-
-        const now = new Date();
-        now.setHours(0, 0, 0, 0);
-        // replaced by supabase);
-        return now;
+        return getDayCut();
       }
 
-      function setDayCutNow() {
-        const now = new Date();
-        // replaced by supabase);
-        // replaced by supabase);
+      async function fetchDayReset() {
+        const { data, error } = await supabaseClient
+          .from('store_settings')
+          .select('day_reset_at')
+          .eq('store_id', 1)
+          .maybeSingle();
+
+        if (error) {
+          console.error('No se pudo leer day_reset_at:', error);
+          window.__dayResetAt = null;
+          return;
+        }
+
+        window.__dayResetAt = data?.day_reset_at || null;
+      }
+
+      async function setDayCutNow() {
+        const now = new Date().toISOString();
+
+        const { error } = await supabaseClient
+          .from('store_settings')
+          .update({ day_reset_at: now })
+          .eq('store_id', 1);
+
+        if (error) {
+          console.error('No se pudo guardar day_reset_at:', error);
+          alert('No se pudo resetear el día.');
+          return false;
+        }
+
+        window.__dayResetAt = now;
         updateDayCutInfo();
+        return true;
       }
 
       function updateDayCutInfo() {
@@ -1638,8 +1659,10 @@
       resetDayBtn.addEventListener('click', async () => {
         const ok = confirm('¿Seguro que quieres reiniciar el día? Se ocultarán de la vista todos los pedidos recibidos hasta este momento.');
         if (!ok) return;
+
         const success = await setDayCutNow();
         if (!success) return;
+
         await loadOrders();
       });
 
@@ -1652,41 +1675,6 @@
         startAutoRefresh();
       })();
     
-// --- DAY RESET GLOBAL (SUPABASE) ---
-async function fetchDayReset() {
-  const { data, error } = await supabase
-    .from('store_settings')
-    .select('day_reset_at')
-    .limit(1)
-    .single();
-
-  if (!error && data) {
-    window.__dayResetAt = data.day_reset_at;
-  }
-}
-
-async function setDayReset() {
-  const now = new Date().toISOString();
-  const { error } = await supabase
-    .from('store_settings')
-    .update({ day_reset_at: now })
-    .neq('id', 0);
-
-  if (!error) {
-    window.__dayResetAt = now;
-    await loadOrders(); // refresh UI
-  }
-}
-
-// override reset button
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.querySelector('[data-reset-day]');
-  if (btn) {
-    btn.onclick = setDayReset;
-  }
-  fetchDayReset();
-});
-
 </script>
   
 
@@ -1728,41 +1716,6 @@ document.addEventListener('DOMContentLoaded', () => {
       setActiveMobileTab('');
     }
   });
-
-// --- DAY RESET GLOBAL (SUPABASE) ---
-async function fetchDayReset() {
-  const { data, error } = await supabase
-    .from('store_settings')
-    .select('day_reset_at')
-    .limit(1)
-    .single();
-
-  if (!error && data) {
-    window.__dayResetAt = data.day_reset_at;
-  }
-}
-
-async function setDayReset() {
-  const now = new Date().toISOString();
-  const { error } = await supabase
-    .from('store_settings')
-    .update({ day_reset_at: now })
-    .neq('id', 0);
-
-  if (!error) {
-    window.__dayResetAt = now;
-    await loadOrders(); // refresh UI
-  }
-}
-
-// override reset button
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.querySelector('[data-reset-day]');
-  if (btn) {
-    btn.onclick = setDayReset;
-  }
-  fetchDayReset();
-});
 
 </script>
 
