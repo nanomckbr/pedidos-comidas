@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pedidos Comidas</title>
+
+    <meta name="theme-color" content="#f97316" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="apple-touch-icon" href="./icon-192.png" />
+
     <style>
       :root {
         --bg: #000000;
@@ -626,6 +631,28 @@
   margin-bottom: 6px !important;
 }
 
+
+      .install-app-wrap {
+        margin-top: 18px;
+      }
+
+      .install-app-btn {
+        display: none;
+        border: 1px solid rgba(249, 115, 22, 0.28);
+        background: rgba(255, 255, 255, 0.04);
+        color: #fff;
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .install-app-btn.show {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
 </style>
   </head>
   <body>
@@ -657,6 +684,9 @@
         <div class="categories-header">
           <h2>Categorías</h2>
           <p>Elige una categoría para ver su menú. Puedes cambiar entre categorías sin perder lo agregado al carrito.</p>
+          <div class="install-app-wrap">
+            <button id="install-app-btn" class="install-app-btn" type="button">📲 Instalar app</button>
+          </div>
           <div id="category-nav" class="category-nav"></div>
         </div>
 
@@ -1442,6 +1472,42 @@
 
       if (drawerCloseBtn) {
         drawerCloseBtn.addEventListener('click', closeCartDrawer);
+      }
+
+
+      let deferredInstallPrompt = null;
+      const installAppBtn = document.getElementById('install-app-btn');
+
+      window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+        if (installAppBtn) {
+          installAppBtn.classList.add('show');
+        }
+      });
+
+      if (installAppBtn) {
+        installAppBtn.addEventListener('click', async () => {
+          if (!deferredInstallPrompt) return;
+          deferredInstallPrompt.prompt();
+          await deferredInstallPrompt.userChoice;
+          deferredInstallPrompt = null;
+          installAppBtn.classList.remove('show');
+        });
+      }
+
+      window.addEventListener('appinstalled', () => {
+        if (installAppBtn) {
+          installAppBtn.classList.remove('show');
+        }
+      });
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch((error) => {
+            console.error('No se pudo registrar el service worker:', error);
+          });
+        });
       }
 
       loadBranding();
